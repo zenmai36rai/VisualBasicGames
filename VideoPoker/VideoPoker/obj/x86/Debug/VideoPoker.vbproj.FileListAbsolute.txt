@@ -1,0 +1,11 @@
+C:\Users\USER\documents\visual studio 2010\Projects\VideoPoker\VideoPoker\bin\Debug\VideoPoker.exe
+C:\Users\USER\documents\visual studio 2010\Projects\VideoPoker\VideoPoker\bin\Debug\VideoPoker.pdb
+C:\Users\USER\documents\visual studio 2010\Projects\VideoPoker\VideoPoker\bin\Debug\VideoPoker.xml
+C:\Users\USER\documents\visual studio 2010\Projects\VideoPoker\VideoPoker\obj\x86\Debug\ResolveAssemblyReference.cache
+C:\Users\USER\documents\visual studio 2010\Projects\VideoPoker\VideoPoker\obj\x86\Debug\WindowsApplication1.Form1.resources
+C:\Users\USER\documents\visual studio 2010\Projects\VideoPoker\VideoPoker\obj\x86\Debug\WindowsApplication1.Resources.resources
+C:\Users\USER\documents\visual studio 2010\Projects\VideoPoker\VideoPoker\obj\x86\Debug\GenerateResource.read.1.tlog
+C:\Users\USER\documents\visual studio 2010\Projects\VideoPoker\VideoPoker\obj\x86\Debug\GenerateResource.write.1.tlog
+C:\Users\USER\documents\visual studio 2010\Projects\VideoPoker\VideoPoker\obj\x86\Debug\VideoPoker.exe
+C:\Users\USER\documents\visual studio 2010\Projects\VideoPoker\VideoPoker\obj\x86\Debug\VideoPoker.xml
+C:\Users\USER\documents\visual studio 2010\Projects\VideoPoker\VideoPoker\obj\x86\Debug\VideoPoker.pdb

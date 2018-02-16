@@ -1,0 +1,12 @@
+C:\Users\USER\documents\visual studio 2010\Projects\MahJong\MahJong\bin\Debug\MahJong.exe
+C:\Users\USER\documents\visual studio 2010\Projects\MahJong\MahJong\bin\Debug\MahJong.pdb
+C:\Users\USER\documents\visual studio 2010\Projects\MahJong\MahJong\bin\Debug\MahJong.xml
+C:\Users\USER\documents\visual studio 2010\Projects\MahJong\MahJong\obj\x86\Debug\ResolveAssemblyReference.cache
+C:\Users\USER\documents\visual studio 2010\Projects\MahJong\MahJong\obj\x86\Debug\WindowsApplication1.Resources.resources
+C:\Users\USER\documents\visual studio 2010\Projects\MahJong\MahJong\obj\x86\Debug\GenerateResource.read.1.tlog
+C:\Users\USER\documents\visual studio 2010\Projects\MahJong\MahJong\obj\x86\Debug\GenerateResource.write.1.tlog
+C:\Users\USER\documents\visual studio 2010\Projects\MahJong\MahJong\obj\x86\Debug\MahJong.exe
+C:\Users\USER\documents\visual studio 2010\Projects\MahJong\MahJong\obj\x86\Debug\MahJong.xml
+C:\Users\USER\documents\visual studio 2010\Projects\MahJong\MahJong\obj\x86\Debug\MahJong.pdb
+C:\Users\USER\Documents\Visual Studio 2010\Projects\MahJong\MahJong\obj\x86\Debug\WindowsApplication1.Form2.resources
+C:\Users\USER\Documents\Visual Studio 2010\Projects\MahJong\MahJong\obj\x86\Debug\WindowsApplication1.Mahjong.resources
