@@ -8,16 +8,18 @@
     Const RETURN_LOG As Boolean = False
     Const DEBUG_TIME As Boolean = False
     Const ROBO_TEBAN As Integer = BLACK
+    Const BLANK As Integer = 255
+    Const BRANCH_WIDTH As Integer = 800
     Class MoveData
         Public r As Byte
         Public r2 As Byte
         Public src As Byte
         Public dst As Byte
-        Public hand As Byte = 255
+        Public hand As Byte = BLANK
     End Class
     Dim best As MoveData = New MoveData
     Dim modosi As MoveData = New MoveData
-    Dim Node(800 * (YOMI_DEPTH + 1)) As MoveData
+    Dim Node(BRANCH_WIDTH * (YOMI_DEPTH + 1)) As MoveData
     Dim NodeCount As Integer
     Dim ArrayCount As Integer
     Dim komaname As Array
@@ -50,10 +52,10 @@
         tegomaw = {0, 0, 0, 0, 0, 0, 0, 0}
         tegomab = {0, 0, 0, 0, 0, 0, 0, 0}
         state = 0
-        undo = 255
-        komaundo = 255
+        undo = BLANK
+        komaundo = BLANK
         kihumem = 0
-        narimem = 255
+        narimem = BLANK
         robomode = False
         BoardSet()
         Randomize()
@@ -183,7 +185,7 @@
         Dim y As Integer
         Dim dx As Integer
         Dim dy As Integer
-        HuRange = {255}
+        HuRange = {BLANK}
         x = locate - Int(locate / 9) * 9
         y = Int(locate / 9)
         dx = x
@@ -198,7 +200,7 @@
         Dim i As Integer
         Dim dist As Integer
         Dim a As Array
-        a = {255, 255, 255, 255, 255, 255, 255, 255, 255}
+        a = {BLANK, BLANK, BLANK, BLANK, BLANK, BLANK, BLANK, BLANK, BLANK}
         x = locate - Int(locate / 9) * 9
         y = Int(locate / 9)
         For i = 1 To 8 Step 1
@@ -228,11 +230,11 @@
         Dim i As Integer
         Dim dist As Integer
         Dim a As Array
-        a = {255, 255, 255, 255, 255, 255, 255, 255,
-                255, 255, 255, 255, 255, 255, 255, 255,
-                255, 255, 255, 255, 255, 255, 255, 255,
-                255, 255, 255, 255, 255, 255, 255, 255,
-                255, 255, 255, 255}
+        a = {BLANK, BLANK, BLANK, BLANK, BLANK, BLANK, BLANK, BLANK,
+                BLANK, BLANK, BLANK, BLANK, BLANK, BLANK, BLANK, BLANK,
+                BLANK, BLANK, BLANK, BLANK, BLANK, BLANK, BLANK, BLANK,
+                BLANK, BLANK, BLANK, BLANK, BLANK, BLANK, BLANK, BLANK,
+                BLANK, BLANK, BLANK, BLANK}
         x = locate - Int(locate / 9) * 9
         y = Int(locate / 9)
         For i = 1 To 8 Step 1
@@ -327,11 +329,11 @@
         Dim i As Integer
         Dim dist As Integer
         Dim a As Array
-        a = {255, 255, 255, 255, 255, 255, 255, 255,
-                255, 255, 255, 255, 255, 255, 255, 255,
-                255, 255, 255, 255, 255, 255, 255, 255,
-                255, 255, 255, 255, 255, 255, 255, 255,
-                255, 255, 255, 255}
+        a = {BLANK, BLANK, BLANK, BLANK, BLANK, BLANK, BLANK, BLANK,
+                BLANK, BLANK, BLANK, BLANK, BLANK, BLANK, BLANK, BLANK,
+                BLANK, BLANK, BLANK, BLANK, BLANK, BLANK, BLANK, BLANK,
+                BLANK, BLANK, BLANK, BLANK, BLANK, BLANK, BLANK, BLANK,
+                BLANK, BLANK, BLANK, BLANK}
         x = locate - Int(locate / 9) * 9
         y = Int(locate / 9)
         For i = 1 To 8 Step 1
@@ -430,7 +432,7 @@
         Dim y As Integer
         Dim dx As Integer
         Dim dy As Integer
-        KeimaRange = {255, 255}
+        KeimaRange = {BLANK, BLANK}
         x = locate - Int(locate / 9) * 9
         y = Int(locate / 9)
         dx = x + 1
@@ -445,7 +447,7 @@
         Dim y As Integer
         Dim dx As Integer
         Dim dy As Integer
-        GinRange = {255, 255, 255, 255, 255}
+        GinRange = {BLANK, BLANK, BLANK, BLANK, BLANK}
         x = locate - Int(locate / 9) * 9
         y = Int(locate / 9)
         dx = x
@@ -469,7 +471,7 @@
         Dim y As Integer
         Dim dx As Integer
         Dim dy As Integer
-        KinRange = {255, 255, 255, 255, 255, 255}
+        KinRange = {BLANK, BLANK, BLANK, BLANK, BLANK, BLANK}
         x = locate - Int(locate / 9) * 9
         y = Int(locate / 9)
         dx = x
@@ -496,7 +498,7 @@
         Dim y As Integer
         Dim dx As Integer
         Dim dy As Integer
-        OuRange = {255, 255, 255, 255, 255, 255, 255, 255}
+        OuRange = {BLANK, BLANK, BLANK, BLANK, BLANK, BLANK, BLANK, BLANK}
         x = locate - Int(locate / 9) * 9
         y = Int(locate / 9)
         dx = x
@@ -637,7 +639,7 @@
                     If tegomaw(i) > 0 Then
                         range = HandRange(wb, i)
                         For j = 0 To range.Length - 1 Step 1
-                            If range(j) <> 255 Then
+                            If range(j) <> BLANK Then
                                 Node(idx) = New MoveData
                                 Node(idx).hand = i
                                 Node(idx).r2 = range(j)
@@ -650,7 +652,7 @@
                     If tegomab(i) > 0 Then
                         range = HandRange(wb, i)
                         For j = 0 To range.Length - 1 Step 1
-                            If range(j) <> 255 Then
+                            If range(j) <> BLANK Then
                                 Node(idx) = New MoveData
                                 Node(idx).hand = i + 15
                                 Node(idx).r2 = range(j)
@@ -668,13 +670,13 @@
                 range = UnitRange(i)
                 ArrayCount += range.Length
                 For j = 0 To range.Length - 1 Step 1
-                    If range(j) <> 255 Then
+                    If range(j) <> BLANK Then
                         Node(idx) = New MoveData
                         Node(idx).r = i
                         Node(idx).r2 = range(j)
                         Node(idx).src = board(i - 1)
                         Node(idx).dst = board(range(j) - 1)
-                        Node(idx).hand = 255
+                        Node(idx).hand = BLANK
                         NodeCount += 1
                         idx += 1
                     End If
@@ -701,17 +703,17 @@
         Dim MakeBuff As MoveData = New MoveData
         Dim FindFlag As Boolean = False
         SuspendLayout()
-        best.r = 255
+        best.r = BLANK
         Dim ret As Integer = alphabeta(0, wb, YOMI_DEPTH, nodemin, nodemax)
         If RETURN_LOG Then
             ListBox1.Items.Add(ret)
         End If
         robomode = True
         ResumeLayout()
-        If best.r = 255 Then
+        If best.r = BLANK Then
             ListBox1.Items.Add("▽投了")
             ListBox1.TopIndex = ListBox1.Items.Count - 1
-        ElseIf best.hand = 255 Then
+        ElseIf best.hand = BLANK Then
             r = best.r
             r2 = best.r2
             GetButton(r).PerformClick()
@@ -734,7 +736,7 @@
             undo = locate
             range = UnitRange(locate)
             For i = 0 To range.Length - 1 Step 1
-                If range(i) <> 255 Then
+                If range(i) <> BLANK Then
                     r = True
                 End If
             Next
@@ -759,7 +761,7 @@
         ElseIf state = 1 And RangeCheck(locate) Then
             'MoveChara(locate)
             Dim d As MoveData = New MoveData
-            d.hand = 255
+            d.hand = BLANK
             d.r = undo
             d.r2 = locate
             d.src = board(undo - 1)
@@ -778,7 +780,7 @@
         ElseIf state = 2 And RangeCheck(locate) Then
             'MoveChara(locate)
             Dim d As MoveData = New MoveData
-            d.hand = 255
+            d.hand = BLANK
             d.r = undo
             d.r2 = locate
             d.src = board(undo - 1)
@@ -799,8 +801,8 @@
             MakeMove(d, True)
             DispAll()
             AddKihu(locate)
-            undo = 255
-            komaundo = 255
+            undo = BLANK
+            komaundo = BLANK
             state = 0
             Me.Refresh()
             Me.Cursor = Cursors.WaitCursor
@@ -818,8 +820,8 @@
             MakeMove(d, True)
             DispAll()
             AddKihu(locate)
-            undo = 255
-            komaundo = 255
+            undo = BLANK
+            komaundo = BLANK
             state = 0
         End If
     End Sub
@@ -841,18 +843,18 @@
         range = all.Clone()
         For i = 0 To 80 Step 1
             If board(i) <> 0 Then
-                range(i) = 255
+                range(i) = BLANK
             End If
         Next
         If koma = 1 Then
             For i = 0 To 8 Step 1
-                range(i) = 255
+                range(i) = BLANK
             Next
             For i = 0 To 8 Step 1
                 For j = 0 To 8
                     If board(i + j * 9) = 1 Then
                         For k = 0 To 8
-                            range(i + k * 9) = 255
+                            range(i + k * 9) = BLANK
                         Next
                     End If
                 Next
@@ -860,23 +862,23 @@
         End If
         If koma = 2 Then
             For i = 0 To 8 Step 1
-                range(i) = 255
+                range(i) = BLANK
             Next
         End If
         If koma = 3 Then
             For i = 0 To 17 Step 1
-                range(i) = 255
+                range(i) = BLANK
             Next
         End If
         If koma = 15 Then
             For i = 72 To 80 Step 1
-                range(i) = 255
+                range(i) = BLANK
             Next
             For i = 0 To 8 Step 1
                 For j = 0 To 8
                     If board(i + j * 9) = 15 Then
                         For k = 0 To 8
-                            range(i + k * 9) = 255
+                            range(i + k * 9) = BLANK
                         Next
                     End If
                 Next
@@ -884,12 +886,12 @@
         End If
         If koma = 16 Then
             For i = 72 To 80 Step 1
-                range(i) = 255
+                range(i) = BLANK
             Next
         End If
         If koma = 17 Then
             For i = 63 To 80 Step 1
-                range(i) = 255
+                range(i) = BLANK
             Next
         End If
         HandRange = range.Clone
@@ -900,18 +902,18 @@
         range = all.Clone()
         For i = 0 To 80 Step 1
             If board(i) <> 0 Then
-                range(i) = 255
+                range(i) = BLANK
             End If
         Next
         If koma = 1 Then
             For i = 0 To 8 Step 1
-                range(i) = 255
+                range(i) = BLANK
             Next
             For i = 0 To 8 Step 1
                 For j = 0 To 8
                     If board(i + j * 9) = 1 Then
                         For k = 0 To 8
-                            range(i + k * 9) = 255
+                            range(i + k * 9) = BLANK
                         Next
                     End If
                 Next
@@ -919,23 +921,23 @@
         End If
         If koma = 2 Then
             For i = 0 To 8 Step 1
-                range(i) = 255
+                range(i) = BLANK
             Next
         End If
         If koma = 3 Then
             For i = 0 To 17 Step 1
-                range(i) = 255
+                range(i) = BLANK
             Next
         End If
         If koma = 15 Then
             For i = 72 To 80 Step 1
-                range(i) = 255
+                range(i) = BLANK
             Next
             For i = 0 To 8 Step 1
                 For j = 0 To 8
                     If board(i + j * 9) = 15 Then
                         For k = 0 To 8
-                            range(i + k * 9) = 255
+                            range(i + k * 9) = BLANK
                         Next
                     End If
                 Next
@@ -943,18 +945,18 @@
         End If
         If koma = 16 Then
             For i = 72 To 80 Step 1
-                range(i) = 255
+                range(i) = BLANK
             Next
         End If
         If koma = 17 Then
             For i = 63 To 80 Step 1
-                range(i) = 255
+                range(i) = BLANK
             Next
         End If
-        If komaundo <> 255 Then
+        If komaundo <> BLANK Then
             range = {}
             DispAll()
-            komaundo = 255
+            komaundo = BLANK
             state = 0
             TakeHand = range.Clone
             Exit Function
@@ -1015,7 +1017,7 @@
         locate = locate - 1
         x = locate - Int(locate / 9) * 9 + 1
         y = Int(locate / 9) + 1
-        If komaundo <> 255 Then
+        If komaundo <> BLANK Then
             uchi = "打"
         Else
             uchi = ""
@@ -1025,7 +1027,7 @@
         Else
             pos = Str(x) + GetKanji(y)
         End If
-        If narimem <> 255 And narimem <> board(locate) Then
+        If narimem <> BLANK And narimem <> board(locate) Then
             koma = GetKomaName(narimem)
             nari = "成"
         Else
@@ -1036,11 +1038,11 @@
         ListBox1.Items.Add(Hyouka() * ROBO_TEBAN * wb)
         ListBox1.TopIndex = ListBox1.Items.Count - 1
         kihumem = locate
-        narimem = 255
+        narimem = BLANK
     End Sub
     Private Sub MakeMove(ByVal d As MoveData, ByVal mov As Boolean)
         modosi = d
-        If d.hand <> 255 Then
+        If d.hand <> BLANK Then
             KomaOki(d.r2, d.hand)
             GoTo LOG_WRITE
         End If
@@ -1058,7 +1060,7 @@ LOG_WRITE:
         End If
     End Sub
     Private Sub UnmakeMove(ByVal d As MoveData)
-        If d.hand <> 255 Then
+        If d.hand <> BLANK Then
             KomaModosi(d.r2)
             board(d.r2 - 1) = 0
             Exit Sub
@@ -1180,7 +1182,7 @@ LOG_WRITE:
         locate = locate - 1
         x = locate - Int(locate / 9) * 9 + 1
         y = Int(locate / 9) + 1
-        If komaundo <> 255 Then
+        If komaundo <> BLANK Then
             uchi = "打"
         Else
             uchi = ""
@@ -1190,7 +1192,7 @@ LOG_WRITE:
         Else
             pos = Str(x) + GetKanji(y)
         End If
-        If narimem <> 255 And narimem <> board(locate) Then
+        If narimem <> BLANK And narimem <> board(locate) Then
             koma = GetKomaName(narimem)
             nari = "成"
         Else
@@ -1200,7 +1202,7 @@ LOG_WRITE:
         ListBox1.Items.Add(triangle + pos + koma + GetSoeji(locate + 1) + uchi + nari)
         ListBox1.TopIndex = ListBox1.Items.Count - 1
         kihumem = locate
-        narimem = 255
+        narimem = BLANK
     End Sub
     Private Function GetKomaName(ByVal index As Integer) As String
         If 15 <= index Then
@@ -1231,12 +1233,12 @@ LOG_WRITE:
         Dim dl As Integer
         Dim lr As String
         Dim ud As String
-        Kouho = {255, 255, 255, 255, 255, 255}
+        Kouho = {BLANK, BLANK, BLANK, BLANK, BLANK, BLANK}
         ki = 0
         lr = ""
         ud = ""
         prev = board.Clone
-        If undo = 255 Then
+        If undo = BLANK Then
             GetSoeji = ""
             Exit Function
         End If
@@ -1262,7 +1264,7 @@ LOG_WRITE:
         xc = 0
         yc = 0
         For i = 0 To Kouho.Length - 1 Step 1
-            If Kouho(i) <> 255 Then
+            If Kouho(i) <> BLANK Then
                 dl = Kouho(i)
                 dl = dl - 1
                 dx = dl - Int(dl / 9) * 9 + 1
@@ -1277,7 +1279,7 @@ LOG_WRITE:
         Next
 
         For i = 0 To Kouho.Length - 1 Step 1
-            If Kouho(i) <> 255 Then
+            If Kouho(i) <> BLANK Then
                 dl = Kouho(i)
                 dl = dl - 1
                 dx = dl - Int(dl / 9) * 9 + 1
