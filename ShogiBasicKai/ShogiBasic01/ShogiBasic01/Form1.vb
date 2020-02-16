@@ -2,7 +2,7 @@
     Const WHITE As Integer = 1
     Const BLACK As Integer = -1
     Const USE_AB As Boolean = True
-    Const YOMI_DEPTH As Integer = 3
+    Const YOMI_DEPTH As Integer = 1
     Const HAND_READ As Boolean = True
     Const DEBUG_LOG As Boolean = False
     Const RETURN_LOG As Boolean = False
@@ -17,11 +17,13 @@
         Public dst As Byte
         Public hand As Byte = BLANK
     End Class
+    Dim GenerationFlag As Boolean = False
     Dim best As MoveData = New MoveData
     Dim modosi As MoveData = New MoveData
     Dim Node(BRANCH_WIDTH * (YOMI_DEPTH + 1)) As MoveData
     Dim NodeCount As Integer
-    Dim ArrayCount As Integer
+    Dim NodeIdx As Integer
+    ''Dim ArrayCount As Integer
     Dim komaname As Array
     Dim board As Array
     Dim state As Integer
@@ -35,6 +37,7 @@
     Dim kihumem As Integer
     Dim narimem As Integer
     Dim robomode As Boolean
+    Dim komakiki As Array
     Dim table As Array = {0, 1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 6, 7, 1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 6, 7}
     Dim score As Array = {0, 100, 300, 400, 600, 800, 1000, 1100, 65535, 900, 800, 800, 1000, 1200, 1300, 100, 300, 400, 600, 800, 1000, 1100, 65535, 900, 800, 800, 1000, 1200, 1300}
     Private Sub Init() Handles Me.HandleCreated
@@ -57,11 +60,15 @@
         kihumem = 0
         narimem = BLANK
         robomode = False
+        KomaKikiInit()
         BoardSet()
         Randomize()
         '        For i = 0 To score.Length - 1 Step 1
         '       score(i) = score(i) + Rnd() * score(i) * 0.1
         '      Next
+    End Sub
+    Private Sub KomaKikiInit()
+       komakiki = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
     End Sub
     Private Sub BoardSet()
         Dim p As Integer
@@ -167,19 +174,39 @@
             RangeCheck = False
         End If
     End Function
-    Private Sub AddRange(ByVal dx As Integer, ByVal dy As Integer, ByVal array As Array, ByVal pos As Integer)
+    Private Sub AddRange(ByVal dx As Integer, ByVal dy As Integer, ByRef array As Array, ByVal pos As Integer)
         Dim dist As Integer
         If CheckBoardRange(dx, dy) = True Then
             dist = dx + dy * 9 + 1
+            ''if kikiread = True Then
+            ''   komakiki(dist - 1) += 1
+            ''End If
             If IsWhite(undo) And IsWhite(dist) Then
                 Exit Sub
             End If
             If IsBlack(undo) And IsBlack(dist) Then
                 Exit Sub
             End If
-            array.SetValue(dist, pos)
+            AddValue(array, dist, pos)
         End If
     End Sub
+    Private Sub AddValue(ByRef a As Array, ByVal dist As Integer, ByVal pos As integer)
+        a.SetValue(dist, pos)
+        If GenerationFlag = True Then
+            Dim i As Integer = undo
+            Dim idx As Integer = NodeIdx
+            Node(idx) = New MoveData
+            Node(idx).r = i
+            Node(idx).r2 = dist
+            Node(idx).src = board(i - 1)
+            Node(idx).dst = board(dist - 1)
+            Node(idx).hand = BLANK
+            NodeCount += 1
+            NodeIdx += 1
+            ''idx += 1
+        End If
+    End Sub
+
     Private Function HuRange(ByVal locate As Integer, ByVal wb As Integer) As Array
         Dim x As Integer
         Dim y As Integer
@@ -211,9 +238,8 @@
                 If IsWB(wb, undo) = IsWB(wb, dist) Then
                     Exit For
                 End If
-                a.SetValue(dist, i)
+                AddValue(a, dist, i)
                 If IsWB(wb, undo) = IsWB(-wb, dist) Then
-                    a.SetValue(dist, i)
                     Exit For
                 End If
             Else
@@ -245,9 +271,8 @@
                 If IsWB(wb, undo) = IsWB(wb, dist) Then
                     Exit For
                 End If
-                a.SetValue(dist, i)
+                AddValue(a, dist, i)
                 If IsWB(wb, undo) = IsWB(-wb, dist) Then
-                    a.SetValue(dist, i)
                     Exit For
                 End If
             Else
@@ -262,9 +287,8 @@
                 If IsWB(wb, undo) = IsWB(wb, dist) Then
                     Exit For
                 End If
-                a.SetValue(dist, i + 7)
+                AddValue(a, dist, i + 7)
                 If IsWB(wb, undo) = IsWB(-wb, dist) Then
-                    a.SetValue(dist, i + 7)
                     Exit For
                 End If
             Else
@@ -279,9 +303,8 @@
                 If IsWB(wb, undo) = IsWB(wb, dist) Then
                     Exit For
                 End If
-                a.SetValue(dist, i + 15)
+                AddValue(a, dist, i + 15)
                 If IsWB(wb, undo) = IsWB(-wb, dist) Then
-                    a.SetValue(dist, i + 15)
                     Exit For
                 End If
             Else
@@ -296,9 +319,8 @@
                 If IsWB(wb, undo) = IsWB(wb, dist) Then
                     Exit For
                 End If
-                a.SetValue(dist, i + 23)
+                AddValue(a, dist, i + 23)
                 If IsWB(wb, undo) = IsWB(-wb, dist) Then
-                    a.SetValue(dist, i + 23)
                     Exit For
                 End If
             Else
@@ -345,13 +367,13 @@
                     Exit For
                 End If
                 If IsWB(wb, undo) = IsWB(-wb, dist) Then
-                    a.SetValue(dist, i)
+                    AddValue(a, dist, i)
                     Exit For
                 ElseIf wb = -1 And IsBlack(undo) = IsWhite(dist) Then
-                    a.SetValue(dist, i)
+                    AddValue(a, dist, i)
                     Exit For
                 Else
-                    a.SetValue(dist, i)
+                    AddValue(a, dist, i)
                 End If
             Else
                 Exit For
@@ -366,10 +388,10 @@
                     Exit For
                 End If
                 If IsWB(wb, undo) = IsWB(-wb, dist) Then
-                    a.SetValue(dist, i + 7)
+                    AddValue(a, dist, i + 7)
                     Exit For
                 Else
-                    a.SetValue(dist, i + 7)
+                    AddValue(a, dist, i + 7)
                 End If
             Else
                 Exit For
@@ -384,10 +406,10 @@
                     Exit For
                 End If
                 If IsWB(wb, undo) = IsWB(-wb, dist) Then
-                    a.SetValue(dist, i + 15)
+                    AddValue(a, dist, i + 15)
                     Exit For
                 Else
-                    a.SetValue(dist, i + 15)
+                    AddValue(a, dist, i + 15)
                 End If
             Else
                 Exit For
@@ -402,10 +424,10 @@
                     Exit For
                 End If
                 If IsWB(wb, undo) = IsWB(wb, dist) Then
-                    a.SetValue(dist, i + 23)
+                    AddValue(a, dist, i + 23)
                     Exit For
                 Else
-                    a.SetValue(dist, i + 23)
+                    AddValue(a, dist, i + 23)
                 End If
             Else
                 Exit For
@@ -590,10 +612,33 @@
     Private Function KomaScore(ByVal koma) As Integer
         KomaScore = score(koma)
     End Function
+    Private Function GetKomaKikiBoard() As Array
+            KomaKikiInit()
+            For i = 1 To 81 Step 1
+            If True = IsWhite(i) Then
+                range = UnitRange(i)
+                For j = 0 To range.Length - 1 Step 1
+                    If range(j) <> BLANK Then
+                        komakiki(range(j) - 1) += 1
+                    End If
+                Next
+            End if
+            If True = IsBlack(i) Then
+                range = UnitRange(i)
+                For j = 0 To range.Length - 1 Step 1
+                    If range(j) <> BLANK Then
+                        komakiki(range(j) - 1) -= 1
+                    End If
+                Next
+            End if
+        Next
+        return komakiki
+    End Function
     Private Function Hyouka() As Integer
         Dim arw As Array = {1, 2, 3, 4, 5, 6, 7, 8}
         Dim arb As Array = {15, 16, 17, 18, 19, 20, 21, 22}
         Hyouka = 0
+        ''GetKomaKikiBoard()
         For i = 0 To 80 Step 1
             If IsWB(WHITE, i + 1) Then
                 Hyouka += KomaScore(board(i))
@@ -601,11 +646,13 @@
             If IsWB(BLACK, i + 1) Then
                 Hyouka -= KomaScore(board(i))
             End If
+            ''Hyouka += komakiki(i) * 10
         Next
         For i = 0 To 7 Step 1
             Hyouka += tegomaw(i) * KomaScore(arw(i)) * 1.05
             Hyouka -= tegomab(i) * KomaScore(arb(i)) * 1.05
         Next
+        
         Hyouka = Hyouka / 2
         Return Hyouka
     End Function
@@ -664,23 +711,29 @@
                 End If
             Next
         End If
+        
         For i = 1 To 81 Step 1
             If True = IsWB(wb, i) Then
                 undo = i
-                range = UnitRange(i)
-                ArrayCount += range.Length
-                For j = 0 To range.Length - 1 Step 1
-                    If range(j) <> BLANK Then
-                        Node(idx) = New MoveData
-                        Node(idx).r = i
-                        Node(idx).r2 = range(j)
-                        Node(idx).src = board(i - 1)
-                        Node(idx).dst = board(range(j) - 1)
-                        Node(idx).hand = BLANK
-                        NodeCount += 1
-                        idx += 1
-                    End If
-                Next
+                GenerationFlag = True
+                NodeIdx = idx
+                ''range = UnitRange(i)
+                UnitRange(i)
+                GenerationFlag = False
+                ''ArrayCount += range.Length
+                ''For j = 0 To range.Length - 1 Step 1
+                ''    If range(j) <> BLANK Then
+                ''        Node(idx) = New MoveData
+                ''        Node(idx).r = i
+                ''        Node(idx).r2 = range(j)
+                ''        Node(idx).src = board(i - 1)
+                ''        Node(idx).dst = board(range(j) - 1)
+                ''        Node(idx).hand = BLANK
+                ''        NodeCount += 1
+                ''        idx += 1
+                ''    End If
+                ''Next
+                idx += (NodeIdx - idx)
             End If
         Next
         Return idx
@@ -695,7 +748,7 @@
         Dim nodemin As Integer
         c = 0
         NodeCount = 0
-        ArrayCount = 0
+        ''ArrayCount = 0
         Dim starttime As Long = Now.Hour * 3600 + Now.Minute * 60 + Now.Second
         undobuf = undo
         nodemax = 214748364
