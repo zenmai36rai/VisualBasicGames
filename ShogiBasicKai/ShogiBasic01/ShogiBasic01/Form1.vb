@@ -4,6 +4,8 @@
     Const USE_AB As Boolean = True
     Const YOMI_DEPTH As Integer = 1
     Const HAND_READ As Boolean = True
+    Const KOMAKIKI_READ As Boolean = True
+    Const NIRAMI_READ As Boolean = True
     Const DEBUG_LOG As Boolean = False
     Const RETURN_LOG As Boolean = False
     Const DEBUG_TIME As Boolean = False
@@ -37,7 +39,10 @@
     Dim kihumem As Integer
     Dim narimem As Integer
     Dim robomode As Boolean
-    Dim komakiki As Array
+    Dim komakiki_w As Array
+    Dim komakiki_b As Array
+    Dim nirami_w As Integer
+    Dim nirami_b As Integer
     Dim table As Array = {0, 1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 6, 7, 1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 6, 7}
     Dim score As Array = {0, 100, 300, 400, 600, 800, 1000, 1100, 65535, 900, 800, 800, 1000, 1200, 1300, 100, 300, 400, 600, 800, 1000, 1100, 65535, 900, 800, 800, 1000, 1200, 1300}
     Private Sub Init() Handles Me.HandleCreated
@@ -68,7 +73,9 @@
         '      Next
     End Sub
     Private Sub KomaKikiInit()
-       komakiki = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
+       Dim komakiki As Array = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
+       komakiki_w = komakiki
+       komakiki_b = komakiki
     End Sub
     Private Sub BoardSet()
         Dim p As Integer
@@ -178,9 +185,14 @@
         Dim dist As Integer
         If CheckBoardRange(dx, dy) = True Then
             dist = dx + dy * 9 + 1
-            ''if kikiread = True Then
-            ''   komakiki(dist - 1) += 1
-            ''End If
+            if KOMAKIKI_READ = True Then
+               If IsWhite(dist) Then
+                   komakiki_w(dist - 1) += 1
+               End If
+               If IsBlack(dist) Then
+                   komakiki_b(dist - 1) += 1
+               End If               
+            End If
             If IsWhite(undo) And IsWhite(dist) Then
                 Exit Sub
             End If
@@ -191,7 +203,7 @@
         End If
     End Sub
     Private Sub AddValue(ByRef a As Array, ByVal dist As Integer, ByVal pos As integer)
-        a.SetValue(dist, pos)
+         a.SetValue(dist, pos)
         If GenerationFlag = True Then
             Dim i As Integer = undo
             Dim idx As Integer = NodeIdx
@@ -227,6 +239,7 @@
         Dim i As Integer
         Dim dist As Integer
         Dim a As Array
+        Dim kf As Boolean = False
         a = {BLANK, BLANK, BLANK, BLANK, BLANK, BLANK, BLANK, BLANK, BLANK}
         x = locate - Int(locate / 9) * 9
         y = Int(locate / 9)
@@ -367,9 +380,6 @@
                     Exit For
                 End If
                 If IsWB(wb, undo) = IsWB(-wb, dist) Then
-                    AddValue(a, dist, i)
-                    Exit For
-                ElseIf wb = -1 And IsBlack(undo) = IsWhite(dist) Then
                     AddValue(a, dist, i)
                     Exit For
                 Else
@@ -586,6 +596,18 @@
             IsWB = IsBlack(i)
         End If
     End Function
+    Private Function IsEnemyKing(ByVal wb As Integer, ByVal i As Integer) As Boolean
+        IsEnemyKing = False
+        If wb = WHITE Then
+            If board(i - 1) = 22 Then
+                IsEnemyKing = True
+            End If
+        Else
+            If board(i - 1) = 8 Then
+                IsEnemyKing = True
+            End If
+        End If
+    End Function
     Private Function max(ByVal a As Integer, ByVal b As Integer)
         If a >= b Then
             max = a
@@ -612,47 +634,28 @@
     Private Function KomaScore(ByVal koma) As Integer
         KomaScore = score(koma)
     End Function
-    Private Function GetKomaKikiBoard() As Array
-            KomaKikiInit()
-            For i = 1 To 81 Step 1
-            If True = IsWhite(i) Then
-                range = UnitRange(i)
-                For j = 0 To range.Length - 1 Step 1
-                    If range(j) <> BLANK Then
-                        komakiki(range(j) - 1) += 1
-                    End If
-                Next
-            End if
-            If True = IsBlack(i) Then
-                range = UnitRange(i)
-                For j = 0 To range.Length - 1 Step 1
-                    If range(j) <> BLANK Then
-                        komakiki(range(j) - 1) -= 1
-                    End If
-                Next
-            End if
-        Next
-        return komakiki
-    End Function
     Private Function Hyouka() As Integer
         Dim arw As Array = {1, 2, 3, 4, 5, 6, 7, 8}
         Dim arb As Array = {15, 16, 17, 18, 19, 20, 21, 22}
         Hyouka = 0
-        ''GetKomaKikiBoard()
         For i = 0 To 80 Step 1
             If IsWB(WHITE, i + 1) Then
                 Hyouka += KomaScore(board(i))
+                If board(i) = 1 Then
+                    Hyouka += komakiki_w(i) * 20
+                End If
             End If
             If IsWB(BLACK, i + 1) Then
                 Hyouka -= KomaScore(board(i))
+                If board(i) = 15 Then
+                    Hyouka -= komakiki_b(i) * 20
+                End If
             End If
-            ''Hyouka += komakiki(i) * 10
         Next
         For i = 0 To 7 Step 1
             Hyouka += tegomaw(i) * KomaScore(arw(i)) * 1.05
             Hyouka -= tegomab(i) * KomaScore(arb(i)) * 1.05
         Next
-        
         Hyouka = Hyouka / 2
         Return Hyouka
     End Function
@@ -680,6 +683,13 @@
     End Function
     Private Function GenerateMoves(ByVal first As Integer, ByVal wb As Integer) As Integer
         Dim idx As Integer = first
+        If KOMAKIKI_READ Then
+            KomaKikiInit()
+        End If
+        If NIRAMI_READ Then
+            nirami_w = 0
+            nirami_b = 0
+        End If
         If HAND_READ Then
             For i = 0 To 7
                 If wb = 1 Then
