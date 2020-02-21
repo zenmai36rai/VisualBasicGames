@@ -2,7 +2,7 @@
     Const WHITE As Integer = 1
     Const BLACK As Integer = -1
     Const USE_AB As Boolean = True
-    Const YOMI_DEPTH As Integer = 1
+    Const YOMI_DEPTH As Integer =  3
     Const HAND_READ As Boolean = True
     Const KOMAKIKI_READ As Boolean = True
     Const NIRAMI_READ As Boolean = True
@@ -44,7 +44,7 @@
     Dim nirami_w As Integer
     Dim nirami_b As Integer
     Dim table As Array = {0, 1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 6, 7, 1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 6, 7}
-    Dim score As Array = {0, 100, 300, 400, 600, 800, 1000, 1100, 65535, 900, 800, 800, 1000, 1200, 1300, 100, 300, 400, 600, 800, 1000, 1100, 65535, 900, 800, 800, 1000, 1200, 1300}
+    Dim score As Array = {0, 100, 300, 400, 600, 800, 1050, 1000, 65535, 900, 800, 800, 1000, 1200, 1100, 100, 300, 400, 600, 800, 1050, 1000, 65535, 900, 800, 800, 1000, 1200, 1100}
     Private Sub Init() Handles Me.HandleCreated
         komaname = {"", "歩", "香", "桂", "銀", "金", "飛", "角", "王", "と", "杏", "圭", "全", "龍", "馬"}
         all = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81}
@@ -194,9 +194,15 @@
                End If               
             End If
             If IsWhite(undo) And IsWhite(dist) Then
+                if KOMAKIKI_READ = True Then
+                   komakiki_w(dist - 1) += 1
+                End If
                 Exit Sub
             End If
             If IsBlack(undo) And IsBlack(dist) Then
+                if KOMAKIKI_READ = True Then
+                   komakiki_b(dist - 1) += 1
+                End If
                 Exit Sub
             End If
             AddValue(array, dist, pos)
@@ -642,13 +648,13 @@
             If IsWB(WHITE, i + 1) Then
                 Hyouka += KomaScore(board(i))
                 If board(i) = 1 Then
-                    Hyouka += komakiki_w(i) * 20
+                    Hyouka += komakiki_w(i) *  1
                 End If
             End If
             If IsWB(BLACK, i + 1) Then
                 Hyouka -= KomaScore(board(i))
                 If board(i) = 15 Then
-                    Hyouka -= komakiki_b(i) * 20
+                    Hyouka -= komakiki_b(i) * 1
                 End If
             End If
         Next
