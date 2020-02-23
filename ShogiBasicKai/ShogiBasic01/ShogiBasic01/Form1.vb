@@ -2,7 +2,7 @@
     Const WHITE As Integer = 1
     Const BLACK As Integer = -1
     Const USE_AB As Boolean = True
-    Const YOMI_DEPTH As Integer =  3
+    Const YOMI_DEPTH As Integer = 3
     Const HAND_READ As Boolean = True
     Const KOMAKIKI_READ As Boolean = True
     Const NIRAMI_READ As Boolean = True
@@ -73,9 +73,8 @@
         '      Next
     End Sub
     Private Sub KomaKikiInit()
-       Dim komakiki As Array = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
-       komakiki_w = komakiki
-       komakiki_b = komakiki
+       komakiki_w = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
+       komakiki_b = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
     End Sub
     Private Sub BoardSet()
         Dim p As Integer
@@ -181,18 +180,26 @@
             RangeCheck = False
         End If
     End Function
-    Private Sub AddRange(ByVal dx As Integer, ByVal dy As Integer, ByRef array As Array, ByVal pos As Integer)
+    Private Sub AddKomakiki(ByVal dx As Integer, ByVal dy As Integer)
+        if KOMAKIKI_READ = True Then
+            Dim dist As Integer
+            If CheckBoardRange(dx, dy) = True Then
+                dist = dx + dy * 9 + 1
+                If IsWhite(undo) And IsWhite(dist) Then
+                   komakiki_w(dist - 1) += 1
+                End If
+                Exit Sub
+                If IsBlack(undo) And IsBlack(dist) Then
+                    komakiki_b(dist - 1) += 1
+                End IF
+                Exit Sub
+            End If
+        End If
+   End Sub
+   Private Sub AddRange(ByVal dx As Integer, ByVal dy As Integer, ByRef array As Array, ByVal pos As Integer)
         Dim dist As Integer
         If CheckBoardRange(dx, dy) = True Then
             dist = dx + dy * 9 + 1
-            if KOMAKIKI_READ = True Then
-               If IsWhite(dist) Then
-                   komakiki_w(dist - 1) += 1
-               End If
-               If IsBlack(dist) Then
-                   komakiki_b(dist - 1) += 1
-               End If               
-            End If
             If IsWhite(undo) And IsWhite(dist) Then
                 if KOMAKIKI_READ = True Then
                    komakiki_w(dist - 1) += 1
@@ -209,7 +216,7 @@
         End If
     End Sub
     Private Sub AddValue(ByRef a As Array, ByVal dist As Integer, ByVal pos As integer)
-         a.SetValue(dist, pos)
+        a.SetValue(dist, pos)
         If GenerationFlag = True Then
             Dim i As Integer = undo
             Dim idx As Integer = NodeIdx
@@ -255,6 +262,7 @@
             If CheckBoardRange(dx, dy) = True Then
                 dist = dx + dy * 9 + 1
                 If IsWB(wb, undo) = IsWB(wb, dist) Then
+                    AddKomakiki(dx,dy)
                     Exit For
                 End If
                 AddValue(a, dist, i)
@@ -288,6 +296,7 @@
             If CheckBoardRange(dx, dy) = True Then
                 dist = dx + dy * 9 + 1
                 If IsWB(wb, undo) = IsWB(wb, dist) Then
+                    AddKomakiki(dx,dy)
                     Exit For
                 End If
                 AddValue(a, dist, i)
@@ -304,6 +313,7 @@
             If CheckBoardRange(dx, dy) = True Then
                 dist = dx + dy * 9 + 1
                 If IsWB(wb, undo) = IsWB(wb, dist) Then
+                    AddKomakiki(dx,dy)
                     Exit For
                 End If
                 AddValue(a, dist, i + 7)
@@ -320,6 +330,7 @@
             If CheckBoardRange(dx, dy) = True Then
                 dist = dx + dy * 9 + 1
                 If IsWB(wb, undo) = IsWB(wb, dist) Then
+                    AddKomakiki(dx,dy)
                     Exit For
                 End If
                 AddValue(a, dist, i + 15)
@@ -336,6 +347,7 @@
             If CheckBoardRange(dx, dy) = True Then
                 dist = dx + dy * 9 + 1
                 If IsWB(wb, undo) = IsWB(wb, dist) Then
+                    AddKomakiki(dx,dy)
                     Exit For
                 End If
                 AddValue(a, dist, i + 23)
@@ -383,6 +395,7 @@
             If CheckBoardRange(dx, dy) = True Then
                 dist = dx + dy * 9 + 1
                 If IsWB(wb, undo) = IsWB(wb, dist) Then
+                    AddKomakiki(dx,dy)
                     Exit For
                 End If
                 If IsWB(wb, undo) = IsWB(-wb, dist) Then
@@ -401,6 +414,7 @@
             If CheckBoardRange(dx, dy) = True Then
                 dist = dx + dy * 9 + 1
                 If IsWB(wb, undo) = IsWB(wb, dist) Then
+                    AddKomakiki(dx,dy)
                     Exit For
                 End If
                 If IsWB(wb, undo) = IsWB(-wb, dist) Then
@@ -419,6 +433,7 @@
             If CheckBoardRange(dx, dy) = True Then
                 dist = dx + dy * 9 + 1
                 If IsWB(wb, undo) = IsWB(wb, dist) Then
+                    AddKomakiki(dx,dy)
                     Exit For
                 End If
                 If IsWB(wb, undo) = IsWB(-wb, dist) Then
@@ -437,6 +452,7 @@
             If CheckBoardRange(dx, dy) = True Then
                 dist = dx + dy * 9 + 1
                 If IsWB(wb, undo) = IsWB(wb, dist) Then
+                    AddKomakiki(dx,dy)
                     Exit For
                 End If
                 If IsWB(wb, undo) = IsWB(wb, dist) Then
