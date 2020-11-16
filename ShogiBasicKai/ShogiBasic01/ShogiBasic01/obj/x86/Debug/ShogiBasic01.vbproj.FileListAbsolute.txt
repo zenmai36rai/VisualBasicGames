@@ -28,3 +28,18 @@ C:\Users\USER\Documents\Visual Studio 2010\Projects\ShogiBasicKai\ShogiBasic01\S
 C:\Users\USER\Documents\Visual Studio 2010\Projects\ShogiBasicKai\ShogiBasic01\ShogiBasic01\obj\x86\Debug\ShogiBasic01.exe
 C:\Users\USER\Documents\Visual Studio 2010\Projects\ShogiBasicKai\ShogiBasic01\ShogiBasic01\obj\x86\Debug\ShogiBasic01.xml
 C:\Users\USER\Documents\Visual Studio 2010\Projects\ShogiBasicKai\ShogiBasic01\ShogiBasic01\obj\x86\Debug\ShogiBasic01.pdb
+C:\Users\宮澤 郷介\source\repos\zenmai36rai\VisualBasicGames\ShogiBasicKai\ShogiBasic01\ShogiBasic01\obj\x86\Debug\WindowsApplication1.Form1.resources
+C:\Users\宮澤 郷介\source\repos\zenmai36rai\VisualBasicGames\ShogiBasicKai\ShogiBasic01\ShogiBasic01\obj\x86\Debug\WindowsApplication1.Resources.resources
+C:\Users\宮澤 郷介\source\repos\zenmai36rai\VisualBasicGames\ShogiBasicKai\ShogiBasic01\ShogiBasic01\obj\x86\Debug\ShogiBasic01.vbproj.GenerateResource.cache
+C:\Users\宮澤 郷介\source\repos\zenmai36rai\VisualBasicGames\ShogiBasicKai\ShogiBasic01\ShogiBasic01\obj\x86\Debug\ShogiBasic01.vbproj.CoreCompileInputs.cache
+C:\Users\宮澤 郷介\source\repos\zenmai36rai\VisualBasicGames\ShogiBasicKai\ShogiBasic01\ShogiBasic01\obj\x86\Debug\ShogiBasic01.exe
+C:\Users\宮澤 郷介\source\repos\zenmai36rai\VisualBasicGames\ShogiBasicKai\ShogiBasic01\ShogiBasic01\obj\x86\Debug\ShogiBasic01.xml
+C:\Users\宮澤 郷介\source\repos\zenmai36rai\VisualBasicGames\ShogiBasicKai\ShogiBasic01\ShogiBasic01\obj\x86\Debug\ShogiBasic01.pdb
+C:\Users\宮澤 郷介\source\repos\zenmai36rai\VisualBasicGames\ShogiBasicKai\ShogiBasic01\ShogiBasic01\bin\Debug\ShogiBasic01.exe.manifest
+C:\Users\宮澤 郷介\source\repos\zenmai36rai\VisualBasicGames\ShogiBasicKai\ShogiBasic01\ShogiBasic01\bin\Debug\ShogiBasic01.application
+C:\Users\宮澤 郷介\source\repos\zenmai36rai\VisualBasicGames\ShogiBasicKai\ShogiBasic01\ShogiBasic01\bin\Debug\ShogiBasic01.exe
+C:\Users\宮澤 郷介\source\repos\zenmai36rai\VisualBasicGames\ShogiBasicKai\ShogiBasic01\ShogiBasic01\bin\Debug\ShogiBasic01.pdb
+C:\Users\宮澤 郷介\source\repos\zenmai36rai\VisualBasicGames\ShogiBasicKai\ShogiBasic01\ShogiBasic01\bin\Debug\ShogiBasic01.xml
+C:\Users\宮澤 郷介\source\repos\zenmai36rai\VisualBasicGames\ShogiBasicKai\ShogiBasic01\ShogiBasic01\obj\x86\Debug\ShogiBasic01.vbprojAssemblyReference.cache
+C:\Users\宮澤 郷介\source\repos\zenmai36rai\VisualBasicGames\ShogiBasicKai\ShogiBasic01\ShogiBasic01\obj\x86\Debug\ShogiBasic01.exe.manifest
+C:\Users\宮澤 郷介\source\repos\zenmai36rai\VisualBasicGames\ShogiBasicKai\ShogiBasic01\ShogiBasic01\obj\x86\Debug\ShogiBasic01.application

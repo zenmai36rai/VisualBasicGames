@@ -1340,7 +1340,6 @@ Partial Class Form1
         Me.Button255.Size = New System.Drawing.Size(35, 38)
         Me.Button255.TabIndex = 97
         Me.Button255.UseVisualStyleBackColor = False
-        Me.Button255.Visible = False
         '
         'ListBox1
         '
@@ -1384,7 +1383,6 @@ Partial Class Form1
         Me.ButtonRobo.TabIndex = 103
         Me.ButtonRobo.Text = "Robo"
         Me.ButtonRobo.UseVisualStyleBackColor = False
-        Me.ButtonRobo.Visible = False
         '
         'TextBox3
         '
@@ -1416,7 +1414,6 @@ Partial Class Form1
         Me.Button82.TabIndex = 106
         Me.Button82.Text = "戻"
         Me.Button82.UseVisualStyleBackColor = True
-        Me.Button82.Visible = False
         '
         'Form1
         '

@@ -881,8 +881,8 @@
             d.hand = pop
             d.r = undo
             d.r2 = locate
-            d.src = board(undo - 1)
-            d.dst = board(locate - 1)
+            'd.src = board(undo - 1)
+            'd.dst = board(locate - 1)
             MakeMove(d, True)
             DispAll()
             AddKihu(locate)
@@ -900,8 +900,8 @@
             d.hand = pop
             d.r = undo
             d.r2 = locate
-            d.src = board(undo - 1)
-            d.dst = board(locate - 1)
+            'd.src = board(undo - 1)
+            'd.dst = board(locate - 1)
             MakeMove(d, True)
             DispAll()
             AddKihu(locate)
