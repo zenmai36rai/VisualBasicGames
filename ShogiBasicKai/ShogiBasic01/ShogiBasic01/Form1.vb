@@ -238,7 +238,7 @@
         Dim dx As Integer
         Dim dy As Integer
         HuRange = {BLANK}
-        x = locate - Int(locate / 9) * 9
+        x = locate Mod 9
         y = Int(locate / 9)
         dx = x
         dy = y - 1 * wb
@@ -254,7 +254,7 @@
         Dim a As Array
         Dim kf As Boolean = False
         a = {BLANK, BLANK, BLANK, BLANK, BLANK, BLANK, BLANK, BLANK, BLANK}
-        x = locate - Int(locate / 9) * 9
+        x = locate Mod 9
         y = Int(locate / 9)
         For i = 1 To 8 Step 1
             dx = x
@@ -262,7 +262,7 @@
             If CheckBoardRange(dx, dy) = True Then
                 dist = dx + dy * 9 + 1
                 If IsWB(wb, undo) = IsWB(wb, dist) Then
-                    AddKomakiki(dx,dy)
+                    AddKomakiki(dx, dy)
                     Exit For
                 End If
                 AddValue(a, dist, i)
@@ -288,7 +288,7 @@
                 BLANK, BLANK, BLANK, BLANK, BLANK, BLANK, BLANK, BLANK,
                 BLANK, BLANK, BLANK, BLANK, BLANK, BLANK, BLANK, BLANK,
                 BLANK, BLANK, BLANK, BLANK}
-        x = locate - Int(locate / 9) * 9
+        x = locate Mod 9
         y = Int(locate / 9)
         For i = 1 To 8 Step 1
             dx = x
@@ -296,7 +296,7 @@
             If CheckBoardRange(dx, dy) = True Then
                 dist = dx + dy * 9 + 1
                 If IsWB(wb, undo) = IsWB(wb, dist) Then
-                    AddKomakiki(dx,dy)
+                    AddKomakiki(dx, dy)
                     Exit For
                 End If
                 AddValue(a, dist, i)
@@ -313,7 +313,7 @@
             If CheckBoardRange(dx, dy) = True Then
                 dist = dx + dy * 9 + 1
                 If IsWB(wb, undo) = IsWB(wb, dist) Then
-                    AddKomakiki(dx,dy)
+                    AddKomakiki(dx, dy)
                     Exit For
                 End If
                 AddValue(a, dist, i + 7)
@@ -330,7 +330,7 @@
             If CheckBoardRange(dx, dy) = True Then
                 dist = dx + dy * 9 + 1
                 If IsWB(wb, undo) = IsWB(wb, dist) Then
-                    AddKomakiki(dx,dy)
+                    AddKomakiki(dx, dy)
                     Exit For
                 End If
                 AddValue(a, dist, i + 15)
@@ -347,7 +347,7 @@
             If CheckBoardRange(dx, dy) = True Then
                 dist = dx + dy * 9 + 1
                 If IsWB(wb, undo) = IsWB(wb, dist) Then
-                    AddKomakiki(dx,dy)
+                    AddKomakiki(dx, dy)
                     Exit For
                 End If
                 AddValue(a, dist, i + 23)
@@ -387,7 +387,7 @@
                 BLANK, BLANK, BLANK, BLANK, BLANK, BLANK, BLANK, BLANK,
                 BLANK, BLANK, BLANK, BLANK, BLANK, BLANK, BLANK, BLANK,
                 BLANK, BLANK, BLANK, BLANK}
-        x = locate - Int(locate / 9) * 9
+        x = locate Mod 9
         y = Int(locate / 9)
         For i = 1 To 8 Step 1
             dx = x - i
@@ -395,7 +395,7 @@
             If CheckBoardRange(dx, dy) = True Then
                 dist = dx + dy * 9 + 1
                 If IsWB(wb, undo) = IsWB(wb, dist) Then
-                    AddKomakiki(dx,dy)
+                    AddKomakiki(dx, dy)
                     Exit For
                 End If
                 If IsWB(wb, undo) = IsWB(-wb, dist) Then
@@ -414,7 +414,7 @@
             If CheckBoardRange(dx, dy) = True Then
                 dist = dx + dy * 9 + 1
                 If IsWB(wb, undo) = IsWB(wb, dist) Then
-                    AddKomakiki(dx,dy)
+                    AddKomakiki(dx, dy)
                     Exit For
                 End If
                 If IsWB(wb, undo) = IsWB(-wb, dist) Then
@@ -433,7 +433,7 @@
             If CheckBoardRange(dx, dy) = True Then
                 dist = dx + dy * 9 + 1
                 If IsWB(wb, undo) = IsWB(wb, dist) Then
-                    AddKomakiki(dx,dy)
+                    AddKomakiki(dx, dy)
                     Exit For
                 End If
                 If IsWB(wb, undo) = IsWB(-wb, dist) Then
@@ -452,7 +452,7 @@
             If CheckBoardRange(dx, dy) = True Then
                 dist = dx + dy * 9 + 1
                 If IsWB(wb, undo) = IsWB(wb, dist) Then
-                    AddKomakiki(dx,dy)
+                    AddKomakiki(dx, dy)
                     Exit For
                 End If
                 If IsWB(wb, undo) = IsWB(wb, dist) Then
@@ -487,7 +487,7 @@
         Dim dx As Integer
         Dim dy As Integer
         KeimaRange = {BLANK, BLANK}
-        x = locate - Int(locate / 9) * 9
+        x = locate Mod 9
         y = Int(locate / 9)
         dx = x + 1
         dy = y - 2 * wb
@@ -502,7 +502,7 @@
         Dim dx As Integer
         Dim dy As Integer
         GinRange = {BLANK, BLANK, BLANK, BLANK, BLANK}
-        x = locate - Int(locate / 9) * 9
+        x = locate Mod 9
         y = Int(locate / 9)
         dx = x
         dy = y - 1 * wb
@@ -526,7 +526,7 @@
         Dim dx As Integer
         Dim dy As Integer
         KinRange = {BLANK, BLANK, BLANK, BLANK, BLANK, BLANK}
-        x = locate - Int(locate / 9) * 9
+        x = locate Mod 9
         y = Int(locate / 9)
         dx = x
         dy = y - 1
@@ -553,7 +553,7 @@
         Dim dx As Integer
         Dim dy As Integer
         OuRange = {BLANK, BLANK, BLANK, BLANK, BLANK, BLANK, BLANK, BLANK}
-        x = locate - Int(locate / 9) * 9
+        x = locate Mod 9
         y = Int(locate / 9)
         dx = x
         dy = y - 1
@@ -664,7 +664,7 @@
             If IsWB(WHITE, i + 1) Then
                 Hyouka += KomaScore(board(i))
                 If board(i) = 1 Then
-                    Hyouka += komakiki_w(i) *  1
+                    Hyouka += komakiki_w(i) * 1
                 End If
             End If
             If IsWB(BLACK, i + 1) Then
@@ -743,7 +743,7 @@
                 End If
             Next
         End If
-        
+
         For i = 1 To 81 Step 1
             If True = IsWB(wb, i) Then
                 undo = i
@@ -1100,7 +1100,7 @@
             triangle = "▽"
         End If
         locate = locate - 1
-        x = locate - Int(locate / 9) * 9 + 1
+        x = locate Mod 9 + 1
         y = Int(locate / 9) + 1
         If komaundo <> BLANK Then
             uchi = "打"
@@ -1265,7 +1265,7 @@ LOG_WRITE:
             triangle = "▽"
         End If
         locate = locate - 1
-        x = locate - Int(locate / 9) * 9 + 1
+        x = locate Mod 9 + 1
         y = Int(locate / 9) + 1
         If komaundo <> BLANK Then
             uchi = "打"
