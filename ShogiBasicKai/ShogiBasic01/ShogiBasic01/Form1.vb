@@ -2,7 +2,7 @@
     Const WHITE As Integer = 1
     Const BLACK As Integer = -1
     Const USE_AB As Boolean = True
-    Const YOMI_DEPTH As Integer = 1
+    Const YOMI_DEPTH As Integer = 3
     Const HAND_READ As Boolean = True
     Const KOMAKIKI_READ As Boolean = False
     Const NIRAMI_READ As Boolean = False
@@ -278,13 +278,13 @@
             If CheckBoardRange(dx, dy) = True Then
                 dist = dx + dy * 9 + 1
                 If IsWhite(undo) And IsWhite(dist) Then
-                   komakiki_w(dist - 1) += 1
+                    komakiki_w(dist - 1) += 1
+                    Exit Sub
                 End If
-                Exit Sub
                 If IsBlack(undo) And IsBlack(dist) Then
                     komakiki_b(dist - 1) += 1
-                End IF
-                Exit Sub
+                    Exit Sub
+                End If
             End If
         End If
    End Sub
@@ -293,15 +293,9 @@
         If CheckBoardRange(dx, dy) = True Then
             dist = dx + dy * 9 + 1
             If IsWhite(undo) And IsWhite(dist) Then
-                if KOMAKIKI_READ = True Then
-                   komakiki_w(dist - 1) += 1
-                End If
                 Exit Sub
             End If
             If IsBlack(undo) And IsBlack(dist) Then
-                if KOMAKIKI_READ = True Then
-                   komakiki_b(dist - 1) += 1
-                End If
                 Exit Sub
             End If
             AddValue(array, dist, pos)
@@ -320,7 +314,7 @@
             Node(idx).hand = BLANK
             NodeCount += 1
             NodeIdx += 1
-            ''idx += 1
+            idx += 1
         End If
     End Sub
 
@@ -863,15 +857,13 @@
                 End If
             End If
             x = x + 1
-            If True = IsWB(wb, x) Then
+            If IsWB(wb, x) Then
                 undo = x
                 GenerationFlag = True
                 NodeIdx = idx
                 UnitRange(x)
                 GenerationFlag = False
                 idx += (NodeIdx - idx)
-            Else
-                er += 1
             End If
             If (b1 = 0) And (b2 = 0) Then
                 Exit For
