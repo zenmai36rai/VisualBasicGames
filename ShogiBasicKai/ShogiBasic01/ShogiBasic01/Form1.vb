@@ -2,7 +2,7 @@
     Const WHITE As Integer = 1
     Const BLACK As Integer = -1
     Const USE_AB As Boolean = True
-    Const YOMI_DEPTH As Integer = 3
+    Const YOMI_DEPTH As Integer = 1
     Const HAND_READ As Boolean = True
     Const KOMAKIKI_READ As Boolean = False
     Const NIRAMI_READ As Boolean = False
@@ -27,6 +27,7 @@
     Dim Node(BRANCH_WIDTH * (YOMI_DEPTH + 1)) As MoveData
     Dim NodeCount As Integer
     Dim NodeIdx As Integer
+    Const BB_JOINT_POS As Integer = 54
     Class BitBoard
         Public b1 As Int64 = 0
         Public b2 As Int64 = 0
@@ -52,7 +53,7 @@
     Dim nirami_w As Integer
     Dim nirami_b As Integer
     Dim table As Array = {0, 1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 6, 7, 1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 6, 7}
-    Dim score As Array = {0, 100, 300, 400, 600, 800, 1050, 1000, 65535, 900, 800, 800, 1000, 1200, 1100, 100, 300, 400, 600, 800, 1050, 1000, 65535, 900, 800, 800, 1000, 1200, 1100}
+    Dim score As Array = {0, 100, 300, 400, 600, 800, 1050, 1000, 32000, 900, 800, 800, 1000, 1200, 1100, 100, 300, 400, 600, 800, 1050, 1000, 65535, 900, 800, 800, 1000, 1200, 1100}
     Private Function CountByte(ByVal bits As Int64) As Integer
         Dim mask As Int64 = 1
         For i = 0 To 63
@@ -73,7 +74,7 @@
         Else
             pos = NTZ(bits2)
             If pos <> 0 Then
-                Return 54 + pos
+                Return BB_JOINT_POS + pos
             Else
                 Return 0
             End If
@@ -90,19 +91,19 @@
     End Function
     Private Sub BoardMove(ByVal pos As Integer, ByVal koma As Integer)
         Dim x As Int64 = 0
-        If 0 <= pos And pos < 54 Then
+        If 0 <= pos And pos < BB_JOINT_POS Then
             x = 1 << pos
-        ElseIf pos >= 54 Then
-            x = 1 << (pos - 54)
+        ElseIf pos >= BB_JOINT_POS Then
+            x = 1 << (pos - BB_JOINT_POS)
         End If
         If KomaWB(koma) = WHITE Then
-            If pos < 54 Then
+            If pos < BB_JOINT_POS Then
                 WhiteBB.b1 += x
             Else
                 WhiteBB.b2 += x
             End If
         Else
-            If pos < 54 Then
+            If pos < BB_JOINT_POS Then
                 BlackBB.b1 += x
             Else
                 BlackBB.b2 += x
@@ -112,19 +113,19 @@
     End Sub
     Private Sub BoardRemove(ByVal pos As Integer)
         Dim x As Int64 = 0
-        If 0 <= pos And pos < 54 Then
+        If 0 <= pos And pos < BB_JOINT_POS Then
             x = 1 << pos
-        ElseIf pos >= 54 Then
-            x = 1 << (pos - 54)
+        ElseIf pos >= BB_JOINT_POS Then
+            x = 1 << (pos - BB_JOINT_POS)
         End If
         If KomaWB(board(pos)) = WHITE Then
-            If pos < 54 Then
+            If pos < BB_JOINT_POS Then
                 WhiteBB.b1 -= x
             Else
                 WhiteBB.b2 -= x
             End If
         Else
-            If pos < 54 Then
+            If pos < BB_JOINT_POS Then
                 BlackBB.b1 -= x
             Else
                 BlackBB.b2 -= x
@@ -754,15 +755,15 @@
         For i = 0 To 80 Step 1
             If IsWB(WHITE, i + 1) Then
                 Hyouka += KomaScore(board(i))
-                If board(i) = 1 Then
-                    Hyouka += komakiki_w(i) * 1
-                End If
+                'If board(i) = 1 Then
+                'Hyouka += komakiki_w(i) * 1
+                'End If
             End If
             If IsWB(BLACK, i + 1) Then
                 Hyouka -= KomaScore(board(i))
-                If board(i) = 15 Then
-                    Hyouka -= komakiki_b(i) * 1
-                End If
+                'If board(i) = 15 Then
+                'Hyouka -= komakiki_b(i) * 1
+                'End If
             End If
         Next
         For i = 0 To 7 Step 1
@@ -858,7 +859,7 @@
                     x = NTZ(b2)
                     mask = 1
                     b2 -= (mask << x)
-                    x = x + 54
+                    x = x + BB_JOINT_POS
                 End If
             End If
             x = x + 1
