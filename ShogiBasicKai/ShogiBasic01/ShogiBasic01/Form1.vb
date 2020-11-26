@@ -2,7 +2,7 @@
     Const WHITE As Integer = 1
     Const BLACK As Integer = -1
     Const USE_AB As Boolean = True
-    Const YOMI_DEPTH As Integer = 3
+    Const YOMI_DEPTH As Integer = 1
     Const HAND_READ As Boolean = True
     Const KOMAKIKI_READ As Boolean = False
     Const NIRAMI_READ As Boolean = False
@@ -53,7 +53,7 @@
     Dim nirami_w As Integer
     Dim nirami_b As Integer
     Dim table As Array = {0, 1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 6, 7, 1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 6, 7}
-    Dim score As Array = {0, 100, 300, 400, 600, 800, 1050, 1000, 32000, 900, 800, 800, 1000, 1200, 1100, 100, 300, 400, 600, 800, 1050, 1000, 65535, 900, 800, 800, 1000, 1200, 1100}
+    Dim score As Array = {0, 100, 300, 400, 600, 800, 1050, 1000, 32000, 900, 800, 800, 1000, 1200, 1100, 100, 300, 400, 600, 800, 1050, 1000, 32000, 900, 800, 800, 1000, 1200, 1100}
     Private Function CountByte(ByVal bits As Int64) As Integer
         Dim mask As Int64 = 1
         For i = 0 To 63
@@ -789,6 +789,26 @@
         Next
         Return alpha
     End Function
+    Private Function GetBitPos(ByRef b1 As Int64, ByRef b2 As Int64) As Integer
+        Dim x As Integer = 0
+        Dim mask As Int64 = 0
+        If 0 <> b1 Then
+            x = NTZ(b1)
+            mask = 1
+            b1 -= (mask << x)
+        ElseIf 0 <> b2 Then
+            x = NTZ(b2)
+            mask = 1
+            b2 -= (mask << x)
+            x = x + BB_JOINT_POS
+        Else
+            Return -1
+        End If
+        If x > 80 Then
+            Return -1 'もし通ったらデバッグが必要
+        End If
+        Return x
+    End Function
     Private Function GenerateMoves(ByVal first As Integer, ByVal wb As Integer) As Integer
         Dim idx As Integer = first
         If KOMAKIKI_READ Then
@@ -832,7 +852,6 @@
 
         Dim b1 As Int64
         Dim b2 As Int64
-        Dim er As Integer = 0
 
         If wb = WHITE Then
             b1 = WhiteBB.b1
@@ -842,33 +861,19 @@
             b2 = BlackBB.b2
         End If
         Dim mask As Int64 = 1
-        For i = 1 To 81 Step 1
-            Dim x As Integer = 0
-            If 0 <> b1 Then
-                x = NTZ(b1)
-                mask = 1
-                b1 -= (mask << x)
-            ElseIf x = 0 Then
-                If 0 <> b2 Then
-                    x = NTZ(b2)
-                    mask = 1
-                    b2 -= (mask << x)
-                    x = x + BB_JOINT_POS
-                End If
-            End If
+        Dim x As Integer = GetBitPos(b1, b2)
+        Do While (x <> -1)
             x = x + 1
-            If IsWB(wb, x) Then
-                undo = x
+            'If IsWB(wb, x) Then
+            undo = x
                 GenerationFlag = True
                 NodeIdx = idx
                 UnitRange(x)
                 GenerationFlag = False
                 idx += (NodeIdx - idx)
-            End If
-            If (b1 = 0) And (b2 = 0) Then
-                Exit For
-            End If
-        Next
+            'End If
+            x = GetBitPos(b1, b2)
+        Loop
         Return idx
     End Function
     Private Sub RobotMove(ByVal wb As Integer)
