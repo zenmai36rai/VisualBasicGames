@@ -80,7 +80,7 @@
     End Sub
     Private Sub BoardSet()
         Dim p As Integer
-        For p = 1 To 81 Step 1
+        For p = 0 To 80 Step 1
             UnitSet(p)
         Next
     End Sub
@@ -88,7 +88,7 @@
         Dim b As Button
         Dim c As Integer
         b = GetButton(locale)
-        c = board(locale - 1)
+        c = board(locale)
         If c = 0 Then
             b.Text = ""
             b.BackColor = Color.LightGray
@@ -104,7 +104,7 @@
     End Sub
     Private Function UnitRange(ByVal locate As Integer) As Array
         Dim unit As Integer
-        locate = locate - 1
+        locate = locate
         unit = board(locate)
         UnitRange = all
         If unit = 1 Then
@@ -186,13 +186,13 @@
         if KOMAKIKI_READ = True Then
             Dim dist As Integer
             If CheckBoardRange(dx, dy) = True Then
-                dist = dx + dy * 9 + 1
+                dist = dx + dy * 9
                 If IsWhite(undo) And IsWhite(dist) Then
-                   komakiki_w(dist - 1) += 1
+                    komakiki_w(dist) += 1
                 End If
                 Exit Sub
                 If IsBlack(undo) And IsBlack(dist) Then
-                    komakiki_b(dist - 1) += 1
+                    komakiki_b(dist) += 1
                 End IF
                 Exit Sub
             End If
@@ -201,16 +201,16 @@
    Private Sub AddRange(ByVal dx As Integer, ByVal dy As Integer, ByRef array As Array, ByVal pos As Integer)
         Dim dist As Integer
         If CheckBoardRange(dx, dy) = True Then
-            dist = dx + dy * 9 + 1
+            dist = dx + dy * 9
             If IsWhite(undo) And IsWhite(dist) Then
                 if KOMAKIKI_READ = True Then
-                   komakiki_w(dist - 1) += 1
+                    komakiki_w(dist) += 1
                 End If
                 Exit Sub
             End If
             If IsBlack(undo) And IsBlack(dist) Then
                 if KOMAKIKI_READ = True Then
-                   komakiki_b(dist - 1) += 1
+                    komakiki_b(dist) += 1
                 End If
                 Exit Sub
             End If
@@ -225,8 +225,8 @@
             Node(idx) = New MoveData
             Node(idx).r = i
             Node(idx).r2 = dist
-            Node(idx).src = board(i - 1)
-            Node(idx).dst = board(dist - 1)
+            Node(idx).src = board(i)
+            Node(idx).dst = board(dist)
             Node(idx).hand = BLANK
             NodeCount += 1
             NodeIdx += 1
@@ -262,7 +262,7 @@
             dx = x
             dy = y - i * wb
             If CheckBoardRange(dx, dy) = True Then
-                dist = dx + dy * 9 + 1
+                dist = dx + dy * 9
                 If IsWB(wb, undo) = IsWB(wb, dist) Then
                     AddKomakiki(dx, dy)
                     Exit For
@@ -296,7 +296,7 @@
             dx = x
             dy = y - i * wb
             If CheckBoardRange(dx, dy) = True Then
-                dist = dx + dy * 9 + 1
+                dist = dx + dy * 9
                 If IsWB(wb, undo) = IsWB(wb, dist) Then
                     AddKomakiki(dx, dy)
                     Exit For
@@ -313,7 +313,7 @@
             dx = x
             dy = y + i * wb
             If CheckBoardRange(dx, dy) = True Then
-                dist = dx + dy * 9 + 1
+                dist = dx + dy * 9
                 If IsWB(wb, undo) = IsWB(wb, dist) Then
                     AddKomakiki(dx, dy)
                     Exit For
@@ -330,7 +330,7 @@
             dx = x - i * wb
             dy = y
             If CheckBoardRange(dx, dy) = True Then
-                dist = dx + dy * 9 + 1
+                dist = dx + dy * 9
                 If IsWB(wb, undo) = IsWB(wb, dist) Then
                     AddKomakiki(dx, dy)
                     Exit For
@@ -347,7 +347,7 @@
             dx = x + i * wb
             dy = y
             If CheckBoardRange(dx, dy) = True Then
-                dist = dx + dy * 9 + 1
+                dist = dx + dy * 9
                 If IsWB(wb, undo) = IsWB(wb, dist) Then
                     AddKomakiki(dx, dy)
                     Exit For
@@ -395,7 +395,7 @@
             dx = x - i
             dy = y - i
             If CheckBoardRange(dx, dy) = True Then
-                dist = dx + dy * 9 + 1
+                dist = dx + dy * 9
                 If IsWB(wb, undo) = IsWB(wb, dist) Then
                     AddKomakiki(dx, dy)
                     Exit For
@@ -414,7 +414,7 @@
             dx = x + i
             dy = y + i
             If CheckBoardRange(dx, dy) = True Then
-                dist = dx + dy * 9 + 1
+                dist = dx + dy * 9
                 If IsWB(wb, undo) = IsWB(wb, dist) Then
                     AddKomakiki(dx, dy)
                     Exit For
@@ -433,7 +433,7 @@
             dx = x - i
             dy = y + i
             If CheckBoardRange(dx, dy) = True Then
-                dist = dx + dy * 9 + 1
+                dist = dx + dy * 9
                 If IsWB(wb, undo) = IsWB(wb, dist) Then
                     AddKomakiki(dx, dy)
                     Exit For
@@ -452,7 +452,7 @@
             dx = x + i
             dy = y - i
             If CheckBoardRange(dx, dy) = True Then
-                dist = dx + dy * 9 + 1
+                dist = dx + dy * 9
                 If IsWB(wb, undo) = IsWB(wb, dist) Then
                     AddKomakiki(dx, dy)
                     Exit For
@@ -594,10 +594,10 @@
     Private Function IsWhite(ByVal locate As Integer) As Boolean
         Dim c As Integer
         IsWhite = False
-        If locate < 1 Or 81 < locate Then
+        If locate < 0 Or 80 < locate Then
             Exit Function
         End If
-        c = board(locate - 1)
+        c = board(locate)
         If 1 <= c And c <= 14 Then
             IsWhite = True
         End If
@@ -605,10 +605,10 @@
     Private Function IsBlack(ByVal locate As Integer) As Boolean
         Dim c As Integer
         IsBlack = False
-        If locate < 1 Or 81 < locate Then
+        If locate < 0 Or 80 < locate Then
             Exit Function
         End If
-        c = board(locate - 1)
+        c = board(locate)
         If 15 <= c And c <= 30 Then
             IsBlack = True
         End If
@@ -623,11 +623,11 @@
     Private Function IsEnemyKing(ByVal wb As Integer, ByVal i As Integer) As Boolean
         IsEnemyKing = False
         If wb = WHITE Then
-            If board(i - 1) = 22 Then
+            If board(i) = 22 Then
                 IsEnemyKing = True
             End If
         Else
-            If board(i - 1) = 8 Then
+            If board(i) = 8 Then
                 IsEnemyKing = True
             End If
         End If
@@ -692,14 +692,14 @@
             If board(i) = 0 Then
                 Continue For
             End If
-            If IsWB(WHITE, i + 1) Then
+            If IsWB(WHITE, i) Then
                 Hyouka += KomaScore(board(i))
                 d = KomaDist(enem_sq_x, enem_sq_y, i)
                 Dim s1 As Integer = komakiki_w(i) * our_effect_value(d) / 1024
                 Dim s2 As Integer = komakiki_b(i) * thier_effect_value(d) / 1024
                 Hyouka += s1 - s2
             End If
-            If IsWB(BLACK, i + 1) Then
+            If IsWB(BLACK, i) Then
                 Hyouka -= KomaScore(board(i))
                 d = KomaDist(king_sq_x, king_sq_y, i)
                 Dim s1 As Integer = komakiki_b(i) * our_effect_value(d) / 1024
@@ -781,13 +781,12 @@
             If board(i) = 0 Then
                 Continue For
             End If
-            Dim pos = i + 1
-            If True = IsWB(wb, pos) Then
-                undo = pos
+            If True = IsWB(wb, i) Then
+                undo = i
                 GenerationFlag = True
                 NodeIdx = idx
                 ''range = UnitRange(i)
-                UnitRange(pos)
+                UnitRange(i)
                 GenerationFlag = False
                 ''ArrayCount += range.Length
                 ''For j = 0 To range.Length - 1 Step 1
@@ -850,6 +849,7 @@
         End If
     End Sub
     Private Sub UnitClick(ByVal locate As Integer)
+        locate = locate - 1
         Dim b As Button
         Dim c As Integer
         Dim r As Integer
@@ -886,8 +886,8 @@
             d.hand = BLANK
             d.r = undo
             d.r2 = locate
-            d.src = board(undo - 1)
-            d.dst = board(locate - 1)
+            d.src = board(undo)
+            d.dst = board(locate)
             MakeMove(d, True)
             DispAll()
             AddKihu(locate)
@@ -905,21 +905,21 @@
             d.hand = BLANK
             d.r = undo
             d.r2 = locate
-            d.src = board(undo - 1)
-            d.dst = board(locate - 1)
+            d.src = board(undo)
+            d.dst = board(locate)
             MakeMove(d, True)
             DispAll()
             AddKihu(locate)
             state = 0
         ElseIf state = 3 And RangeCheck(locate) Then
-            'board(locate - 1) = pop
+            'board(locate) = pop
             'tegomaw(pop - 1) = tegomaw(pop - 1) - 1
             Dim d As MoveData = New MoveData
             d.hand = pop
             d.r = undo
             d.r2 = locate
-            'd.src = board(undo - 1)
-            'd.dst = board(locate - 1)
+            'd.src = board(undo)
+            'd.dst = board(locate)
             MakeMove(d, True)
             DispAll()
             AddKihu(locate)
@@ -931,14 +931,14 @@
             RobotMove(-1)
             Me.Cursor = Cursors.Default
         ElseIf state = 4 And RangeCheck(locate) Then
-            'board(locate - 1) = pop
+            'board(locate) = pop
             'tegomab(pop - 15) = tegomab(pop - 15) - 1
             Dim d As MoveData = New MoveData
             d.hand = pop
             d.r = undo
             d.r2 = locate
-            'd.src = board(undo - 1)
-            'd.dst = board(locate - 1)
+            'd.src = board(undo)
+            'd.dst = board(locate)
             MakeMove(d, True)
             DispAll()
             AddKihu(locate)
@@ -948,7 +948,7 @@
         End If
     End Sub
     Private Sub DispAll()
-        For p = 1 To 81 Step 1
+        For p = 0 To 80 Step 1
             UnitSet(p)
         Next
         DispHand()
@@ -1136,7 +1136,6 @@
             wb = -1
             triangle = "▽"
         End If
-        locate = locate - 1
         x = locate Mod 9 + 1
         y = Int(locate / 9) + 1
         If komaundo <> BLANK Then
@@ -1156,7 +1155,7 @@
             koma = GetKomaName(board(locate))
             nari = ""
         End If
-        ListBox1.Items.Add("Y" + triangle + pos + koma + GetSoeji(locate + 1) + uchi + nari)
+        ListBox1.Items.Add("Y" + triangle + pos + koma + GetSoeji(locate) + uchi + nari)
         ListBox1.Items.Add(Hyouka() * ROBO_TEBAN * wb)
         ListBox1.TopIndex = ListBox1.Items.Count - 1
         kihumem = locate
@@ -1170,11 +1169,11 @@
         End If
         KomaTori(d.r2)
         If mov Then
-            narimem = board(d.r - 1)
+            narimem = board(d.r)
         End If
         ClassUp(d.r)
-        board(d.r2 - 1) = board(d.r - 1)
-        board(d.r - 1) = 0
+        board(d.r2) = board(d.r)
+        board(d.r) = 0
         ClassUp(d.r2)
 LOG_WRITE:
         If DEBUG_LOG Then
@@ -1184,10 +1183,10 @@ LOG_WRITE:
     Private Sub UnmakeMove(ByVal d As MoveData)
         If d.hand <> BLANK Then
             KomaModosi(d.r2)
-            board(d.r2 - 1) = 0
+            board(d.r2) = 0
             Exit Sub
         End If
-        board(d.r - 1) = d.src
+        board(d.r) = d.src
         KomaKaeshi(d.r2, d.dst)
     End Sub
     Private Function Question() As Boolean
@@ -1201,54 +1200,54 @@ LOG_WRITE:
     End Function
     Private Sub ClassUp(ByVal locate As Integer)
         Dim unit As Integer
-        unit = board(locate - 1)
+        unit = board(locate)
         If IsWhite(locate) And 1 <= locate And locate <= 27 Then
             If Question() = False Then
                 Exit Sub
             End If
             If unit = 1 Then
-                board(locate - 1) = 9
+                board(locate) = 9
             End If
             If unit = 2 Then
-                board(locate - 1) = 10
+                board(locate) = 10
             End If
             If unit = 3 Then
-                board(locate - 1) = 11
+                board(locate) = 11
             End If
             If unit = 4 Then
-                board(locate - 1) = 12
+                board(locate) = 12
             End If
             If unit = 6 Then
-                board(locate - 1) = 13
+                board(locate) = 13
             End If
             If unit = 7 Then
-                board(locate - 1) = 14
+                board(locate) = 14
             End If
         End If
-        If IsBlack(locate) And 55 <= locate And locate <= 81 Then
+        If IsBlack(locate) And 54 <= locate And locate <= 80 Then
             If unit = 15 Then
-                board(locate - 1) = 23
+                board(locate) = 23
             End If
             If unit = 16 Then
-                board(locate - 1) = 24
+                board(locate) = 24
             End If
             If unit = 17 Then
-                board(locate - 1) = 25
+                board(locate) = 25
             End If
             If unit = 18 Then
-                board(locate - 1) = 26
+                board(locate) = 26
             End If
             If unit = 20 Then
-                board(locate - 1) = 27
+                board(locate) = 27
             End If
             If unit = 21 Then
-                board(locate - 1) = 28
+                board(locate) = 28
             End If
         End If
     End Sub
     Private Sub KomaTori(ByVal locate)
         Dim t As Integer
-        t = board(locate - 1)
+        t = board(locate)
         If 15 <= t Then
             t = table(t) - 1
             tegomaw(t) = tegomaw(t) + 1
@@ -1259,7 +1258,7 @@ LOG_WRITE:
     End Sub
     Private Sub KomaModosi(ByVal locate)
         Dim t As Integer
-        t = board(locate - 1)
+        t = board(locate)
         If 15 <= t Then
             t = table(t) - 1
             tegomab(t) = tegomab(t) + 1
@@ -1269,7 +1268,7 @@ LOG_WRITE:
         End If
     End Sub
     Private Sub KomaOki(ByVal locate, ByVal t)
-        board(locate - 1) = t
+        board(locate) = t
         If 15 <= t Then
             t = table(t) - 1
             tegomab(t) = tegomab(t) - 1
@@ -1279,7 +1278,7 @@ LOG_WRITE:
         End If
     End Sub
     Private Sub KomaKaeshi(ByVal locate, ByVal t)
-        board(locate - 1) = t
+        board(locate) = t
         If 15 <= t Then
             t = table(t) - 1
             tegomaw(t) = tegomaw(t) - 1
@@ -1301,7 +1300,7 @@ LOG_WRITE:
         Else
             triangle = "▽"
         End If
-        locate = locate - 1
+        locate = locate
         x = locate Mod 9 + 1
         y = Int(locate / 9) + 1
         If komaundo <> BLANK Then
@@ -1321,7 +1320,7 @@ LOG_WRITE:
             koma = GetKomaName(board(locate))
             nari = ""
         End If
-        ListBox1.Items.Add(triangle + pos + koma + GetSoeji(locate + 1) + uchi + nari)
+        ListBox1.Items.Add(triangle + pos + koma + GetSoeji(locate) + uchi + nari)
         ListBox1.TopIndex = ListBox1.Items.Count - 1
         kihumem = locate
         narimem = BLANK
@@ -1364,11 +1363,11 @@ LOG_WRITE:
             GetSoeji = ""
             Exit Function
         End If
-        prev(undo - 1) = board(locate - 1)
-        prev(locate - 1) = 0
-        For i = 1 To 81 Step 1
+        prev(undo) = board(locate)
+        prev(locate) = 0
+        For i = 0 To 80 Step 1
             If i = undo Then
-            ElseIf prev(i - 1) = prev(undo - 1) Then
+            ElseIf prev(i) = prev(undo) Then
                 Range = UnitRange(i)
                 For j = 0 To Range.Length - 1 Step 1
                     If Range(j) = locate Then
@@ -1377,20 +1376,19 @@ LOG_WRITE:
                 Next
             End If
         Next
-        lbuf = locate - 1
-        lx = lbuf - Int(lbuf / 9) * 9 + 1
-        ly = Int(lbuf / 9) + 1
-        ubuf = undo - 1
-        x = ubuf - Int(ubuf / 9) * 9 + 1
-        y = Int(ubuf / 9) + 1
+        lbuf = locate
+        lx = lbuf Mod 9
+        ly = Int(lbuf / 9)
+        ubuf = undo
+        x = ubuf Mod 9
+        y = Int(ubuf / 9)
         xc = 0
         yc = 0
         For i = 0 To Kouho.Length - 1 Step 1
             If Kouho(i) <> BLANK Then
                 dl = Kouho(i)
-                dl = dl - 1
-                dx = dl - Int(dl / 9) * 9 + 1
-                dy = Int(dl / 9) + 1
+                dx = dl Mod 9
+                dy = Int(dl / 9)
                 If x = dx Then
                     xc = xc + 1
                 End If
@@ -1403,9 +1401,8 @@ LOG_WRITE:
         For i = 0 To Kouho.Length - 1 Step 1
             If Kouho(i) <> BLANK Then
                 dl = Kouho(i)
-                dl = dl - 1
-                dx = dl - Int(dl / 9) * 9 + 1
-                dy = Int(dl / 9) + 1
+                dx = dl - Int(dl / 9) * 9
+                dy = Int(dl / 9)
                 If 1 <= yc Then
                     If state = 1 Then
                         If x < dx Then
@@ -1684,6 +1681,7 @@ LOG_WRITE:
         UnitClick(81)
     End Sub
     Private Function GetButton(ByVal locate As Integer) As Button
+        locate = locate + 1
         GetButton = Button255
         If locate = 1 Then
             GetButton = Button1
