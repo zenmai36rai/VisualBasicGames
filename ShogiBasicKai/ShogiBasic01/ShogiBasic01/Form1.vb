@@ -66,7 +66,7 @@
                 Dim x As Integer = 1 << pos
                 b1 += x
             ElseIf BB_JOINT <= pos And pos <= 80 Then
-                Dim x As Integer = 1 << pos
+                Dim x As Integer = 1 << pos - BB_JOINT
                 b2 += x
             Else
                 Return -1
@@ -78,7 +78,7 @@
                 Dim x As Integer = 1 << pos
                 b1 -= x
             ElseIf BB_JOINT <= pos And pos <= 80 Then
-                Dim x As Integer = 1 << pos
+                Dim x As Integer = 1 << pos - BB_JOINT
                 b2 -= x
             Else
                 Return -1
