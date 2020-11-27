@@ -2,18 +2,16 @@
     Const WHITE As Integer = 1
     Const BLACK As Integer = -1
     Const USE_AB As Boolean = True
-    Const YOMI_DEPTH As Integer = 1
+    Const YOMI_DEPTH As Integer = 3
     Const HAND_READ As Boolean = True
-    Const KOMAKIKI_READ As Boolean = False
-    Const NIRAMI_READ As Boolean = False
+    Const KOMAKIKI_READ As Boolean = True
+    Const NIRAMI_READ As Boolean = True
     Const DEBUG_LOG As Boolean = False
     Const RETURN_LOG As Boolean = False
     Const DEBUG_TIME As Boolean = False
     Const ROBO_TEBAN As Integer = BLACK
     Const BLANK As Integer = 255
     Const BRANCH_WIDTH As Integer = 800
-    Dim jijin_komakiki_score As Array = {69632, 34816, 23210, 17408, 13926, 11605, 9947, 8704, 7736}
-    Dim aite_komakiki_score As Array = {98304, 49152, 32768, 24576, 19660, 16384, 14043, 12288, 10922}
     Class MoveData
         Public r As Byte
         Public r2 As Byte
@@ -27,13 +25,6 @@
     Dim Node(BRANCH_WIDTH * (YOMI_DEPTH + 1)) As MoveData
     Dim NodeCount As Integer
     Dim NodeIdx As Integer
-    Const BB_JOINT_POS As Integer = 54
-    Class BitBoard
-        Public b1 As Int64 = 0
-        Public b2 As Int64 = 0
-    End Class
-    Dim WhiteBB As BitBoard = New BitBoard
-    Dim BlackBB As BitBoard = New BitBoard
     ''Dim ArrayCount As Integer
     Dim komaname As Array
     Dim board As Array
@@ -53,86 +44,9 @@
     Dim nirami_w As Integer
     Dim nirami_b As Integer
     Dim table As Array = {0, 1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 6, 7, 1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 6, 7}
-    Dim score As Array = {0, 100, 300, 400, 600, 800, 1050, 1000, 32000, 900, 800, 800, 1000, 1200, 1100, 100, 300, 400, 600, 800, 1050, 1000, 32000, 900, 800, 800, 1000, 1200, 1100}
-    Private Function CountByte(ByVal bits As Int64) As Integer
-        Dim mask As Int64 = 1
-        For i = 0 To 63
-            mask = mask << 1
-            If bits And mask Then
-                Return i
-            End If
-        Next
-        Return 0
-    End Function
-    Private Function NTZ(ByVal x As Int64) As Integer
-        Return CountByte(x)
-    End Function
-    Private Function GetNextPos(ByVal bits1 As Int64, ByVal bits2 As Int64) As Integer
-        Dim pos As Integer = NTZ(bits1)
-        If pos <> 0 Then
-            Return pos
-        Else
-            pos = NTZ(bits2)
-            If pos <> 0 Then
-                Return BB_JOINT_POS + pos
-            Else
-                Return 0
-            End If
-        End If
-    End Function
-    Private Function KomaWB(ByVal koma As Integer) As Integer
-        If 0 < koma And koma < 15 Then
-            Return WHITE
-        End If
-        If 15 <= koma Then
-            Return BLACK
-        End If
-        Return 0
-    End Function
-    Private Sub BoardMove(ByVal pos As Integer, ByVal koma As Integer)
-        Dim x As Int64 = 0
-        If 0 <= pos And pos < BB_JOINT_POS Then
-            x = 1 << pos
-        ElseIf pos >= BB_JOINT_POS Then
-            x = 1 << (pos - BB_JOINT_POS)
-        End If
-        If KomaWB(koma) = WHITE Then
-            If pos < BB_JOINT_POS Then
-                WhiteBB.b1 += x
-            Else
-                WhiteBB.b2 += x
-            End If
-        Else
-            If pos < BB_JOINT_POS Then
-                BlackBB.b1 += x
-            Else
-                BlackBB.b2 += x
-            End If
-        End If
-        board(pos) = koma
-    End Sub
-    Private Sub BoardRemove(ByVal pos As Integer)
-        Dim x As Int64 = 0
-        If 0 <= pos And pos < BB_JOINT_POS Then
-            x = 1 << pos
-        ElseIf pos >= BB_JOINT_POS Then
-            x = 1 << (pos - BB_JOINT_POS)
-        End If
-        If KomaWB(board(pos)) = WHITE Then
-            If pos < BB_JOINT_POS Then
-                WhiteBB.b1 -= x
-            Else
-                WhiteBB.b2 -= x
-            End If
-        Else
-            If pos < BB_JOINT_POS Then
-                BlackBB.b1 -= x
-            Else
-                BlackBB.b2 -= x
-            End If
-        End If
-        board(pos) = 0
-    End Sub
+    Dim score As Array = {0, 90, 315, 405, 495, 540, 855, 990, 15000, 540, 540, 540, 540, 945, 1395, 0, 90, 315, 405, 495, 540, 855, 990, 30000, 540, 540, 540, 540, 945, 1395}
+    Dim our_effect_value As Array = {69632, 34816, 23210, 17408, 13926, 11605, 9947, 8704, 7736}
+    Dim thier_effect_value As Array = {98304, 49152, 32768, 24576, 19660, 16384, 14043, 12288, 10922}
     Private Sub Init() Handles Me.HandleCreated
         komaname = {"", "歩", "香", "桂", "銀", "金", "飛", "角", "王", "と", "杏", "圭", "全", "龍", "馬"}
         all = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81}
@@ -145,10 +59,6 @@
                     1, 1, 1, 1, 1, 1, 1, 1, 1,
                     0, 6, 0, 0, 0, 0, 0, 7, 0,
                     2, 3, 4, 5, 8, 5, 4, 3, 2}
-        WhiteBB.b1 = &B000000000_000000000_000000000_000000000_000000000_000000000
-        WhiteBB.b2 = &B111111111_010000010_111111111
-        BlackBB.b1 = &B111111111_010000010_111111111_000000000_000000000_000000000
-        BlackBB.b2 = &B000000000_000000000_000000000
         tegomaw = {0, 0, 0, 0, 0, 0, 0, 0}
         tegomab = {0, 0, 0, 0, 0, 0, 0, 0}
         state = 0
@@ -278,13 +188,13 @@
             If CheckBoardRange(dx, dy) = True Then
                 dist = dx + dy * 9 + 1
                 If IsWhite(undo) And IsWhite(dist) Then
-                    komakiki_w(dist - 1) += 1
-                    Exit Sub
+                   komakiki_w(dist - 1) += 1
                 End If
+                Exit Sub
                 If IsBlack(undo) And IsBlack(dist) Then
                     komakiki_b(dist - 1) += 1
-                    Exit Sub
-                End If
+                End IF
+                Exit Sub
             End If
         End If
    End Sub
@@ -293,9 +203,15 @@
         If CheckBoardRange(dx, dy) = True Then
             dist = dx + dy * 9 + 1
             If IsWhite(undo) And IsWhite(dist) Then
+                if KOMAKIKI_READ = True Then
+                   komakiki_w(dist - 1) += 1
+                End If
                 Exit Sub
             End If
             If IsBlack(undo) And IsBlack(dist) Then
+                if KOMAKIKI_READ = True Then
+                   komakiki_b(dist - 1) += 1
+                End If
                 Exit Sub
             End If
             AddValue(array, dist, pos)
@@ -314,7 +230,7 @@
             Node(idx).hand = BLANK
             NodeCount += 1
             NodeIdx += 1
-            idx += 1
+            ''idx += 1
         End If
     End Sub
 
@@ -742,22 +658,50 @@
     Private Function KomaScore(ByVal koma) As Integer
         KomaScore = score(koma)
     End Function
+    Private Function KomaDist(ByVal king_x, ByVal king_y, ByVal koma) As Integer
+        Dim x = king_x - koma Mod 9
+        Dim y = king_y - koma / 9
+        If x < 0 Then
+            x = -x
+        End If
+        If y < 0 Then
+            y = -y
+        End If
+        KomaDist = Math.Sqrt(x ^ 2 + y ^ 2) / 456
+    End Function
     Private Function Hyouka() As Integer
         Dim arw As Array = {1, 2, 3, 4, 5, 6, 7, 8}
         Dim arb As Array = {15, 16, 17, 18, 19, 20, 21, 22}
+        Dim king_sq_x As Integer = 0
+        Dim king_sq_y As Integer = 0
+        Dim enem_sq_x As Integer = 0
+        Dim enem_sq_y As Integer = 0
+        Dim d As Integer = 0
         Hyouka = 0
+        For i = 0 To 80 Step 1
+            If board(i) = 8 Then
+                king_sq_x = i Mod 9
+                king_sq_y = i / 9
+            End If
+            If board(i) = 22 Then
+                enem_sq_x = i Mod 9
+                enem_sq_y = i / 9
+            End If
+        Next
         For i = 0 To 80 Step 1
             If IsWB(WHITE, i + 1) Then
                 Hyouka += KomaScore(board(i))
-                'If board(i) = 1 Then
-                'Hyouka += komakiki_w(i) * 1
-                'End If
+                d = KomaDist(enem_sq_x, enem_sq_y, i)
+                Dim s1 As Integer = komakiki_w(i) * our_effect_value(d) / 1024
+                Dim s2 As Integer = komakiki_b(i) * thier_effect_value(d) / 1024
+                Hyouka += s1 - s2
             End If
             If IsWB(BLACK, i + 1) Then
                 Hyouka -= KomaScore(board(i))
-                'If board(i) = 15 Then
-                'Hyouka -= komakiki_b(i) * 1
-                'End If
+                d = KomaDist(king_sq_x, king_sq_y, i)
+                Dim s1 As Integer = komakiki_b(i) * our_effect_value(d) / 1024
+                Dim s2 As Integer = komakiki_w(i) * thier_effect_value(d) / 1024
+                Hyouka += s1 - s2
             End If
         Next
         For i = 0 To 7 Step 1
@@ -788,26 +732,6 @@
             End If
         Next
         Return alpha
-    End Function
-    Private Function GetBitPos(ByRef b1 As Int64, ByRef b2 As Int64) As Integer
-        Dim x As Integer = 0
-        Dim mask As Int64 = 0
-        If 0 <> b1 Then
-            x = NTZ(b1)
-            mask = 1
-            b1 -= (mask << x)
-        ElseIf 0 <> b2 Then
-            x = NTZ(b2)
-            mask = 1
-            b2 -= (mask << x)
-            x = x + BB_JOINT_POS
-        Else
-            Return -1
-        End If
-        If x > 80 Then
-            Return -1 'もし通ったらデバッグが必要
-        End If
-        Return x
     End Function
     Private Function GenerateMoves(ByVal first As Integer, ByVal wb As Integer) As Integer
         Dim idx As Integer = first
@@ -850,30 +774,30 @@
             Next
         End If
 
-        Dim b1 As Int64
-        Dim b2 As Int64
-
-        If wb = WHITE Then
-            b1 = WhiteBB.b1
-            b2 = WhiteBB.b2
-        Else
-            b1 = BlackBB.b1
-            b2 = BlackBB.b2
-        End If
-        Dim mask As Int64 = 1
-        Dim x As Integer = GetBitPos(b1, b2)
-        Do While (x <> -1)
-            x = x + 1
-            'If IsWB(wb, x) Then
-            undo = x
+        For i = 1 To 81 Step 1
+            If True = IsWB(wb, i) Then
+                undo = i
                 GenerationFlag = True
                 NodeIdx = idx
-                UnitRange(x)
+                ''range = UnitRange(i)
+                UnitRange(i)
                 GenerationFlag = False
+                ''ArrayCount += range.Length
+                ''For j = 0 To range.Length - 1 Step 1
+                ''    If range(j) <> BLANK Then
+                ''        Node(idx) = New MoveData
+                ''        Node(idx).r = i
+                ''        Node(idx).r2 = range(j)
+                ''        Node(idx).src = board(i - 1)
+                ''        Node(idx).dst = board(range(j) - 1)
+                ''        Node(idx).hand = BLANK
+                ''        NodeCount += 1
+                ''        idx += 1
+                ''    End If
+                ''Next
                 idx += (NodeIdx - idx)
-            'End If
-            x = GetBitPos(b1, b2)
-        Loop
+            End If
+        Next
         Return idx
     End Function
     Private Sub RobotMove(ByVal wb As Integer)
@@ -1242,8 +1166,8 @@
             narimem = board(d.r - 1)
         End If
         ClassUp(d.r)
-        BoardMove(d.r2 - 1, board(d.r - 1))
-        BoardRemove(d.r - 1)
+        board(d.r2 - 1) = board(d.r - 1)
+        board(d.r - 1) = 0
         ClassUp(d.r2)
 LOG_WRITE:
         If DEBUG_LOG Then
@@ -1253,10 +1177,10 @@ LOG_WRITE:
     Private Sub UnmakeMove(ByVal d As MoveData)
         If d.hand <> BLANK Then
             KomaModosi(d.r2)
-            BoardRemove(d.r2 - 1)
+            board(d.r2 - 1) = 0
             Exit Sub
         End If
-        BoardMove(d.r - 1, d.src)
+        board(d.r - 1) = d.src
         KomaKaeshi(d.r2, d.dst)
     End Sub
     Private Function Question() As Boolean
@@ -1338,7 +1262,7 @@ LOG_WRITE:
         End If
     End Sub
     Private Sub KomaOki(ByVal locate, ByVal t)
-        BoardMove(locate - 1, t)
+        board(locate - 1) = t
         If 15 <= t Then
             t = table(t) - 1
             tegomab(t) = tegomab(t) - 1
@@ -1348,7 +1272,7 @@ LOG_WRITE:
         End If
     End Sub
     Private Sub KomaKaeshi(ByVal locate, ByVal t)
-        BoardMove(locate - 1, t)
+        board(locate - 1) = t
         If 15 <= t Then
             t = table(t) - 1
             tegomaw(t) = tegomaw(t) - 1
