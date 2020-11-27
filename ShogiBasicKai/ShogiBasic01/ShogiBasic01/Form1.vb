@@ -108,7 +108,12 @@
     Dim table As Array = {0, 1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 6, 7, 1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 6, 7}
     Dim score As Array = {0, 90, 315, 405, 495, 540, 855, 990, 15000, 540, 540, 540, 540, 945, 1395, 0, 90, 315, 405, 495, 540, 855, 990, 30000, 540, 540, 540, 540, 945, 1395}
     Dim our_effect_value As Array = {69632, 34816, 23210, 17408, 13926, 11605, 9947, 8704, 7736}
-    Dim thier_effect_value As Array = {98304, 49152, 32768, 24576, 19660, 16384, 14043, 12288, 10922}
+    Dim their_effect_value As Array = {98304, 49152, 32768, 24576, 19660, 16384, 14043, 12288, 10922}
+    Const KOMAKIKI_SUM As Integer = 11
+    Const WH_OR_BL As Integer = 2
+    Const KING_POS As Integer = 81
+    Const EFFECT_POS As Integer = 81
+    Dim score_table(KOMAKIKI_SUM, WH_OR_BL, KING_POS, EFFECT_POS) As Integer
     Private Function SetBoard(ByVal dist As Integer, ByVal koma As Integer) As Integer
         If IsWhite(dist) Then
             bb_white.RemoveBoard(dist)
@@ -154,6 +159,14 @@
         narimem = BLANK
         robomode = False
         KomaKikiInit()
+        For k = 0 To KOMAKIKI_SUM - 1 Step 1
+            For kp = 0 To 80 Step 1
+                For i = 0 To 80 Step 1
+                    score_table(k, 0, kp, i) = k * our_effect_value(KomaDist(kp, i)) / 1024
+                    score_table(k, 1, kp, i) = k * their_effect_value(KomaDist(kp, i)) / 1024
+                Next
+            Next
+        Next
         BoardSet()
         Randomize()
         '        For i = 0 To score.Length - 1 Step 1
@@ -744,54 +757,46 @@
     Private Function KomaScore(ByVal koma) As Integer
         KomaScore = score(koma)
     End Function
-    Private Function KomaDist(ByVal king_x, ByVal king_y, ByVal koma) As Integer
+    Private Function KomaDist(ByVal king_pos, ByVal koma) As Integer
+        Dim king_x As Integer
+        Dim king_y As Integer
+        king_x = king_pos Mod 9
+        king_y = king_pos / 9
         Dim x = king_x - koma Mod 9
         Dim y = king_y - koma / 9
-        If x < 0 Then
-            x = -x
-        End If
-        If y < 0 Then
-            y = -y
-        End If
         KomaDist = Math.Sqrt(x ^ 2 + y ^ 2) / 456
     End Function
     Private Function Hyouka() As Integer
-        Dim king_sq_x As Integer = 0
-        Dim king_sq_y As Integer = 0
-        Dim enem_sq_x As Integer = 0
-        Dim enem_sq_y As Integer = 0
+        Dim king_pos As Integer = 0
+        Dim enem_pos As Integer = 0
         Dim d As Integer = 0
         Hyouka = 0
-        'For i = 0 To 80 Step 1
-        'If board(i) = 0 Then
-        'Continue For
-        'End If
-        'If board(i) = 8 Then
-        'king_sq_x = i Mod 9
-        'king_sq_y = i / 9
-        'End If
-        'If board(i) = 22 Then
-        'enem_sq_x = i Mod 9
-        'enem_sq_y = i / 9
-        'End If
-        'Next
+        For i = 0 To 80 Step 1
+            If board(i) = 0 Then
+                Continue For
+            End If
+            If board(i) = 8 Then
+                king_pos = i
+            End If
+            If board(i) = 22 Then
+                enem_pos = i
+            End If
+        Next
         For i = 0 To 80 Step 1
             If board(i) = 0 Then
                 Continue For
             End If
             If IsWB(WHITE, i) Then
                 Hyouka += KomaScore(board(i))
-                'd = KomaDist(enem_sq_x, enem_sq_y, i)
-                'Dim s1 As Integer = komakiki_w(i) * our_effect_value(d) / 1024
-                'Dim s2 As Integer = komakiki_b(i) * thier_effect_value(d) / 1024
-                'Hyouka += s1 - s2
+                Dim s1 As Integer = score_table(komakiki_w(i), 0, enem_pos, i)
+                Dim s2 As Integer = score_table(komakiki_b(i), 1, enem_pos, i)
+                Hyouka += s1 - s2
             End If
             If IsWB(BLACK, i) Then
                 Hyouka -= KomaScore(board(i))
-                'd = KomaDist(king_sq_x, king_sq_y, i)
-                'Dim s1 As Integer = komakiki_b(i) * our_effect_value(d) / 1024
-                'Dim s2 As Integer = komakiki_w(i) * thier_effect_value(d) / 1024
-                'Hyouka += s1 - s2
+                Dim s1 As Integer = score_table(komakiki_b(i), 0, king_pos, i)
+                Dim s2 As Integer = score_table(komakiki_w(i), 1, king_pos, i)
+                Hyouka += s1 - s2
             End If
         Next
         For i = 0 To 7 Step 1
