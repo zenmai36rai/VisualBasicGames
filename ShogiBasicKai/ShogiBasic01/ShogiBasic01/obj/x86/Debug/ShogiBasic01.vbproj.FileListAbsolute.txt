@@ -42,3 +42,4 @@ C:\Users\宮澤 郷介\source\repos\zenmai36rai\VisualBasicGames\ShogiBasicKai\S
 C:\Users\宮澤 郷介\source\repos\zenmai36rai\VisualBasicGames\ShogiBasicKai\ShogiBasic01\ShogiBasic01\bin\Debug\ShogiBasic01.xml
 C:\Users\宮澤 郷介\source\repos\zenmai36rai\VisualBasicGames\ShogiBasicKai\ShogiBasic01\ShogiBasic01\obj\x86\Debug\ShogiBasic01.exe.manifest
 C:\Users\宮澤 郷介\source\repos\zenmai36rai\VisualBasicGames\ShogiBasicKai\ShogiBasic01\ShogiBasic01\obj\x86\Debug\ShogiBasic01.application
+C:\Users\宮澤 郷介\source\repos\zenmai36rai\VisualBasicGames\ShogiBasicKai\ShogiBasic01\ShogiBasic01\obj\x86\Debug\ShogiBasic01.vbprojAssemblyReference.cache

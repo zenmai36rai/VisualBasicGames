@@ -689,6 +689,9 @@
             End If
         Next
         For i = 0 To 80 Step 1
+            If board(i) = 0 Then
+                Continue For
+            End If
             If IsWB(WHITE, i + 1) Then
                 Hyouka += KomaScore(board(i))
                 d = KomaDist(enem_sq_x, enem_sq_y, i)
@@ -774,13 +777,17 @@
             Next
         End If
 
-        For i = 1 To 81 Step 1
-            If True = IsWB(wb, i) Then
-                undo = i
+        For i = 0 To 80 Step 1
+            If board(i) = 0 Then
+                Continue For
+            End If
+            Dim pos = i + 1
+            If True = IsWB(wb, pos) Then
+                undo = pos
                 GenerationFlag = True
                 NodeIdx = idx
                 ''range = UnitRange(i)
-                UnitRange(i)
+                UnitRange(pos)
                 GenerationFlag = False
                 ''ArrayCount += range.Length
                 ''For j = 0 To range.Length - 1 Step 1
