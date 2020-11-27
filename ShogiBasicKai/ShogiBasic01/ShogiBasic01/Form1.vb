@@ -189,13 +189,13 @@
             Dim dist As Integer
             If CheckBoardRange(dx, dy) = True Then
                 dist = dx + dy * 9
-                If IsWhite(undo) And IsWhite(dist) Then
+                If IsWhite(undo) Then
                     komakiki_w(dist) += 1
                 End If
                 Exit Sub
-                If IsBlack(undo) And IsBlack(dist) Then
+                If IsBlack(undo) Then
                     komakiki_b(dist) += 1
-                End IF
+                End If
                 Exit Sub
             End If
         End If
@@ -697,17 +697,17 @@
             End If
             If IsWB(WHITE, i) Then
                 Hyouka += KomaScore(board(i))
-                'd = KomaDist(enem_sq_x, enem_sq_y, i)
-                'Dim s1 As Integer = komakiki_w(i) * our_effect_value(d) / 1024
-                'Dim s2 As Integer = komakiki_b(i) * thier_effect_value(d) / 1024
-                'Hyouka += s1 - s2
+                d = KomaDist(enem_sq_x, enem_sq_y, i)
+                Dim s1 As Integer = komakiki_w(i) * our_effect_value(d) / 1024
+                Dim s2 As Integer = komakiki_b(i) * thier_effect_value(d) / 1024
+                Hyouka += s1 - s2
             End If
             If IsWB(BLACK, i) Then
                 Hyouka -= KomaScore(board(i))
-                'd = KomaDist(king_sq_x, king_sq_y, i)
-                'Dim s1 As Integer = komakiki_b(i) * our_effect_value(d) / 1024
-                'Dim s2 As Integer = komakiki_w(i) * thier_effect_value(d) / 1024
-                'Hyouka += s1 - s2
+                d = KomaDist(king_sq_x, king_sq_y, i)
+                Dim s1 As Integer = komakiki_b(i) * our_effect_value(d) / 1024
+                Dim s2 As Integer = komakiki_w(i) * thier_effect_value(d) / 1024
+                Hyouka += s1 - s2
             End If
         Next
         For i = 0 To 7 Step 1
