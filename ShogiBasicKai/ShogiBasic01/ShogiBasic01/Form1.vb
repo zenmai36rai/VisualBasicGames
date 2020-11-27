@@ -110,13 +110,13 @@
     Dim our_effect_value As Array = {69632, 34816, 23210, 17408, 13926, 11605, 9947, 8704, 7736}
     Dim thier_effect_value As Array = {98304, 49152, 32768, 24576, 19660, 16384, 14043, 12288, 10922}
     Private Function SetBoard(ByVal dist As Integer, ByVal koma As Integer) As Integer
+        If IsWhite(dist) Then
+            bb_white.RemoveBoard(dist)
+        End If
+        If IsBlack(dist) Then
+            bb_black.RemoveBoard(dist)
+        End If
         If 0 = koma Then
-            If IsWhite(dist) Then
-                bb_white.RemoveBoard(dist)
-            End If
-            If IsBlack(dist) Then
-                bb_black.RemoveBoard(dist)
-            End If
             board(dist) = koma
         End If
         If 1 <= koma And koma <= 14 Then
@@ -863,19 +863,19 @@
                 End If
             Next
         End If
-        'Dim bb As BitBoard
-        'If wb = WHITE Then
-        'bb = bb_white
-        'Else
-        'bb = bb_black
-        'End If
-        'Dim pos = bb.GetFirst()
-        'While (pos <> -1)
-        For i = 0 To 80 Step 1
-            If board(i) = 0 Then
-                Continue For
-            End If
-            Dim pos = i
+        Dim bb As BitBoard
+        If wb = WHITE Then
+            bb = bb_white
+        Else
+            bb = bb_black
+        End If
+        Dim pos = bb.GetFirst()
+        While (pos <> -1)
+            'For i = 0 To 80 Step 1
+            'If board(i) = 0 Then
+            'Continue For
+            'End If
+            'Dim pos = i
             If True = IsWB(wb, pos) Then
                 undo = pos
                 GenerationFlag = True
@@ -898,9 +898,9 @@
                 ''Next
                 idx += (NodeIdx - idx)
             End If
-            'pos = bb.GetNext()
-            'End While
-        Next
+            pos = bb.GetNext()
+        End While
+        'Next
         Return idx
     End Function
     Private Sub RobotMove(ByVal wb As Integer)
