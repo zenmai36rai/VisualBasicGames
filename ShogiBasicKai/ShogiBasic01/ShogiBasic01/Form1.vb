@@ -32,8 +32,8 @@
     Class BitBoard
         Public b1 As Int64
         Public b2 As Int64
-        Public n1 As Int64
-        Public n2 As Int64
+        Public n1 As Int64 = 0
+        Public n2 As Int64 = 0
         Public Function CountBits(ByVal bits As Int64) As Integer
             Dim mask As Integer = 0
             For i = 0 To BB_JOINT Step 1
@@ -67,7 +67,7 @@
                 b1 += x
             ElseIf BB_JOINT <= pos And pos <= 80 Then
                 Dim x As Integer = 1 << pos
-                b1 += x
+                b2 += x
             Else
                 Return -1
             End If
@@ -79,7 +79,7 @@
                 b1 -= x
             ElseIf BB_JOINT <= pos And pos <= 80 Then
                 Dim x As Integer = 1 << pos
-                b1 -= x
+                b2 -= x
             Else
                 Return -1
             End If
@@ -109,6 +109,26 @@
     Dim score As Array = {0, 90, 315, 405, 495, 540, 855, 990, 15000, 540, 540, 540, 540, 945, 1395, 0, 90, 315, 405, 495, 540, 855, 990, 30000, 540, 540, 540, 540, 945, 1395}
     Dim our_effect_value As Array = {69632, 34816, 23210, 17408, 13926, 11605, 9947, 8704, 7736}
     Dim thier_effect_value As Array = {98304, 49152, 32768, 24576, 19660, 16384, 14043, 12288, 10922}
+    Private Function SetBoard(ByVal dist As Integer, ByVal koma As Integer) As Integer
+        If 0 = koma Then
+            If IsWhite(dist) Then
+                bb_white.RemoveBoard(dist)
+            End If
+            If IsBlack(dist) Then
+                bb_black.RemoveBoard(dist)
+            End If
+            board(dist) = koma
+        End If
+        If 1 <= koma And koma <= 14 Then
+            board(dist) = koma
+            bb_white.AddBoard(dist)
+        End If
+        If 15 <= koma Then
+            board(dist) = koma
+            bb_black.AddBoard(dist)
+        End If
+        Return 0
+    End Function
     Private Sub Init() Handles Me.HandleCreated
         komaname = {"", "歩", "香", "桂", "銀", "金", "飛", "角", "王", "と", "杏", "圭", "全", "龍", "馬"}
         all = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80}
@@ -125,7 +145,7 @@
         tegomab = {0, 0, 0, 0, 0, 0, 0, 0}
         bb_white.b1 = &B000000000_000000000_000000000_000000000_000000000_000000000
         bb_white.b2 = &B111111111_010000010_111111111
-        bb_black.b1 = &B111111111_010000010_111111111_000000000_000000000_000000000
+        bb_black.b1 = &B000000000_000000000_000000000_111111111_010000010_111111111
         bb_black.b2 = &B000000000_000000000_000000000
         state = 0
         undo = BLANK
@@ -742,36 +762,36 @@
         Dim enem_sq_y As Integer = 0
         Dim d As Integer = 0
         Hyouka = 0
-        For i = 0 To 80 Step 1
-            If board(i) = 0 Then
-                Continue For
-            End If
-            If board(i) = 8 Then
-                king_sq_x = i Mod 9
-                king_sq_y = i / 9
-            End If
-            If board(i) = 22 Then
-                enem_sq_x = i Mod 9
-                enem_sq_y = i / 9
-            End If
-        Next
+        'For i = 0 To 80 Step 1
+        'If board(i) = 0 Then
+        'Continue For
+        'End If
+        'If board(i) = 8 Then
+        'king_sq_x = i Mod 9
+        'king_sq_y = i / 9
+        'End If
+        'If board(i) = 22 Then
+        'enem_sq_x = i Mod 9
+        'enem_sq_y = i / 9
+        'End If
+        'Next
         For i = 0 To 80 Step 1
             If board(i) = 0 Then
                 Continue For
             End If
             If IsWB(WHITE, i) Then
                 Hyouka += KomaScore(board(i))
-                d = KomaDist(enem_sq_x, enem_sq_y, i)
-                Dim s1 As Integer = komakiki_w(i) * our_effect_value(d) / 1024
-                Dim s2 As Integer = komakiki_b(i) * thier_effect_value(d) / 1024
-                Hyouka += s1 - s2
+                'd = KomaDist(enem_sq_x, enem_sq_y, i)
+                'Dim s1 As Integer = komakiki_w(i) * our_effect_value(d) / 1024
+                'Dim s2 As Integer = komakiki_b(i) * thier_effect_value(d) / 1024
+                'Hyouka += s1 - s2
             End If
             If IsWB(BLACK, i) Then
                 Hyouka -= KomaScore(board(i))
-                d = KomaDist(king_sq_x, king_sq_y, i)
-                Dim s1 As Integer = komakiki_b(i) * our_effect_value(d) / 1024
-                Dim s2 As Integer = komakiki_w(i) * thier_effect_value(d) / 1024
-                Hyouka += s1 - s2
+                'd = KomaDist(king_sq_x, king_sq_y, i)
+                'Dim s1 As Integer = komakiki_b(i) * our_effect_value(d) / 1024
+                'Dim s2 As Integer = komakiki_w(i) * thier_effect_value(d) / 1024
+                'Hyouka += s1 - s2
             End If
         Next
         For i = 0 To 7 Step 1
@@ -814,7 +834,7 @@
         End If
         If HAND_READ Then
             For i = 0 To 7
-                If wb = 1 Then
+                If wb = WHITE Then
                     If tegomaw(i) > 0 Then
                         range = HandRange(wb, i)
                         For j = 0 To range.Length - 1 Step 1
@@ -843,17 +863,25 @@
                 End If
             Next
         End If
-
+        'Dim bb As BitBoard
+        'If wb = WHITE Then
+        'bb = bb_white
+        'Else
+        'bb = bb_black
+        'End If
+        'Dim pos = bb.GetFirst()
+        'While (pos <> -1)
         For i = 0 To 80 Step 1
             If board(i) = 0 Then
                 Continue For
             End If
-            If True = IsWB(wb, i) Then
-                undo = i
+            Dim pos = i
+            If True = IsWB(wb, pos) Then
+                undo = pos
                 GenerationFlag = True
                 NodeIdx = idx
                 ''range = UnitRange(i)
-                UnitRange(i)
+                UnitRange(pos)
                 GenerationFlag = False
                 ''ArrayCount += range.Length
                 ''For j = 0 To range.Length - 1 Step 1
@@ -870,6 +898,8 @@
                 ''Next
                 idx += (NodeIdx - idx)
             End If
+            'pos = bb.GetNext()
+            'End While
         Next
         Return idx
     End Function
@@ -1237,8 +1267,10 @@
             narimem = board(d.r)
         End If
         ClassUp(d.r)
-        board(d.r2) = board(d.r)
-        board(d.r) = 0
+        'board(d.r2) = board(d.r)
+        SetBoard(d.r2, board(d.r))
+        'board(d.r) = 0
+        SetBoard(d.r, 0)
         ClassUp(d.r2)
 LOG_WRITE:
         If DEBUG_LOG Then
@@ -1248,10 +1280,12 @@ LOG_WRITE:
     Private Sub UnmakeMove(ByVal d As MoveData)
         If d.hand <> BLANK Then
             KomaModosi(d.r2)
-            board(d.r2) = 0
+            'board(d.r2) = 0
+            SetBoard(d.r2, 0)
             Exit Sub
         End If
-        board(d.r) = d.src
+        'board(d.r) = d.src
+        SetBoard(d.r, d.src)
         KomaKaeshi(d.r2, d.dst)
     End Sub
     Private Function Question() As Boolean
@@ -1266,7 +1300,7 @@ LOG_WRITE:
     Private Sub ClassUp(ByVal locate As Integer)
         Dim unit As Integer
         unit = board(locate)
-        If IsWhite(locate) And 1 <= locate And locate <= 27 Then
+        If IsWhite(locate) And 0 <= locate And locate <= 26 Then
             If Question() = False Then
                 Exit Sub
             End If
@@ -1333,7 +1367,8 @@ LOG_WRITE:
         End If
     End Sub
     Private Sub KomaOki(ByVal locate, ByVal t)
-        board(locate) = t
+        'board(locate) = t
+        SetBoard(locate, t)
         If 15 <= t Then
             t = table(t) - 1
             tegomab(t) = tegomab(t) - 1
@@ -1343,7 +1378,8 @@ LOG_WRITE:
         End If
     End Sub
     Private Sub KomaKaeshi(ByVal locate, ByVal t)
-        board(locate) = t
+        'board(locate) = t
+        SetBoard(locate, t)
         If 15 <= t Then
             t = table(t) - 1
             tegomaw(t) = tegomaw(t) - 1
