@@ -33,6 +33,8 @@
     Dim range As Array
     Dim tegomaw As Array
     Dim tegomab As Array
+    Dim ARW As Array = {1, 2, 3, 4, 5, 6, 7, 8}
+    Dim ARB As Array = {15, 16, 17, 18, 19, 20, 21, 22}
     Dim pop As Integer
     Dim all As Array
     Dim komaundo As Integer
@@ -49,7 +51,7 @@
     Dim thier_effect_value As Array = {98304, 49152, 32768, 24576, 19660, 16384, 14043, 12288, 10922}
     Private Sub Init() Handles Me.HandleCreated
         komaname = {"", "歩", "香", "桂", "銀", "金", "飛", "角", "王", "と", "杏", "圭", "全", "龍", "馬"}
-        all = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81}
+        all = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80}
         board = {16, 17, 18, 19, 22, 19, 18, 17, 16,
                     0, 21, 0, 0, 0, 0, 0, 20, 0,
                     15, 15, 15, 15, 15, 15, 15, 15, 15,
@@ -670,8 +672,6 @@
         KomaDist = Math.Sqrt(x ^ 2 + y ^ 2) / 456
     End Function
     Private Function Hyouka() As Integer
-        Dim arw As Array = {1, 2, 3, 4, 5, 6, 7, 8}
-        Dim arb As Array = {15, 16, 17, 18, 19, 20, 21, 22}
         Dim king_sq_x As Integer = 0
         Dim king_sq_y As Integer = 0
         Dim enem_sq_x As Integer = 0
@@ -679,6 +679,9 @@
         Dim d As Integer = 0
         Hyouka = 0
         For i = 0 To 80 Step 1
+            If board(i) = 0 Then
+                Continue For
+            End If
             If board(i) = 8 Then
                 king_sq_x = i Mod 9
                 king_sq_y = i / 9
@@ -694,22 +697,22 @@
             End If
             If IsWB(WHITE, i) Then
                 Hyouka += KomaScore(board(i))
-                d = KomaDist(enem_sq_x, enem_sq_y, i)
-                Dim s1 As Integer = komakiki_w(i) * our_effect_value(d) / 1024
-                Dim s2 As Integer = komakiki_b(i) * thier_effect_value(d) / 1024
-                Hyouka += s1 - s2
+                'd = KomaDist(enem_sq_x, enem_sq_y, i)
+                'Dim s1 As Integer = komakiki_w(i) * our_effect_value(d) / 1024
+                'Dim s2 As Integer = komakiki_b(i) * thier_effect_value(d) / 1024
+                'Hyouka += s1 - s2
             End If
             If IsWB(BLACK, i) Then
                 Hyouka -= KomaScore(board(i))
-                d = KomaDist(king_sq_x, king_sq_y, i)
-                Dim s1 As Integer = komakiki_b(i) * our_effect_value(d) / 1024
-                Dim s2 As Integer = komakiki_w(i) * thier_effect_value(d) / 1024
-                Hyouka += s1 - s2
+                'd = KomaDist(king_sq_x, king_sq_y, i)
+                'Dim s1 As Integer = komakiki_b(i) * our_effect_value(d) / 1024
+                'Dim s2 As Integer = komakiki_w(i) * thier_effect_value(d) / 1024
+                'Hyouka += s1 - s2
             End If
         Next
         For i = 0 To 7 Step 1
-            Hyouka += tegomaw(i) * KomaScore(arw(i)) * 1.05
-            Hyouka -= tegomab(i) * KomaScore(arb(i)) * 1.05
+            Hyouka += tegomaw(i) * KomaScore(ARW(i)) * 1.05
+            Hyouka -= tegomab(i) * KomaScore(ARB(i)) * 1.05
         Next
         Hyouka = Hyouka / 2
         Return Hyouka
@@ -956,11 +959,9 @@
         TextBox4.Text = -Hyouka().ToString
     End Sub
     Private Function HandRange(ByVal wb As Integer, ByVal idx As Integer) As Array
-        Dim arw As Array = {1, 2, 3, 4, 5, 6, 7, 8}
-        Dim arb As Array = {15, 16, 17, 18, 19, 20, 21, 22}
-        Dim koma = arb(idx)
+        Dim koma = ARB(idx)
         If wb = 1 Then
-            koma = arw(idx)
+            koma = ARW(idx)
         End If
         range = all.Clone()
         For i = 0 To 80 Step 1
