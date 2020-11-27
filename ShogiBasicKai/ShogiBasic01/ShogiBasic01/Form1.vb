@@ -28,6 +28,66 @@
     ''Dim ArrayCount As Integer
     Dim komaname As Array
     Dim board As Array
+    Const BB_JOINT As Integer = 54
+    Class BitBoard
+        Public b1 As Int64
+        Public b2 As Int64
+        Public n1 As Int64
+        Public n2 As Int64
+        Public Function CountBits(ByVal bits As Int64) As Integer
+            Dim mask As Integer = 0
+            For i = 0 To BB_JOINT Step 1
+                mask = 1 << i
+                If bits And mask Then
+                    Return i
+                End If
+            Next
+            Return -1
+        End Function
+        Public Function GetFirst() As Integer
+            n1 = b1
+            n2 = b2
+            Return GetNext()
+        End Function
+        Public Function GetNext() As Integer
+            Dim ret As Integer = -1
+            If 0 <> n1 Then
+                ret = CountBits(n1)
+                n1 -= 1 << ret
+            ElseIf 0 <> n2 Then
+                ret = CountBits(n2)
+                n2 -= 1 << ret
+                ret += BB_JOINT
+            End If
+            Return ret
+        End Function
+        Public Function AddBoard(ByVal pos As Integer) As Integer
+            If 0 <= pos And pos < BB_JOINT Then
+                Dim x As Integer = 1 << pos
+                b1 += x
+            ElseIf BB_JOINT <= pos And pos <= 80 Then
+                Dim x As Integer = 1 << pos
+                b1 += x
+            Else
+                Return -1
+            End If
+            Return 0
+        End Function
+        Public Function RemoveBoard(ByVal pos As Integer) As Integer
+            If 0 <= pos And pos < BB_JOINT Then
+                Dim x As Integer = 1 << pos
+                b1 -= x
+            ElseIf BB_JOINT <= pos And pos <= 80 Then
+                Dim x As Integer = 1 << pos
+                b1 -= x
+            Else
+                Return -1
+            End If
+            Return 0
+        End Function
+    End Class
+    Dim bb_white As BitBoard = New BitBoard
+    Dim bb_black As BitBoard = New BitBoard
     Dim state As Integer
     Dim undo As Integer
     Dim range As Array
@@ -63,6 +123,10 @@
                     2, 3, 4, 5, 8, 5, 4, 3, 2}
         tegomaw = {0, 0, 0, 0, 0, 0, 0, 0}
         tegomab = {0, 0, 0, 0, 0, 0, 0, 0}
+        bb_white.b1 = &B000000000_000000000_000000000_000000000_000000000_000000000
+        bb_white.b2 = &B111111111_010000010_111111111
+        bb_black.b1 = &B111111111_010000010_111111111_000000000_000000000_000000000
+        bb_black.b2 = &B000000000_000000000_000000000
         state = 0
         undo = BLANK
         komaundo = BLANK
