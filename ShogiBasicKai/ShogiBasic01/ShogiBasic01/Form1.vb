@@ -330,12 +330,12 @@
         End If
     End Sub
     Private Sub AddValue(ByRef a As Array, ByVal dist As Integer, ByVal pos As integer)
-        If IsWhite(undo) And IsWhite(dist) Then
+        If IsWhite(undo) Then
             If KOMAKIKI_READ = True Then
                 komakiki_w(dist) += 1
             End If
         End If
-        If IsBlack(undo) And IsBlack(dist) Then
+        If IsBlack(undo) Then
             If KOMAKIKI_READ = True Then
                 komakiki_b(dist) += 1
             End If
@@ -861,7 +861,7 @@
             nirami_b = 0
         End If
         If HAND_READ Then
-            For i = 0 To 7
+            For i = 0 To 6 '手駒の玉は読まない
                 If wb = WHITE Then
                     If tegomaw(i) > 0 Then
                         range = HandRange(wb, i)
