@@ -110,7 +110,7 @@
     Const WH_OR_BL As Integer = 3
     Const KING_POS As Integer = 81
     Const EFFECT_POS As Integer = 81
-    Dim score As Array = {0, 90, 315, 405, 495, 540, 855, 990, 15000, 540, 540, 540, 540, 945, 1395, 0, 90, 315, 405, 495, 540, 855, 990, 15000, 540, 540, 540, 540, 945, 1395}
+    Dim score As Array = {0, 90, 315, 405, 495, 540, 990, 855, 15000, 540, 540, 540, 540, 1395, 945, 0, 90, 315, 405, 495, 540, 990, 855, 15000, 540, 540, 540, 540, 1395, 945}
     Dim our_effect_value(9) As Integer
     Dim their_effect_value(9) As Integer
     Dim blank_effect_value(9) As Integer
@@ -582,7 +582,7 @@
                     AddKomakiki(dx, dy)
                     Exit For
                 End If
-                If IsWB(wb, undo) = IsWB(wb, dist) Then
+                If IsWB(wb, undo) = IsWB(-wb, dist) Then
                     AddValue(a, dist, i + 23)
                     Exit For
                 Else
