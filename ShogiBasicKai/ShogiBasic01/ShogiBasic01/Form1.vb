@@ -256,6 +256,7 @@
         End If
         If unit = 17 Then
             UnitRange = KeimaRange(locate, -1)
+
         End If
         If unit = 18 Then
             UnitRange = GinRange(locate, -1)
@@ -329,6 +330,16 @@
         End If
     End Sub
     Private Sub AddValue(ByRef a As Array, ByVal dist As Integer, ByVal pos As integer)
+        If IsWhite(undo) And IsWhite(dist) Then
+            If KOMAKIKI_READ = True Then
+                komakiki_w(dist) += 1
+            End If
+        End If
+        If IsBlack(undo) And IsBlack(dist) Then
+            If KOMAKIKI_READ = True Then
+                komakiki_b(dist) += 1
+            End If
+        End If
         a.SetValue(dist, pos)
         If GenerationFlag = True Then
             Dim i As Integer = undo
