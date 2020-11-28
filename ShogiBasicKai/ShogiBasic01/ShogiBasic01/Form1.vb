@@ -184,9 +184,9 @@
         Next
         BoardSet()
         Randomize()
-        '        For i = 0 To score.Length - 1 Step 1
-        '       score(i) = score(i) + Rnd() * score(i) * 0.1
-        '      Next
+        'For i = 0 To score.Length - 1 Step 1
+        'score(i) = score(i) + Rnd() * score(i) * 0.1
+        'Next
     End Sub
     Private Sub KomaKikiInit()
        komakiki_w = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
@@ -788,11 +788,11 @@
         Dim king_y As Integer
         king_x = king_pos Mod 9
         king_y = king_pos / 9
-        Dim x = king_x - koma Mod 9
+        Dim x = king_x - (koma Mod 9)
         Dim y = king_y - koma / 9
         KomaDist = Math.Sqrt(x ^ 2 + y ^ 2) / 456
     End Function
-    Private Function Hyouka(ByVal wb As Integer) As Integer
+    Private Function Hyouka() As Integer
         Dim king_pos As Integer = 0
         Dim enem_pos As Integer = 0
         Dim d As Integer = 0
@@ -812,7 +812,6 @@
             If board(i) = 0 Then
                 Continue For
             End If
-            Dim kiki_count As Integer = komakiki_w(i)
             If IsWB(WHITE, i) Then
                 Hyouka += KomaScore(board(i))
                 Dim s1 = score_table(komakiki_w(i), 0, enem_pos, i)
@@ -836,7 +835,7 @@
     Private Function alphabeta(ByVal first As Integer, ByVal wb As Integer, ByVal depth As Integer,
                             ByVal alpha As Integer, ByVal beta As Integer) As Integer
         If depth = 0 Then
-            Return Hyouka(wb) * wb
+            Return Hyouka() * wb
         End If
         Dim last As Integer = GenerateMoves(first, wb)
         For i = first To last - 1
@@ -1081,8 +1080,8 @@
             UnitSet(p)
         Next
         DispHand()
-        TextBox3.Text = Hyouka(WHITE).ToString
-        TextBox4.Text = -Hyouka(BLACK).ToString
+        TextBox3.Text = Hyouka().ToString
+        TextBox4.Text = -Hyouka().ToString
     End Sub
     Private Function HandRange(ByVal wb As Integer, ByVal idx As Integer) As Array
         Dim koma = ARB(idx)
@@ -1283,7 +1282,7 @@
             nari = ""
         End If
         ListBox1.Items.Add("Y" + triangle + pos + koma + GetSoeji(locate) + uchi + nari)
-        ListBox1.Items.Add(Hyouka(wb) * ROBO_TEBAN * wb)
+        ListBox1.Items.Add(Hyouka() * ROBO_TEBAN * wb)
         ListBox1.TopIndex = ListBox1.Items.Count - 1
         kihumem = locate
         narimem = BLANK
