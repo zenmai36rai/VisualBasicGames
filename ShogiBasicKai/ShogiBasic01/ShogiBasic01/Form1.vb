@@ -106,13 +106,13 @@
     Dim nirami_w As Integer
     Dim nirami_b As Integer
     Dim table As Array = {0, 1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 6, 7, 1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 6, 7}
-    Dim score As Array = {0, 90, 315, 405, 495, 540, 855, 990, 15000, 540, 540, 540, 540, 945, 1395, 0, 90, 315, 405, 495, 540, 855, 990, 30000, 540, 540, 540, 540, 945, 1395}
-    Dim our_effect_value As Array = {69632, 34816, 23210, 17408, 13926, 11605, 9947, 8704, 7736}
-    Dim their_effect_value As Array = {98304, 49152, 32768, 24576, 19660, 16384, 14043, 12288, 10922}
     Const KOMAKIKI_SUM As Integer = 11
     Const WH_OR_BL As Integer = 2
     Const KING_POS As Integer = 81
     Const EFFECT_POS As Integer = 81
+    Dim score As Array = {0, 90, 315, 405, 495, 540, 855, 990, 15000, 540, 540, 540, 540, 945, 1395, 0, 90, 315, 405, 495, 540, 855, 990, 15000, 540, 540, 540, 540, 945, 1395}
+    Dim our_effect_value(9) As Integer
+    Dim their_effect_value(9) As Integer
     Dim score_table(KOMAKIKI_SUM, WH_OR_BL, KING_POS, EFFECT_POS) As Integer
     Private Function SetBoard(ByVal dist As Integer, ByVal koma As Integer) As Integer
         If IsWhite(dist) Then
@@ -159,11 +159,23 @@
         narimem = BLANK
         robomode = False
         KomaKikiInit()
-        For k = 0 To KOMAKIKI_SUM - 1 Step 1
+        For d = 0 To 8 Step 1
+            our_effect_value(d) = 85 * 1024 / (d + 1)
+            their_effect_value(d) = 98 * 1024 / (d + 1)
+        Next
+        Dim k_sum_val(KOMAKIKI_SUM) As Integer
+        For m = 0 To KOMAKIKI_SUM - 1 Step 1
+            If m = 0 Then
+                k_sum_val(m) = 0
+            Else
+                k_sum_val(m) = (1024 * Math.Pow(1.3, (m - 1))) / 1024
+            End If
+        Next
+        For m = 0 To KOMAKIKI_SUM - 1 Step 1
             For kp = 0 To 80 Step 1
                 For i = 0 To 80 Step 1
-                    score_table(k, 0, kp, i) = k * our_effect_value(KomaDist(kp, i)) / 1024
-                    score_table(k, 1, kp, i) = k * their_effect_value(KomaDist(kp, i)) / 1024
+                    score_table(m, 0, kp, i) = k_sum_val(m) * our_effect_value(KomaDist(kp, i)) / 1024
+                    score_table(m, 1, kp, i) = k_sum_val(m) * their_effect_value(KomaDist(kp, i)) / 1024
                 Next
             Next
         Next
