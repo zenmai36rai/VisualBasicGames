@@ -107,12 +107,13 @@
     Dim nirami_b As Integer
     Dim table As Array = {0, 1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 6, 7, 1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 6, 7}
     Const KOMAKIKI_SUM As Integer = 11
-    Const WH_OR_BL As Integer = 2
+    Const WH_OR_BL As Integer = 3
     Const KING_POS As Integer = 81
     Const EFFECT_POS As Integer = 81
     Dim score As Array = {0, 90, 315, 405, 495, 540, 855, 990, 15000, 540, 540, 540, 540, 945, 1395, 0, 90, 315, 405, 495, 540, 855, 990, 15000, 540, 540, 540, 540, 945, 1395}
     Dim our_effect_value(9) As Integer
     Dim their_effect_value(9) As Integer
+    Dim blank_effect_value(9) As Integer
     Dim score_table(KOMAKIKI_SUM, WH_OR_BL, KING_POS, EFFECT_POS) As Integer
     Private Function SetBoard(ByVal dist As Integer, ByVal koma As Integer) As Integer
         If IsWhite(dist) Then
@@ -162,6 +163,7 @@
         For d = 0 To 8 Step 1
             our_effect_value(d) = 85 * 1024 / (d + 1)
             their_effect_value(d) = 98 * 1024 / (d + 1)
+            blank_effect_value(d) = 48 * 1024 / (d + 1)
         Next
         Dim k_sum_val(KOMAKIKI_SUM) As Integer
         For m = 0 To KOMAKIKI_SUM - 1 Step 1
@@ -176,6 +178,7 @@
                 For i = 0 To 80 Step 1
                     score_table(m, 0, kp, i) = k_sum_val(m) * our_effect_value(KomaDist(kp, i)) / 1024
                     score_table(m, 1, kp, i) = k_sum_val(m) * their_effect_value(KomaDist(kp, i)) / 1024
+                    score_table(m, 2, kp, i) = k_sum_val(m) * blank_effect_value(KomaDist(kp, i)) / 1024
                 Next
             Next
         Next
@@ -789,7 +792,7 @@
         Dim y = king_y - koma / 9
         KomaDist = Math.Sqrt(x ^ 2 + y ^ 2) / 456
     End Function
-    Private Function Hyouka() As Integer
+    Private Function Hyouka(ByVal wb As Integer) As Integer
         Dim king_pos As Integer = 0
         Dim enem_pos As Integer = 0
         Dim d As Integer = 0
@@ -807,6 +810,11 @@
         Next
         For i = 0 To 80 Step 1
             If board(i) = 0 Then
+                If (wb = WHITE) Then
+                    Hyouka += score_table(komakiki_w(i), 2, enem_pos, i)
+                Else
+                    Hyouka += score_table(komakiki_b(i), 2, king_pos, i)
+                End If
                 Continue For
             End If
             If IsWB(WHITE, i) Then
@@ -832,7 +840,7 @@
     Private Function alphabeta(ByVal first As Integer, ByVal wb As Integer, ByVal depth As Integer,
                             ByVal alpha As Integer, ByVal beta As Integer) As Integer
         If depth = 0 Then
-            Return Hyouka() * wb
+            Return Hyouka(wb) * wb
         End If
         Dim last As Integer = GenerateMoves(first, wb)
         For i = first To last - 1
@@ -1077,8 +1085,8 @@
             UnitSet(p)
         Next
         DispHand()
-        TextBox3.Text = Hyouka().ToString
-        TextBox4.Text = -Hyouka().ToString
+        TextBox3.Text = Hyouka(WHITE).ToString
+        TextBox4.Text = -Hyouka(BLACK).ToString
     End Sub
     Private Function HandRange(ByVal wb As Integer, ByVal idx As Integer) As Array
         Dim koma = ARB(idx)
@@ -1279,7 +1287,7 @@
             nari = ""
         End If
         ListBox1.Items.Add("Y" + triangle + pos + koma + GetSoeji(locate) + uchi + nari)
-        ListBox1.Items.Add(Hyouka() * ROBO_TEBAN * wb)
+        ListBox1.Items.Add(Hyouka(wb) * ROBO_TEBAN * wb)
         ListBox1.TopIndex = ListBox1.Items.Count - 1
         kihumem = locate
         narimem = BLANK
