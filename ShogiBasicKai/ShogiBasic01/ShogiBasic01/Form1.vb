@@ -139,24 +139,30 @@
     Dim blank_effect_value(9) As Integer
     Dim score_table(KOMAKIKI_SUM, WH_OR_BL, KING_POS, EFFECT_POS) As Integer
     Private Function SetBoard(ByVal dist As Integer, ByVal koma As Integer) As Integer
+        If 0 = koma Then
+            board(dist) = koma
+            bb_white.RemoveBoard(dist)
+            bb_black.RemoveBoard(dist)
+        End If
+        If 1 <= koma And koma <= 14 Then
+            board(dist) = koma
+            bb_white.AddBoard(dist)
+            bb_black.RemoveBoard(dist)
+        End If
+        If 15 <= koma Then
+            board(dist) = koma
+            bb_black.AddBoard(dist)
+            bb_white.RemoveBoard(dist)
+        End If
+        Return 0
+    End Function
+    Private Function PickBoard(ByVal dist As Integer, ByVal koma As Integer) As Integer
         If IsWhite(dist) Then
             bb_white.RemoveBoard(dist)
         End If
         If IsBlack(dist) Then
             bb_black.RemoveBoard(dist)
         End If
-        If 0 = koma Then
-            board(dist) = koma
-        End If
-        If 1 <= koma And koma <= 14 Then
-            board(dist) = koma
-            bb_white.AddBoard(dist)
-        End If
-        If 15 <= koma Then
-            board(dist) = koma
-            bb_black.AddBoard(dist)
-        End If
-        Return 0
     End Function
     Private Sub Init() Handles Me.HandleCreated
         komaname = {"", "歩", "香", "桂", "銀", "金", "飛", "角", "王", "と", "杏", "圭", "全", "龍", "馬"}
@@ -172,10 +178,16 @@
                     2, 3, 4, 5, 8, 5, 4, 3, 2}
         tegomaw = {0, 0, 0, 0, 0, 0, 0, 0}
         tegomab = {0, 0, 0, 0, 0, 0, 0, 0}
-        bb_white.b1 = &B111111111_000000000_000000000_000000000_000000000_000000000_000000000
-        bb_white.b2 = &B111111111_010000010
-        bb_black.b1 = &B000000000_000000000_000000000_000000000_111111111_010000010_111111111
-        bb_black.b2 = &B000000000_000000000
+        For i = 0 To 80 Step 1
+            Dim k = board(i)
+            If k <> 0 Then
+                If k <= 14 Then
+                    bb_white.AddBoard(i)
+                Else
+                    bb_black.AddBoard(i)
+                End If
+            End If
+        Next
         state = 0
         undo = BLANK
         komaundo = BLANK
@@ -339,35 +351,35 @@
         Dim dist As Integer
         If CheckBoardRange(dx, dy) = True Then
             dist = dx + dy * 9
-            If IsWhite(locate) And IsWhite(dist) Then
-                If KOMAKIKI_READ = True Then
-                    komakiki_w(dist) += 1
-                End If
-                Exit Sub
+            If JigomaCheck(locate, dist) Then
+                AddValue(locate, array, dist, pos)
             End If
-            If IsBlack(locate) And IsBlack(dist) Then
-                If KOMAKIKI_READ = True Then
-                    komakiki_b(dist) += 1
-                End If
-                Exit Sub
-            End If
-            AddValue(array, dist, pos)
         End If
     End Sub
-    Private Sub AddValue(ByRef a As Array, ByVal dist As Integer, ByVal pos As Integer)
-        If IsWhite(undo) Then
+    Private Function JigomaCheck(ByVal locate As Integer, ByVal dist As Integer) As Boolean
+        JigomaCheck = True
+        If IsWhite(locate) Then
+            If IsWhite(dist) Then
+                JigomaCheck = False
+            End If
             If KOMAKIKI_READ = True Then
                 komakiki_w(dist) += 1
             End If
         End If
-        If IsBlack(undo) Then
+        If IsBlack(locate) Then
+            If IsBlack(dist) Then
+                JigomaCheck = False
+            End If
             If KOMAKIKI_READ = True Then
                 komakiki_b(dist) += 1
             End If
         End If
+        Return JigomaCheck
+    End Function
+    Private Sub AddValue(ByVal locate As Integer, ByRef a As Array, ByVal dist As Integer, ByVal pos As Integer)
         a.SetValue(dist, pos)
         If GenerationFlag = True Then
-            Dim i As Integer = undo
+            Dim i As Integer = locate
             Dim idx As Integer = NodeIdx
             Node(idx) = New MoveData
             Node(idx).r = i
@@ -410,11 +422,11 @@
             dy = y - i * wb
             If CheckBoardRange(dx, dy) = True Then
                 dist = dx + dy * 9
-                If IsWB(wb, locate) = IsWB(wb, dist) Then
+                If JigomaCheck(locate, dist) = False Then
                     AddKomakiki(dx, dy)
                     Exit For
                 End If
-                AddValue(a, dist, i)
+                AddValue(locate, a, dist, i)
                 If IsWB(wb, locate) = IsWB(-wb, dist) Then
                     Exit For
                 End If
@@ -444,11 +456,11 @@
             dy = y - i * wb
             If CheckBoardRange(dx, dy) = True Then
                 dist = dx + dy * 9
-                If IsWB(wb, locate) = IsWB(wb, dist) Then
+                If JigomaCheck(locate, dist) = False Then
                     AddKomakiki(dx, dy)
                     Exit For
                 End If
-                AddValue(a, dist, i)
+                AddValue(locate, a, dist, i)
                 If IsWB(wb, locate) = IsWB(-wb, dist) Then
                     Exit For
                 End If
@@ -461,11 +473,11 @@
             dy = y + i * wb
             If CheckBoardRange(dx, dy) = True Then
                 dist = dx + dy * 9
-                If IsWB(wb, locate) = IsWB(wb, dist) Then
+                If JigomaCheck(locate, dist) = False Then
                     AddKomakiki(dx, dy)
                     Exit For
                 End If
-                AddValue(a, dist, i + 7)
+                AddValue(locate, a, dist, i + 7)
                 If IsWB(wb, locate) = IsWB(-wb, dist) Then
                     Exit For
                 End If
@@ -478,11 +490,11 @@
             dy = y
             If CheckBoardRange(dx, dy) = True Then
                 dist = dx + dy * 9
-                If IsWB(wb, locate) = IsWB(wb, dist) Then
+                If JigomaCheck(locate, dist) = False Then
                     AddKomakiki(dx, dy)
                     Exit For
                 End If
-                AddValue(a, dist, i + 15)
+                AddValue(locate, a, dist, i + 15)
                 If IsWB(wb, locate) = IsWB(-wb, dist) Then
                     Exit For
                 End If
@@ -495,11 +507,11 @@
             dy = y
             If CheckBoardRange(dx, dy) = True Then
                 dist = dx + dy * 9
-                If IsWB(wb, locate) = IsWB(wb, dist) Then
+                If JigomaCheck(locate, dist) = False Then
                     AddKomakiki(dx, dy)
                     Exit For
                 End If
-                AddValue(a, dist, i + 23)
+                AddValue(locate, a, dist, i + 23)
                 If IsWB(wb, locate) = IsWB(-wb, dist) Then
                     Exit For
                 End If
@@ -543,15 +555,14 @@
             dy = y - i
             If CheckBoardRange(dx, dy) = True Then
                 dist = dx + dy * 9
-                If IsWB(wb, locate) = IsWB(wb, dist) Then
-                    AddKomakiki(dx, dy)
+                If JigomaCheck(locate, dist) = False Then
                     Exit For
                 End If
                 If IsWB(wb, locate) = IsWB(-wb, dist) Then
-                    AddValue(a, dist, i)
+                    AddValue(locate, a, dist, i)
                     Exit For
                 Else
-                    AddValue(a, dist, i)
+                    AddValue(locate, a, dist, i)
                 End If
             Else
                 Exit For
@@ -562,15 +573,14 @@
             dy = y + i
             If CheckBoardRange(dx, dy) = True Then
                 dist = dx + dy * 9
-                If IsWB(wb, locate) = IsWB(wb, dist) Then
-                    AddKomakiki(dx, dy)
+                If JigomaCheck(locate, dist) = False Then
                     Exit For
                 End If
                 If IsWB(wb, locate) = IsWB(-wb, dist) Then
-                    AddValue(a, dist, i + 7)
+                    AddValue(locate, a, dist, i + 7)
                     Exit For
                 Else
-                    AddValue(a, dist, i + 7)
+                    AddValue(locate, a, dist, i + 7)
                 End If
             Else
                 Exit For
@@ -581,15 +591,14 @@
             dy = y + i
             If CheckBoardRange(dx, dy) = True Then
                 dist = dx + dy * 9
-                If IsWB(wb, locate) = IsWB(wb, dist) Then
-                    AddKomakiki(dx, dy)
+                If JigomaCheck(locate, dist) = False Then
                     Exit For
                 End If
                 If IsWB(wb, locate) = IsWB(-wb, dist) Then
-                    AddValue(a, dist, i + 15)
+                    AddValue(locate, a, dist, i + 15)
                     Exit For
                 Else
-                    AddValue(a, dist, i + 15)
+                    AddValue(locate, a, dist, i + 15)
                 End If
             Else
                 Exit For
@@ -600,15 +609,14 @@
             dy = y - i
             If CheckBoardRange(dx, dy) = True Then
                 dist = dx + dy * 9
-                If IsWB(wb, locate) = IsWB(wb, dist) Then
-                    AddKomakiki(dx, dy)
+                If JigomaCheck(locate, dist) = False Then
                     Exit For
                 End If
                 If IsWB(wb, locate) = IsWB(-wb, dist) Then
-                    AddValue(a, dist, i + 23)
+                    AddValue(locate, a, dist, i + 23)
                     Exit For
                 Else
-                    AddValue(a, dist, i + 23)
+                    AddValue(locate, a, dist, i + 23)
                 End If
             Else
                 Exit For
@@ -828,15 +836,15 @@
             End If
             If IsWB(WHITE, i) Then
                 Hyouka += KomaScore(board(i))
-                Dim s1 = score_table(komakiki_w(i), 0, enem_pos, i)
-                Dim s2 = score_table(komakiki_b(i), 1, king_pos, i)
-                Hyouka += s1 - s2
+                'Dim s1 = score_table(komakiki_w(i), 0, enem_pos, i)
+                'Dim s2 = score_table(komakiki_b(i), 1, king_pos, i)
+                'Hyouka += s1 - s2
             End If
             If IsWB(BLACK, i) Then
                 Hyouka -= KomaScore(board(i))
-                Dim s1 = score_table(komakiki_w(i), 1, enem_pos, i)
-                Dim s2 = score_table(komakiki_b(i), 0, king_pos, i)
-                Hyouka += s1 - s2
+                'Dim s1 = score_table(komakiki_w(i), 1, enem_pos, i)
+                'Dim s2 = score_table(komakiki_b(i), 0, king_pos, i)
+                'Hyouka += s1 - s2
             End If
         Next
         For i = 0 To 7 Step 1
@@ -934,19 +942,14 @@
         Dim c As Integer
         Dim r As Integer
         Dim r2 As Integer
-        Dim undobuf As Integer
-        Dim PutRetire As Boolean = False
         Dim nodemax As Integer
         Dim nodemin As Integer
         c = 0
         NodeCount = 0
-        ''ArrayCount = 0
         Dim starttime As Long = Now.Hour * 3600 + Now.Minute * 60 + Now.Second
-        undobuf = undo
         nodemax = 214748364
         nodemin = -214748364
         Dim MakeBuff As MoveData = New MoveData
-        Dim FindFlag As Boolean = False
         SuspendLayout()
         best.r = BLANK
         Dim ret As Integer = alphabeta(0, wb, YOMI_DEPTH, nodemin, nodemax)
@@ -989,9 +992,9 @@
             If r = False Then
                 Exit Sub
             End If
-            If IsWhite(locate) = True Then
+            If IsWhite(locate) Then
                 state = 1
-            ElseIf IsBlack(locate) = True Then
+            ElseIf IsBlack(locate) Then
                 state = 2
             Else
                 Exit Sub
