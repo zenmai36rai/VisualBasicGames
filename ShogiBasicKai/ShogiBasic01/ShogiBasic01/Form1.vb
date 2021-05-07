@@ -41,16 +41,16 @@
             If 0 <= pos And pos < BB_JOINT Then
                 x = 1 << pos
                 If b And x Then
-                    Return 1
+                    IsExist = 1
                 End If
             ElseIf BB_JOINT <= pos And pos <= 80 Then
                 x = 1 << (pos - BB_JOINT)
                 b = b2
                 If b And x Then
-                    Return 1
+                    IsExist = 1
                 End If
             Else
-                Return 0
+                IsExist = 0
             End If
         End Function
         Public Function CountBits(ByVal bits As Int64) As Integer
@@ -78,7 +78,7 @@
                 n2 -= 1 << ret
                 ret += BB_JOINT
             End If
-            Return ret
+            GetNext = ret
         End Function
         Public Function AddBoard(ByVal pos As Integer) As Integer
             If 0 <= pos And pos < BB_JOINT Then
@@ -86,9 +86,10 @@
                 b1 = b1 Or x
             ElseIf BB_JOINT <= pos And pos <= 80 Then
                 Dim x As Int64 = 1 << (pos - BB_JOINT)
-                b2 = b1 Or x
+                b2 = b2 Or x
             Else
-                Return -1
+                AddBoard = -1
+                Return AddBoard
             End If
             Return 0
         End Function
@@ -102,7 +103,8 @@
                 x = Not x
                 b2 = b2 And x
             Else
-                Return -1
+                RemoveBoard = -1
+                Return RemoveBoard
             End If
             Return 0
         End Function
@@ -170,8 +172,8 @@
                     2, 3, 4, 5, 8, 5, 4, 3, 2}
         tegomaw = {0, 0, 0, 0, 0, 0, 0, 0}
         tegomab = {0, 0, 0, 0, 0, 0, 0, 0}
-        bb_white.b1 = &B000000000_000000000_000000000_000000000_000000000_000000000_111111111
-        bb_white.b2 = &B010000010_111111111
+        bb_white.b1 = &B111111111_000000000_000000000_000000000_000000000_000000000_000000000
+        bb_white.b2 = &B111111111_010000010
         bb_black.b1 = &B000000000_000000000_000000000_000000000_111111111_010000010_111111111
         bb_black.b2 = &B000000000_000000000
         state = 0
@@ -738,13 +740,15 @@
     End Function
     Private Function IsWhite(ByVal locate As Integer) As Boolean
         If bb_white.IsExist(locate) > 0 Then
-            Return True
+            IsWhite = True
+            Return IsWhite
         End If
         Return False
     End Function
     Private Function IsBlack(ByVal locate As Integer) As Boolean
         If bb_black.IsExist(locate) > 0 Then
-            Return True
+            IsBlack = True
+            Return IsBlack
         End If
         Return False
     End Function
@@ -904,44 +908,26 @@
                 End If
             Next
         End If
-        Dim bb As BitBoard
+        Dim bb As BitBoard = New BitBoard
         If wb = WHITE Then
-            bb = bb_white
+            bb.b1 = bb_white.b1
+            bb.b2 = bb_white.b2
         Else
-            bb = bb_black
+            bb.b1 = bb_black.b1
+            bb.b2 = bb_black.b2
         End If
         Dim pos = bb.GetFirst()
         While (pos <> -1)
-            'For i = 0 To 80 Step 1
-            'If board(i) = 0 Then
-            'Continue For
-            'End If
-            'Dim pos = i
             If True = IsWB(wb, pos) Then
                 undo = pos
                 GenerationFlag = True
                 NodeIdx = idx
-                ''range = UnitRange(i)
                 UnitRange(pos)
                 GenerationFlag = False
-                ''ArrayCount += range.Length
-                ''For j = 0 To range.Length - 1 Step 1
-                ''    If range(j) <> BLANK Then
-                ''        Node(idx) = New MoveData
-                ''        Node(idx).r = i
-                ''        Node(idx).r2 = range(j)
-                ''        Node(idx).src = board(i - 1)
-                ''        Node(idx).dst = board(range(j) - 1)
-                ''        Node(idx).hand = BLANK
-                ''        NodeCount += 1
-                ''        idx += 1
-                ''    End If
-                ''Next
                 idx += (NodeIdx - idx)
             End If
             pos = bb.GetNext()
         End While
-        'Next
         Return idx
     End Function
     Private Sub RobotMove(ByVal wb As Integer)
