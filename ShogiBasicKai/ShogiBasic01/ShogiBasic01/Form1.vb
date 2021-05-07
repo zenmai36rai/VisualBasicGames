@@ -35,18 +35,16 @@
         Public n1 As Int64 = 0
         Public n2 As Int64 = 0
         Public Function IsExist(ByVal pos As Int64) As Integer
-            Dim x As Int64 = 0
-            Dim b As Int64 = b1
+            Dim b As Int64 = 0
             IsExist = 0
             If 0 <= pos And pos < BB_JOINT Then
-                x = 1 << pos
-                If b And x Then
+                b = b1 And 1 << pos
+                If b > 0 Then
                     IsExist = 1
                 End If
             ElseIf BB_JOINT <= pos And pos <= 80 Then
-                x = 1 << (pos - BB_JOINT)
-                b = b2
-                If b And x Then
+                b = b2 And 1 << (pos - BB_JOINT)
+                If b > 0 Then
                     IsExist = 1
                 End If
             Else
@@ -256,66 +254,48 @@
         locate = locate
         unit = board(locate)
         UnitRange = all
-        If unit = 1 Then
-            UnitRange = HuRange(locate, 1)
-        End If
-        If unit = 2 Then
-            UnitRange = KyoRange(locate, 1)
-        End If
-        If unit = 3 Then
-            UnitRange = KeimaRange(locate, 1)
-        End If
-        If unit = 4 Then
-            UnitRange = GinRange(locate, 1)
-        End If
-        If unit = 5 Or unit = 9 Or unit = 10 Or unit = 11 Or unit = 12 Then
-            UnitRange = KinRange(locate, 1)
-        End If
-        If unit = 6 Then
-            UnitRange = HisyaRange(locate, 1, False)
-        End If
-        If unit = 7 Then
-            UnitRange = KakuRange(locate, 1, False)
-        End If
-        If unit = 8 Then
-            UnitRange = OuRange(locate)
-        End If
-        If unit = 13 Then
-            UnitRange = HisyaRange(locate, 1, True)
-        End If
-        If unit = 14 Then
-            UnitRange = KakuRange(locate, 1, True)
-        End If
-        If unit = 15 Then
-            UnitRange = HuRange(locate, -1)
-        End If
-        If unit = 16 Then
-            UnitRange = KyoRange(locate, -1)
-        End If
-        If unit = 17 Then
-            UnitRange = KeimaRange(locate, -1)
-        End If
-        If unit = 18 Then
-            UnitRange = GinRange(locate, -1)
-        End If
-        If unit = 19 Or unit = 23 Or unit = 24 Or unit = 25 Or unit = 26 Then
-            UnitRange = KinRange(locate, -1)
-        End If
-        If unit = 20 Then
-            UnitRange = HisyaRange(locate, -1, False)
-        End If
-        If unit = 21 Then
-            UnitRange = KakuRange(locate, -1, False)
-        End If
-        If unit = 22 Then
-            UnitRange = OuRange(locate)
-        End If
-        If unit = 27 Then
-            UnitRange = HisyaRange(locate, -1, True)
-        End If
-        If unit = 28 Then
-            UnitRange = KakuRange(locate, -1, True)
-        End If
+        Select Case unit
+            Case = 1
+                UnitRange = HuRange(locate, 1)
+            Case 2
+                UnitRange = KyoRange(locate, 1)
+            Case 3
+                UnitRange = KeimaRange(locate, 1)
+            Case 4
+                UnitRange = GinRange(locate, 1)
+            Case 5, 9, 10, 11, 12
+                UnitRange = KinRange(locate, 1)
+            Case 6
+                UnitRange = HisyaRange(locate, 1, False)
+            Case 7
+                UnitRange = KakuRange(locate, 1, False)
+            Case 8
+                UnitRange = OuRange(locate)
+            Case 13
+                UnitRange = HisyaRange(locate, 1, True)
+            Case 14
+                UnitRange = KakuRange(locate, 1, True)
+            Case 15
+                UnitRange = HuRange(locate, -1)
+            Case 16
+                UnitRange = KyoRange(locate, -1)
+            Case 17
+                UnitRange = KeimaRange(locate, -1)
+            Case 18
+                UnitRange = GinRange(locate, -1)
+            Case 19 Or 23 Or 24 Or 25 Or 26
+                UnitRange = KinRange(locate, -1)
+            Case 20
+                UnitRange = HisyaRange(locate, -1, False)
+            Case 21
+                UnitRange = KakuRange(locate, -1, False)
+            Case 22
+                UnitRange = OuRange(locate)
+            Case 27
+                UnitRange = HisyaRange(locate, -1, True)
+            Case 28
+                UnitRange = KakuRange(locate, -1, True)
+        End Select
     End Function
     Private Function RangeCheck(ByVal locate As Integer) As Boolean
         Dim i As Integer
@@ -427,7 +407,7 @@
                     Exit For
                 End If
                 AddValue(locate, a, dist, i)
-                If IsWB(wb, locate) = IsWB(-wb, dist) Then
+                If AB(wb, locate, dist) Then
                     Exit For
                 End If
             Else
@@ -435,6 +415,13 @@
             End If
         Next
         KyoRange = a
+    End Function
+    Private Function AB(ByVal wb As Integer, ByVal locate As Integer, ByVal dist As Integer)
+        AB = False
+        If IsWB(wb, locate) And IsWB(-wb, dist) Then
+            AB = True
+        End If
+        Return AB
     End Function
     Private Function HisyaRange(ByVal locate As Integer, ByVal wb As Integer, ByVal c As Boolean) As Array
         Dim x As Integer
@@ -461,7 +448,7 @@
                     Exit For
                 End If
                 AddValue(locate, a, dist, i)
-                If IsWB(wb, locate) = IsWB(-wb, dist) Then
+                If AB(wb, locate, dist) Then
                     Exit For
                 End If
             Else
@@ -478,7 +465,7 @@
                     Exit For
                 End If
                 AddValue(locate, a, dist, i + 7)
-                If IsWB(wb, locate) = IsWB(-wb, dist) Then
+                If AB(wb, locate, dist) Then
                     Exit For
                 End If
             Else
@@ -495,7 +482,7 @@
                     Exit For
                 End If
                 AddValue(locate, a, dist, i + 15)
-                If IsWB(wb, locate) = IsWB(-wb, dist) Then
+                If AB(wb, locate, dist) Then
                     Exit For
                 End If
             Else
@@ -512,7 +499,7 @@
                     Exit For
                 End If
                 AddValue(locate, a, dist, i + 23)
-                If IsWB(wb, locate) = IsWB(-wb, dist) Then
+                If AB(wb, locate, dist) Then
                     Exit For
                 End If
             Else
@@ -558,7 +545,7 @@
                 If JigomaCheck(locate, dist) = False Then
                     Exit For
                 End If
-                If IsWB(wb, locate) = IsWB(-wb, dist) Then
+                If AB(wb, locate, dist) Then
                     AddValue(locate, a, dist, i)
                     Exit For
                 Else
@@ -576,7 +563,7 @@
                 If JigomaCheck(locate, dist) = False Then
                     Exit For
                 End If
-                If IsWB(wb, locate) = IsWB(-wb, dist) Then
+                If AB(wb, locate, dist) Then
                     AddValue(locate, a, dist, i + 7)
                     Exit For
                 Else
@@ -594,7 +581,7 @@
                 If JigomaCheck(locate, dist) = False Then
                     Exit For
                 End If
-                If IsWB(wb, locate) = IsWB(-wb, dist) Then
+                If AB(wb, locate, dist) Then
                     AddValue(locate, a, dist, i + 15)
                     Exit For
                 Else
@@ -612,7 +599,7 @@
                 If JigomaCheck(locate, dist) = False Then
                     Exit For
                 End If
-                If IsWB(wb, locate) = IsWB(-wb, dist) Then
+                If AB(wb, locate, dist) Then
                     AddValue(locate, a, dist, i + 23)
                     Exit For
                 Else
@@ -761,11 +748,15 @@
         Return False
     End Function
     Private Function IsWB(ByVal wb As Integer, ByVal i As Integer) As Boolean
+        IsWB = False
         If wb = WHITE Then
             IsWB = IsWhite(i)
-        Else
+            Return IsWB
+        ElseIf wb = BLACK Then
             IsWB = IsBlack(i)
+            Return IsWB
         End If
+        Return IsWB
     End Function
     Private Function IsEnemyKing(ByVal wb As Integer, ByVal i As Integer) As Boolean
         IsEnemyKing = False
@@ -1336,44 +1327,36 @@ LOG_WRITE:
             If Question() = False Then
                 Exit Sub
             End If
-            If unit = 1 Then
-                board(locate) = 9
-            End If
-            If unit = 2 Then
-                board(locate) = 10
-            End If
-            If unit = 3 Then
-                board(locate) = 11
-            End If
-            If unit = 4 Then
-                board(locate) = 12
-            End If
-            If unit = 6 Then
-                board(locate) = 13
-            End If
-            If unit = 7 Then
-                board(locate) = 14
-            End If
+            Select Case unit
+                Case 1
+                    board(locate) = 9
+                Case 2
+                    board(locate) = 10
+                Case 3
+                    board(locate) = 11
+                Case 4
+                    board(locate) = 12
+                Case 6
+                    board(locate) = 13
+                Case 7
+                    board(locate) = 14
+            End Select
         End If
         If IsBlack(locate) And 54 <= locate And locate <= 80 Then
-            If unit = 15 Then
-                board(locate) = 23
-            End If
-            If unit = 16 Then
-                board(locate) = 24
-            End If
-            If unit = 17 Then
-                board(locate) = 25
-            End If
-            If unit = 18 Then
-                board(locate) = 26
-            End If
-            If unit = 20 Then
-                board(locate) = 27
-            End If
-            If unit = 21 Then
-                board(locate) = 28
-            End If
+            Select Case unit
+                Case 15
+                    board(locate) = 23
+                Case 16
+                    board(locate) = 24
+                Case 17
+                    board(locate) = 25
+                Case 18
+                    board(locate) = 26
+                Case 20
+                    board(locate) = 27
+                Case 21
+                    board(locate) = 28
+            End Select
         End If
     End Sub
     Private Sub KomaTori(ByVal locate)
@@ -2177,7 +2160,6 @@ LOG_WRITE:
     Private Sub RichTextBox1_TextChanged(sender As Object, e As EventArgs) Handles RichTextBox1.TextChanged
 
     End Sub
-
     Private Sub Button83_Click(sender As Object, e As EventArgs) Handles Button83.Click
         Dim s1 As String = Convert.ToString(bb_black.b1, 2)
         Dim s2 As String = Convert.ToString(bb_black.b2, 2)
