@@ -28,7 +28,7 @@
     ''Dim ArrayCount As Integer
     Dim komaname As Array
     Dim board As Array
-    Const BB_JOINT As Integer = 54
+    Const BB_JOINT As Integer = 63
     Class BitBoard
         Public b1 As Int64
         Public b2 As Int64
@@ -54,7 +54,7 @@
             End If
         End Function
         Public Function CountBits(ByVal bits As Int64) As Integer
-            Dim mask As Integer = 0
+            Dim mask As Int64 = 0
             For i = 0 To BB_JOINT Step 1
                 mask = 1 << i
                 If bits And mask Then
@@ -82,11 +82,11 @@
         End Function
         Public Function AddBoard(ByVal pos As Integer) As Integer
             If 0 <= pos And pos < BB_JOINT Then
-                Dim x As Integer = 1 << pos
-                b1 += x
+                Dim x As Int64 = 1 << pos
+                b1 = b1 Or x
             ElseIf BB_JOINT <= pos And pos <= 80 Then
-                Dim x As Integer = 1 << (pos - BB_JOINT)
-                b2 += x
+                Dim x As Int64 = 1 << (pos - BB_JOINT)
+                b2 = b1 Or x
             Else
                 Return -1
             End If
@@ -94,11 +94,13 @@
         End Function
         Public Function RemoveBoard(ByVal pos As Integer) As Integer
             If 0 <= pos And pos < BB_JOINT Then
-                Dim x As Integer = 1 << pos
-                b1 -= x
+                Dim x As Int64 = 1 << pos
+                x = Not x
+                b1 = b1 And x
             ElseIf BB_JOINT <= pos And pos <= 80 Then
-                Dim x As Integer = 1 << (pos - BB_JOINT)
-                b2 -= x
+                Dim x As Int64 = 1 << (pos - BB_JOINT)
+                x = Not x
+                b2 = b2 And x
             Else
                 Return -1
             End If
@@ -168,10 +170,10 @@
                     2, 3, 4, 5, 8, 5, 4, 3, 2}
         tegomaw = {0, 0, 0, 0, 0, 0, 0, 0}
         tegomab = {0, 0, 0, 0, 0, 0, 0, 0}
-        bb_white.b1 = &B000000000_000000000_000000000_000000000_000000000_000000000
-        bb_white.b2 = &B111111111_010000010_111111111
-        bb_black.b1 = &B000000000_000000000_000000000_111111111_010000010_111111111
-        bb_black.b2 = &B000000000_000000000_000000000
+        bb_white.b1 = &B000000000_000000000_000000000_000000000_000000000_000000000_111111111
+        bb_white.b2 = &B010000010_111111111
+        bb_black.b1 = &B000000000_000000000_000000000_000000000_111111111_010000010_111111111
+        bb_black.b2 = &B000000000_000000000
         state = 0
         undo = BLANK
         komaundo = BLANK
@@ -208,8 +210,8 @@
         'Next
     End Sub
     Private Sub KomaKikiInit()
-       komakiki_w = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
-       komakiki_b = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
+        komakiki_w = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+        komakiki_b = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
     End Sub
     Private Sub BoardSet()
         Dim p As Integer
@@ -278,7 +280,6 @@
         End If
         If unit = 17 Then
             UnitRange = KeimaRange(locate, -1)
-
         End If
         If unit = 18 Then
             UnitRange = GinRange(locate, -1)
@@ -317,7 +318,7 @@
         End If
     End Function
     Private Sub AddKomakiki(ByVal dx As Integer, ByVal dy As Integer)
-        if KOMAKIKI_READ = True Then
+        If KOMAKIKI_READ = True Then
             Dim dist As Integer
             If CheckBoardRange(dx, dy) = True Then
                 dist = dx + dy * 9
@@ -331,7 +332,7 @@
                 End If
             End If
         End If
-   End Sub
+    End Sub
     Private Sub AddRange(ByVal locate As Integer, ByVal dx As Integer, ByVal dy As Integer, ByRef array As Array, ByVal pos As Integer)
         Dim dist As Integer
         If CheckBoardRange(dx, dy) = True Then
@@ -351,7 +352,7 @@
             AddValue(array, dist, pos)
         End If
     End Sub
-    Private Sub AddValue(ByRef a As Array, ByVal dist As Integer, ByVal pos As integer)
+    Private Sub AddValue(ByRef a As Array, ByVal dist As Integer, ByVal pos As Integer)
         If IsWhite(undo) Then
             If KOMAKIKI_READ = True Then
                 komakiki_w(dist) += 1
@@ -1015,6 +1016,8 @@
                     b.BackColor = Color.RoyalBlue
                 ElseIf IsBlack(locate) = True Then
                     b.BackColor = Color.OrangeRed
+                Else
+                    b.BackColor = Color.YellowGreen
                 End If
             Next
         ElseIf state = 1 And RangeCheck(locate) Then
@@ -1822,6 +1825,9 @@ LOG_WRITE:
         UnitClick(81)
     End Sub
     Private Function GetButton(ByVal locate As Integer) As Button
+        If locate < 0 Or 80 < locate Then
+            RichTextBox1.Text += "error"
+        End If
         locate = locate + 1
         GetButton = Button255
         If locate = 1 Then
