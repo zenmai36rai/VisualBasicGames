@@ -34,6 +34,25 @@
         Public b2 As Int64
         Public n1 As Int64 = 0
         Public n2 As Int64 = 0
+        Public Function IsExist(ByVal pos As Int64) As Integer
+            Dim x As Int64 = 0
+            Dim b As Int64 = b1
+            IsExist = 0
+            If 0 <= pos And pos < BB_JOINT Then
+                x = 1 << pos
+                If b And x Then
+                    Return 1
+                End If
+            ElseIf BB_JOINT <= pos And pos <= 80 Then
+                x = 1 << (pos - BB_JOINT)
+                b = b2
+                If b And x Then
+                    Return 1
+                End If
+            Else
+                Return 0
+            End If
+        End Function
         Public Function CountBits(ByVal bits As Int64) As Integer
             Dim mask As Integer = 0
             For i = 0 To BB_JOINT Step 1
@@ -66,7 +85,7 @@
                 Dim x As Integer = 1 << pos
                 b1 += x
             ElseIf BB_JOINT <= pos And pos <= 80 Then
-                Dim x As Integer = 1 << pos - BB_JOINT
+                Dim x As Integer = 1 << (pos - BB_JOINT)
                 b2 += x
             Else
                 Return -1
@@ -78,7 +97,7 @@
                 Dim x As Integer = 1 << pos
                 b1 -= x
             ElseIf BB_JOINT <= pos And pos <= 80 Then
-                Dim x As Integer = 1 << pos - BB_JOINT
+                Dim x As Integer = 1 << (pos - BB_JOINT)
                 b2 -= x
             Else
                 Return -1
@@ -304,27 +323,27 @@
                 dist = dx + dy * 9
                 If IsWhite(undo) Then
                     komakiki_w(dist) += 1
+                    Exit Sub
                 End If
-                Exit Sub
                 If IsBlack(undo) Then
                     komakiki_b(dist) += 1
+                    Exit Sub
                 End If
-                Exit Sub
             End If
         End If
    End Sub
-   Private Sub AddRange(ByVal dx As Integer, ByVal dy As Integer, ByRef array As Array, ByVal pos As Integer)
+    Private Sub AddRange(ByVal locate As Integer, ByVal dx As Integer, ByVal dy As Integer, ByRef array As Array, ByVal pos As Integer)
         Dim dist As Integer
         If CheckBoardRange(dx, dy) = True Then
             dist = dx + dy * 9
-            If IsWhite(undo) And IsWhite(dist) Then
-                if KOMAKIKI_READ = True Then
+            If IsWhite(locate) And IsWhite(dist) Then
+                If KOMAKIKI_READ = True Then
                     komakiki_w(dist) += 1
                 End If
                 Exit Sub
             End If
-            If IsBlack(undo) And IsBlack(dist) Then
-                if KOMAKIKI_READ = True Then
+            If IsBlack(locate) And IsBlack(dist) Then
+                If KOMAKIKI_READ = True Then
                     komakiki_b(dist) += 1
                 End If
                 Exit Sub
@@ -369,7 +388,7 @@
         y = Int(locate / 9)
         dx = x
         dy = y - 1 * wb
-        AddRange(dx, dy, HuRange, 0)
+        AddRange(locate, dx, dy, HuRange, 0)
     End Function
     Private Function KyoRange(ByVal locate As Integer, ByVal wb As Integer) As Array
         Dim x As Integer
@@ -388,12 +407,12 @@
             dy = y - i * wb
             If CheckBoardRange(dx, dy) = True Then
                 dist = dx + dy * 9
-                If IsWB(wb, undo) = IsWB(wb, dist) Then
+                If IsWB(wb, locate) = IsWB(wb, dist) Then
                     AddKomakiki(dx, dy)
                     Exit For
                 End If
                 AddValue(a, dist, i)
-                If IsWB(wb, undo) = IsWB(-wb, dist) Then
+                If IsWB(wb, locate) = IsWB(-wb, dist) Then
                     Exit For
                 End If
             Else
@@ -422,12 +441,12 @@
             dy = y - i * wb
             If CheckBoardRange(dx, dy) = True Then
                 dist = dx + dy * 9
-                If IsWB(wb, undo) = IsWB(wb, dist) Then
+                If IsWB(wb, locate) = IsWB(wb, dist) Then
                     AddKomakiki(dx, dy)
                     Exit For
                 End If
                 AddValue(a, dist, i)
-                If IsWB(wb, undo) = IsWB(-wb, dist) Then
+                If IsWB(wb, locate) = IsWB(-wb, dist) Then
                     Exit For
                 End If
             Else
@@ -439,12 +458,12 @@
             dy = y + i * wb
             If CheckBoardRange(dx, dy) = True Then
                 dist = dx + dy * 9
-                If IsWB(wb, undo) = IsWB(wb, dist) Then
+                If IsWB(wb, locate) = IsWB(wb, dist) Then
                     AddKomakiki(dx, dy)
                     Exit For
                 End If
                 AddValue(a, dist, i + 7)
-                If IsWB(wb, undo) = IsWB(-wb, dist) Then
+                If IsWB(wb, locate) = IsWB(-wb, dist) Then
                     Exit For
                 End If
             Else
@@ -456,12 +475,12 @@
             dy = y
             If CheckBoardRange(dx, dy) = True Then
                 dist = dx + dy * 9
-                If IsWB(wb, undo) = IsWB(wb, dist) Then
+                If IsWB(wb, locate) = IsWB(wb, dist) Then
                     AddKomakiki(dx, dy)
                     Exit For
                 End If
                 AddValue(a, dist, i + 15)
-                If IsWB(wb, undo) = IsWB(-wb, dist) Then
+                If IsWB(wb, locate) = IsWB(-wb, dist) Then
                     Exit For
                 End If
             Else
@@ -473,12 +492,12 @@
             dy = y
             If CheckBoardRange(dx, dy) = True Then
                 dist = dx + dy * 9
-                If IsWB(wb, undo) = IsWB(wb, dist) Then
+                If IsWB(wb, locate) = IsWB(wb, dist) Then
                     AddKomakiki(dx, dy)
                     Exit For
                 End If
                 AddValue(a, dist, i + 23)
-                If IsWB(wb, undo) = IsWB(-wb, dist) Then
+                If IsWB(wb, locate) = IsWB(-wb, dist) Then
                     Exit For
                 End If
             Else
@@ -488,16 +507,16 @@
         If c = True Then
             dx = x - 1
             dy = y - 1
-            AddRange(dx, dy, a, 32)
+            AddRange(locate, dx, dy, a, 32)
             dx = x + 1
             dy = y + 1
-            AddRange(dx, dy, a, 33)
+            AddRange(locate, dx, dy, a, 33)
             dx = x - 1
             dy = y + 1
-            AddRange(dx, dy, a, 34)
+            AddRange(locate, dx, dy, a, 34)
             dx = x + 1
             dy = y - 1
-            AddRange(dx, dy, a, 35)
+            AddRange(locate, dx, dy, a, 35)
         End If
         HisyaRange = a
     End Function
@@ -521,11 +540,11 @@
             dy = y - i
             If CheckBoardRange(dx, dy) = True Then
                 dist = dx + dy * 9
-                If IsWB(wb, undo) = IsWB(wb, dist) Then
+                If IsWB(wb, locate) = IsWB(wb, dist) Then
                     AddKomakiki(dx, dy)
                     Exit For
                 End If
-                If IsWB(wb, undo) = IsWB(-wb, dist) Then
+                If IsWB(wb, locate) = IsWB(-wb, dist) Then
                     AddValue(a, dist, i)
                     Exit For
                 Else
@@ -540,11 +559,11 @@
             dy = y + i
             If CheckBoardRange(dx, dy) = True Then
                 dist = dx + dy * 9
-                If IsWB(wb, undo) = IsWB(wb, dist) Then
+                If IsWB(wb, locate) = IsWB(wb, dist) Then
                     AddKomakiki(dx, dy)
                     Exit For
                 End If
-                If IsWB(wb, undo) = IsWB(-wb, dist) Then
+                If IsWB(wb, locate) = IsWB(-wb, dist) Then
                     AddValue(a, dist, i + 7)
                     Exit For
                 Else
@@ -559,11 +578,11 @@
             dy = y + i
             If CheckBoardRange(dx, dy) = True Then
                 dist = dx + dy * 9
-                If IsWB(wb, undo) = IsWB(wb, dist) Then
+                If IsWB(wb, locate) = IsWB(wb, dist) Then
                     AddKomakiki(dx, dy)
                     Exit For
                 End If
-                If IsWB(wb, undo) = IsWB(-wb, dist) Then
+                If IsWB(wb, locate) = IsWB(-wb, dist) Then
                     AddValue(a, dist, i + 15)
                     Exit For
                 Else
@@ -578,11 +597,11 @@
             dy = y - i
             If CheckBoardRange(dx, dy) = True Then
                 dist = dx + dy * 9
-                If IsWB(wb, undo) = IsWB(wb, dist) Then
+                If IsWB(wb, locate) = IsWB(wb, dist) Then
                     AddKomakiki(dx, dy)
                     Exit For
                 End If
-                If IsWB(wb, undo) = IsWB(-wb, dist) Then
+                If IsWB(wb, locate) = IsWB(-wb, dist) Then
                     AddValue(a, dist, i + 23)
                     Exit For
                 Else
@@ -595,16 +614,16 @@
         If c = True Then
             dx = x
             dy = y - 1
-            AddRange(dx, dy, a, 32)
+            AddRange(locate, dx, dy, a, 32)
             dx = x
             dy = y + 1
-            AddRange(dx, dy, a, 33)
+            AddRange(locate, dx, dy, a, 33)
             dx = x - 1
             dy = y
-            AddRange(dx, dy, a, 34)
+            AddRange(locate, dx, dy, a, 34)
             dx = x + 1
             dy = y
-            AddRange(dx, dy, a, 35)
+            AddRange(locate, dx, dy, a, 35)
         End If
         KakuRange = a
     End Function
@@ -618,10 +637,10 @@
         y = Int(locate / 9)
         dx = x + 1
         dy = y - 2 * wb
-        AddRange(dx, dy, KeimaRange, 0)
+        AddRange(locate, dx, dy, KeimaRange, 0)
         dx = x - 1
         dy = y - 2 * wb
-        AddRange(dx, dy, KeimaRange, 1)
+        AddRange(locate, dx, dy, KeimaRange, 1)
     End Function
     Private Function GinRange(ByVal locate As Integer, ByVal wb As Integer) As Array
         Dim x As Integer
@@ -633,19 +652,19 @@
         y = Int(locate / 9)
         dx = x
         dy = y - 1 * wb
-        AddRange(dx, dy, GinRange, 0)
+        AddRange(locate, dx, dy, GinRange, 0)
         dx = x + 1
         dy = y - 1
-        AddRange(dx, dy, GinRange, 1)
+        AddRange(locate, dx, dy, GinRange, 1)
         dx = x - 1
         dy = y - 1
-        AddRange(dx, dy, GinRange, 2)
+        AddRange(locate, dx, dy, GinRange, 2)
         dx = x + 1
         dy = y + 1
-        AddRange(dx, dy, GinRange, 3)
+        AddRange(locate, dx, dy, GinRange, 3)
         dx = x - 1
         dy = y + 1
-        AddRange(dx, dy, GinRange, 4)
+        AddRange(locate, dx, dy, GinRange, 4)
     End Function
     Private Function KinRange(ByVal locate As Integer, ByVal wb As Integer) As Array
         Dim x As Integer
@@ -657,22 +676,22 @@
         y = Int(locate / 9)
         dx = x
         dy = y - 1
-        AddRange(dx, dy, KinRange, 0)
+        AddRange(locate, dx, dy, KinRange, 0)
         dx = x + 1
         dy = y - 1 * wb
-        AddRange(dx, dy, KinRange, 1)
+        AddRange(locate, dx, dy, KinRange, 1)
         dx = x - 1
         dy = y - 1 * wb
-        AddRange(dx, dy, KinRange, 2)
+        AddRange(locate, dx, dy, KinRange, 2)
         dx = x + 1
         dy = y
-        AddRange(dx, dy, KinRange, 3)
+        AddRange(locate, dx, dy, KinRange, 3)
         dx = x - 1
         dy = y
-        AddRange(dx, dy, KinRange, 4)
+        AddRange(locate, dx, dy, KinRange, 4)
         dx = x
         dy = y + 1
-        AddRange(dx, dy, KinRange, 5)
+        AddRange(locate, dx, dy, KinRange, 5)
     End Function
     Private Function OuRange(ByVal locate As Integer) As Array
         Dim x As Integer
@@ -684,28 +703,28 @@
         y = Int(locate / 9)
         dx = x
         dy = y - 1
-        AddRange(dx, dy, OuRange, 0)
+        AddRange(locate, dx, dy, OuRange, 0)
         dx = x + 1
         dy = y - 1
-        AddRange(dx, dy, OuRange, 1)
+        AddRange(locate, dx, dy, OuRange, 1)
         dx = x - 1
         dy = y - 1
-        AddRange(dx, dy, OuRange, 2)
+        AddRange(locate, dx, dy, OuRange, 2)
         dx = x + 1
         dy = y + 1
-        AddRange(dx, dy, OuRange, 3)
+        AddRange(locate, dx, dy, OuRange, 3)
         dx = x - 1
         dy = y + 1
-        AddRange(dx, dy, OuRange, 4)
+        AddRange(locate, dx, dy, OuRange, 4)
         dx = x + 1
         dy = y
-        AddRange(dx, dy, OuRange, 5)
+        AddRange(locate, dx, dy, OuRange, 5)
         dx = x - 1
         dy = y
-        AddRange(dx, dy, OuRange, 6)
+        AddRange(locate, dx, dy, OuRange, 6)
         dx = x
         dy = y + 1
-        AddRange(dx, dy, OuRange, 7)
+        AddRange(locate, dx, dy, OuRange, 7)
     End Function
     Private Function CheckBoardRange(ByVal x As Integer, ByVal y As Integer) As Boolean
         CheckBoardRange = True
@@ -717,26 +736,16 @@
         End If
     End Function
     Private Function IsWhite(ByVal locate As Integer) As Boolean
-        Dim c As Integer
-        IsWhite = False
-        If locate < 0 Or 80 < locate Then
-            Exit Function
+        If bb_white.IsExist(locate) > 0 Then
+            Return True
         End If
-        c = board(locate)
-        If 1 <= c And c <= 14 Then
-            IsWhite = True
-        End If
+        Return False
     End Function
     Private Function IsBlack(ByVal locate As Integer) As Boolean
-        Dim c As Integer
-        IsBlack = False
-        If locate < 0 Or 80 < locate Then
-            Exit Function
+        If bb_black.IsExist(locate) > 0 Then
+            Return True
         End If
-        c = board(locate)
-        If 15 <= c And c <= 30 Then
-            IsBlack = True
-        End If
+        Return False
     End Function
     Private Function IsWB(ByVal wb As Integer, ByVal i As Integer) As Boolean
         If wb = WHITE Then
@@ -1004,7 +1013,7 @@
                 b = GetButton(range(c))
                 If IsWhite(locate) = True Then
                     b.BackColor = Color.RoyalBlue
-                Else
+                ElseIf IsBlack(locate) = True Then
                     b.BackColor = Color.OrangeRed
                 End If
             Next
@@ -1021,9 +1030,9 @@
             AddKihu(locate)
             state = 0
             Me.Refresh()
-            Me.Cursor = Cursors.WaitCursor
-            RobotMove(-1)
-            Me.Cursor = Cursors.Default
+            'Me.Cursor = Cursors.WaitCursor
+            'RobotMove(-1)
+            'Me.Cursor = Cursors.Default
         ElseIf (state = 1 Or state = 2) And undo = locate Then
             DispAll()
             state = 0
@@ -2168,5 +2177,18 @@ LOG_WRITE:
     Private Sub Button82_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button82.Click
         UnmakeMove(modosi)
         DispAll()
+    End Sub
+
+    Private Sub RichTextBox1_TextChanged(sender As Object, e As EventArgs) Handles RichTextBox1.TextChanged
+
+    End Sub
+
+    Private Sub Button83_Click(sender As Object, e As EventArgs) Handles Button83.Click
+        Dim s1 As String = Convert.ToString(bb_black.b1, 2)
+        Dim s2 As String = Convert.ToString(bb_black.b2, 2)
+        Dim s3 As String = Convert.ToString(bb_white.b1, 2)
+        Dim s4 As String = Convert.ToString(bb_white.b2, 2)
+        RichTextBox1.Clear()
+        RichTextBox1.Text = s1 + vbCrLf + s2 + vbCrLf + s3 + vbCrLf + s4
     End Sub
 End Class
