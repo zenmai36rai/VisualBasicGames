@@ -2161,11 +2161,30 @@ LOG_WRITE:
 
     End Sub
     Private Sub Button83_Click(sender As Object, e As EventArgs) Handles Button83.Click
-        Dim s1 As String = Convert.ToString(bb_black.b1, 2)
-        Dim s2 As String = Convert.ToString(bb_black.b2, 2)
-        Dim s3 As String = Convert.ToString(bb_white.b1, 2)
+        Dim s As String
+        Dim mask As Int64 = &B111111111
+        For i = 0 To 7 Step 1
+            Dim m As Int64 = mask
+            Dim d As Int64 = (bb_black.b1 >> (i * 9)) And m
+            For j = 0 To 8 Step 1
+                Dim b As Int64 = (d >> j) And 1
+                s += Convert.ToString(b, 2)
+            Next
+            s += vbCrLf
+        Next
+        Dim s2 As String = Convert.ToString(bb_black.b2, 2) + vbCrLf
+        Dim s3 As String
+        For i = 0 To 7 Step 1
+            Dim m As Int64 = mask
+            Dim d As Int64 = (bb_white.b1 >> (i * 9)) And m
+            For j = 0 To 8 Step 1
+                Dim b As Int64 = (d >> j) And 1
+                s3 += Convert.ToString(b, 2)
+            Next
+            s3 += vbCrLf
+        Next
         Dim s4 As String = Convert.ToString(bb_white.b2, 2)
         RichTextBox1.Clear()
-        RichTextBox1.Text = s1 + vbCrLf + s2 + vbCrLf + s3 + vbCrLf + s4
+        RichTextBox1.Text = s + vbCrLf + s2 + vbCrLf + s3 + vbCrLf + s4
     End Sub
 End Class

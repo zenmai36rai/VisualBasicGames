@@ -1,6 +1,10 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\ShogiBasicKai",
+    "\\ShogiBasicKai\\ShogiBasic01",
+    "\\ShogiBasicKai\\ShogiBasic01\\ShogiBasic01"
   ],
+  "SelectedNode": "\\ShogiBasicKai\\ShogiBasic01\\ShogiBasic01.sln",
   "PreviewInSolutionExplorer": false
 }
