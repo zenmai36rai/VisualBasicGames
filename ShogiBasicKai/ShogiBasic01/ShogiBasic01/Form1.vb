@@ -34,16 +34,17 @@
         Public b2 As Int64
         Public n1 As Int64 = 0
         Public n2 As Int64 = 0
+        Private bit As Int64 = 1
         Public Function IsExist(ByVal pos As Int64) As Integer
             Dim b As Int64 = 0
             IsExist = 0
             If 0 <= pos And pos < BB_JOINT Then
-                b = b1 And 1 << pos
+                b = b1 And bit << pos
                 If b > 0 Then
                     IsExist = 1
                 End If
             ElseIf BB_JOINT <= pos And pos <= 80 Then
-                b = b2 And 1 << (pos - BB_JOINT)
+                b = b2 And bit << (pos - BB_JOINT)
                 If b > 0 Then
                     IsExist = 1
                 End If
@@ -54,7 +55,7 @@
         Public Function CountBits(ByVal bits As Int64) As Integer
             Dim mask As Int64 = 0
             For i = 0 To BB_JOINT Step 1
-                mask = 1 << i
+                mask = bit << i
                 If bits And mask Then
                     Return i
                 End If
@@ -70,20 +71,20 @@
             Dim ret As Integer = -1
             If 0 <> n1 Then
                 ret = CountBits(n1)
-                n1 -= 1 << ret
+                n1 -= bit << ret
             ElseIf 0 <> n2 Then
                 ret = CountBits(n2)
-                n2 -= 1 << ret
+                n2 -= bit << ret
                 ret += BB_JOINT
             End If
             GetNext = ret
         End Function
         Public Function AddBoard(ByVal pos As Integer) As Integer
             If 0 <= pos And pos < BB_JOINT Then
-                Dim x As Int64 = 1 << pos
+                Dim x As Int64 = bit << pos
                 b1 = b1 Or x
             ElseIf BB_JOINT <= pos And pos <= 80 Then
-                Dim x As Int64 = 1 << (pos - BB_JOINT)
+                Dim x As Int64 = bit << (pos - BB_JOINT)
                 b2 = b2 Or x
             Else
                 AddBoard = -1
@@ -93,11 +94,11 @@
         End Function
         Public Function RemoveBoard(ByVal pos As Integer) As Integer
             If 0 <= pos And pos < BB_JOINT Then
-                Dim x As Int64 = 1 << pos
+                Dim x As Int64 = bit << pos
                 x = Not x
                 b1 = b1 And x
             ElseIf BB_JOINT <= pos And pos <= 80 Then
-                Dim x As Int64 = 1 << (pos - BB_JOINT)
+                Dim x As Int64 = bit << (pos - BB_JOINT)
                 x = Not x
                 b2 = b2 And x
             Else
@@ -1013,9 +1014,9 @@
             AddKihu(locate)
             state = 0
             Me.Refresh()
-            'Me.Cursor = Cursors.WaitCursor
-            'RobotMove(-1)
-            'Me.Cursor = Cursors.Default
+            Me.Cursor = Cursors.WaitCursor
+            RobotMove(-1)
+            Me.Cursor = Cursors.Default
         ElseIf (state = 1 Or state = 2) And undo = locate Then
             DispAll()
             state = 0
@@ -1798,7 +1799,7 @@ LOG_WRITE:
     End Sub
     Private Function GetButton(ByVal locate As Integer) As Button
         If locate < 0 Or 80 < locate Then
-            RichTextBox1.Text += "error"
+            'RichTextBox1.Text += "error"
         End If
         locate = locate + 1
         GetButton = Button255
@@ -2163,7 +2164,7 @@ LOG_WRITE:
     Private Sub Button83_Click(sender As Object, e As EventArgs) Handles Button83.Click
         Dim s As String
         Dim mask As Int64 = &B111111111
-        For i = 0 To 7 Step 1
+        For i = 0 To 6 Step 1
             Dim m As Int64 = mask
             Dim d As Int64 = (bb_black.b1 >> (i * 9)) And m
             For j = 0 To 8 Step 1
@@ -2174,7 +2175,7 @@ LOG_WRITE:
         Next
         Dim s2 As String = Convert.ToString(bb_black.b2, 2) + vbCrLf
         Dim s3 As String
-        For i = 0 To 7 Step 1
+        For i = 0 To 6 Step 1
             Dim m As Int64 = mask
             Dim d As Int64 = (bb_white.b1 >> (i * 9)) And m
             For j = 0 To 8 Step 1

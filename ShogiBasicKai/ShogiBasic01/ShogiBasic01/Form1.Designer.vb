@@ -1419,17 +1419,17 @@ Partial Class Form1
         '
         'RichTextBox1
         '
-        Me.RichTextBox1.Location = New System.Drawing.Point(618, 12)
+        Me.RichTextBox1.Location = New System.Drawing.Point(629, 12)
         Me.RichTextBox1.Name = "RichTextBox1"
-        Me.RichTextBox1.Size = New System.Drawing.Size(185, 349)
+        Me.RichTextBox1.Size = New System.Drawing.Size(174, 349)
         Me.RichTextBox1.TabIndex = 107
         Me.RichTextBox1.Text = ""
         '
         'Button83
         '
-        Me.Button83.Location = New System.Drawing.Point(618, 367)
+        Me.Button83.Location = New System.Drawing.Point(629, 367)
         Me.Button83.Name = "Button83"
-        Me.Button83.Size = New System.Drawing.Size(185, 38)
+        Me.Button83.Size = New System.Drawing.Size(174, 38)
         Me.Button83.TabIndex = 108
         Me.Button83.Text = "Button83"
         Me.Button83.UseVisualStyleBackColor = True
@@ -1439,7 +1439,7 @@ Partial Class Form1
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 12.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.BackColor = System.Drawing.Color.DarkGreen
-        Me.ClientSize = New System.Drawing.Size(813, 416)
+        Me.ClientSize = New System.Drawing.Size(623, 416)
         Me.Controls.Add(Me.Button83)
         Me.Controls.Add(Me.RichTextBox1)
         Me.Controls.Add(Me.Button82)
