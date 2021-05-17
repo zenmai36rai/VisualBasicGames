@@ -155,14 +155,6 @@
         End If
         Return 0
     End Function
-    Private Function PickBoard(ByVal dist As Integer, ByVal koma As Integer) As Integer
-        If IsWhite(dist) Then
-            bb_white.RemoveBoard(dist)
-        End If
-        If IsBlack(dist) Then
-            bb_black.RemoveBoard(dist)
-        End If
-    End Function
     Private Sub Init() Handles Me.HandleCreated
         komaname = {"", "歩", "香", "桂", "銀", "金", "飛", "角", "王", "と", "杏", "圭", "全", "龍", "馬"}
         all = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80}
@@ -848,8 +840,12 @@
     End Function
     Private Function alphabeta(ByVal first As Integer, ByVal wb As Integer, ByVal depth As Integer,
                             ByVal alpha As Integer, ByVal beta As Integer) As Integer
+        Dim h As Integer = Hyouka() * wb
         If depth = 0 Then
-            Return Hyouka() * wb
+            Return h
+        End If
+        If h < -15000 Or 15000 < h Then
+            Return h
         End If
         Dim last As Integer = GenerateMoves(first, wb)
         For i = first To last - 1
