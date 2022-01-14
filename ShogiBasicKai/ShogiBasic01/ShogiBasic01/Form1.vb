@@ -217,11 +217,25 @@
             Next
         Next
         '穴熊定跡
+        koma_position_score(22, 0) = 100
+        koma_position_score(22, 1) = 40
+        koma_position_score(22, 2) = 20
         koma_position_score(22, 3) = 20
         koma_position_score(22, 12) = 20
         koma_position_score(22, 11) = 40
         koma_position_score(22, 10) = 60
-        koma_position_score(22, 0) = 100
+        '金銀は矢倉を目指す
+        koma_position_score(19, 13) = 10
+        koma_position_score(19, 12) = 20
+        koma_position_score(19, 11) = 40
+        koma_position_score(19, 10) = 60
+        koma_position_score(19, 20) = 70
+        koma_position_score(18, 11) = 10
+        koma_position_score(18, 13) = 20
+        koma_position_score(18, 21) = 40
+        '飛車先の歩は突く
+        koma_position_score(15, 34) = 20
+        koma_position_score(15, 43) = 40
         BoardSet()
         Randomize()
         'For i = 0 To score.Length - 1 Step 1
@@ -262,7 +276,7 @@
         unit = board(locate)
         UnitRange = all
         Select Case unit
-            Case = 1
+            Case 1
                 UnitRange = HuRange(locate, 1)
             Case 2
                 UnitRange = KyoRange(locate, 1)
@@ -290,7 +304,7 @@
                 UnitRange = KeimaRange(locate, -1)
             Case 18
                 UnitRange = GinRange(locate, -1)
-            Case 19 Or 23 Or 24 Or 25 Or 26
+            Case 19, 23, 24, 25, 26
                 UnitRange = KinRange(locate, -1)
             Case 20
                 UnitRange = HisyaRange(locate, -1, False)
