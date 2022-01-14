@@ -136,6 +136,7 @@
     Const KOMA_POS As Integer = 81
     Const KOMA_KIND As Integer = 28
     Dim koma_position_score(KOMA_KIND, KOMA_POS) As Integer
+    Const POSITION_BIAS As Integer = 150
     Dim our_effect_value(9) As Integer
     Dim their_effect_value(9) As Integer
     Dim blank_effect_value(9) As Integer
@@ -236,6 +237,12 @@
         '飛車先の歩は突く
         koma_position_score(15, 34) = 20
         koma_position_score(15, 43) = 40
+        'バイアスを先にかけておく
+        For m = 0 To KOMA_KIND - 1 Step 1
+            For n = 0 To KOMA_POS - 1 Step 1
+                koma_position_score(m, n) = koma_position_score(m, n) * POSITION_BIAS / 100
+            Next
+        Next
         BoardSet()
         Randomize()
         'For i = 0 To score.Length - 1 Step 1
@@ -849,16 +856,16 @@
             If IsWB(WHITE, i) Then
                 Hyouka += KomaScore(board(i))
                 Hyouka += koma_position_score(board(i), i)
-                'Dim s1 = score_table(komakiki_w(i), 0, enem_pos, i)
-                'Dim s2 = score_table(komakiki_b(i), 1, king_pos, i)
-                'Hyouka += s1 - s2
+                Dim s1 = score_table(komakiki_w(i), 0, enem_pos, i)
+                Dim s2 = score_table(komakiki_b(i), 1, king_pos, i)
+                Hyouka += s1 - s2
             End If
             If IsWB(BLACK, i) Then
                 Hyouka -= KomaScore(board(i))
                 Hyouka -= koma_position_score(board(i), i)
-                'Dim s1 = score_table(komakiki_w(i), 1, enem_pos, i)
-                'Dim s2 = score_table(komakiki_b(i), 0, king_pos, i)
-                'Hyouka += s1 - s2
+                Dim s1 = score_table(komakiki_w(i), 1, enem_pos, i)
+                Dim s2 = score_table(komakiki_b(i), 0, king_pos, i)
+                Hyouka -= s2 - s1
             End If
         Next
         For i = 0 To 7 Step 1
