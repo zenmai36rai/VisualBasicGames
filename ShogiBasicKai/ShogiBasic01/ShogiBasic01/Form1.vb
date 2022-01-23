@@ -223,14 +223,15 @@
         koma_position_score(22, 1) = 40
         koma_position_score(22, 2) = 20
         koma_position_score(22, 3) = 20
-        koma_position_score(22, 12) = 20
-        koma_position_score(22, 11) = 40
         koma_position_score(22, 10) = 60
+        koma_position_score(22, 11) = 40
+        koma_position_score(22, 12) = 20
+        koma_position_score(22, 13) = 5
         '金銀は矢倉を目指す
-        koma_position_score(19, 13) = 10
-        koma_position_score(19, 12) = 20
-        koma_position_score(19, 11) = 40
         koma_position_score(19, 10) = 60
+        koma_position_score(19, 11) = 40
+        koma_position_score(19, 12) = 20
+        koma_position_score(19, 13) = 10
         koma_position_score(19, 20) = 70
         koma_position_score(18, 11) = 10
         koma_position_score(18, 13) = 20
