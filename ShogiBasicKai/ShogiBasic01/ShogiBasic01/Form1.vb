@@ -137,6 +137,7 @@
     Const KOMA_KIND As Integer = 28
     Dim koma_position_score(KOMA_KIND, KOMA_POS) As Integer
     Const POSITION_BIAS As Integer = 150
+    Const HIGH_POSITION_SCORE As Integer = 1
     Dim our_effect_value(9) As Integer
     Dim their_effect_value(9) As Integer
     Dim blank_effect_value(9) As Integer
@@ -214,7 +215,7 @@
         Next
         For m = 0 To KOMA_KIND - 1 Step 1
             For n = 0 To KOMA_POS - 1 Step 1
-                koma_position_score(m, n) = 0
+                koma_position_score(m, n) = 0 '(n Mod 9) * HIGH_POSITION_SCORE
             Next
         Next
         '穴熊定跡
@@ -235,8 +236,15 @@
         koma_position_score(18, 13) = 20
         koma_position_score(18, 21) = 40
         '飛車先の歩は突く
-        koma_position_score(15, 34) = 20
-        koma_position_score(15, 43) = 40
+        koma_position_score(15, 34) = 10
+        koma_position_score(15, 43) = 20
+        '棒銀戦法
+        koma_position_score(18, 15) = 10
+        koma_position_score(18, 25) = 20
+        koma_position_score(18, 34) = 30
+        koma_position_score(18, 42) = 40
+        koma_position_score(18, 43) = 40
+        koma_position_score(18, 44) = 40
         'バイアスを先にかけておく
         For m = 0 To KOMA_KIND - 1 Step 1
             For n = 0 To KOMA_POS - 1 Step 1
