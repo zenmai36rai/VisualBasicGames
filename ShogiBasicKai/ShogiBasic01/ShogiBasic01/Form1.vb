@@ -237,8 +237,8 @@
         koma_position_score(18, 13) = 20
         koma_position_score(18, 21) = 40
         '飛車先の歩は突く
-        koma_position_score(15, 34) = 10
-        koma_position_score(15, 43) = 20
+        koma_position_score(15, 34) = 1
+        koma_position_score(15, 43) = 2
         '棒銀戦法
         koma_position_score(18, 15) = 10
         koma_position_score(18, 25) = 20
