@@ -134,6 +134,7 @@ Partial Class Form1
         Me.Button82 = New System.Windows.Forms.Button()
         Me.RichTextBox1 = New System.Windows.Forms.RichTextBox()
         Me.Button83 = New System.Windows.Forms.Button()
+        Me.Button84 = New System.Windows.Forms.Button()
         Me.Panel1.SuspendLayout()
         Me.Panel3.SuspendLayout()
         Me.Panel2.SuspendLayout()
@@ -1429,17 +1430,27 @@ Partial Class Form1
         '
         Me.Button83.Location = New System.Drawing.Point(629, 367)
         Me.Button83.Name = "Button83"
-        Me.Button83.Size = New System.Drawing.Size(174, 38)
+        Me.Button83.Size = New System.Drawing.Size(80, 38)
         Me.Button83.TabIndex = 108
         Me.Button83.Text = "Button83"
         Me.Button83.UseVisualStyleBackColor = True
+        '
+        'Button84
+        '
+        Me.Button84.Location = New System.Drawing.Point(718, 367)
+        Me.Button84.Name = "Button84"
+        Me.Button84.Size = New System.Drawing.Size(84, 38)
+        Me.Button84.TabIndex = 109
+        Me.Button84.Text = "Button84"
+        Me.Button84.UseVisualStyleBackColor = True
         '
         'Form1
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 12.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.BackColor = System.Drawing.Color.DarkGreen
-        Me.ClientSize = New System.Drawing.Size(623, 416)
+        Me.ClientSize = New System.Drawing.Size(817, 416)
+        Me.Controls.Add(Me.Button84)
         Me.Controls.Add(Me.Button83)
         Me.Controls.Add(Me.RichTextBox1)
         Me.Controls.Add(Me.Button82)
@@ -1578,4 +1589,5 @@ Partial Class Form1
     Friend WithEvents Button82 As System.Windows.Forms.Button
     Friend WithEvents RichTextBox1 As RichTextBox
     Friend WithEvents Button83 As Button
+    Friend WithEvents Button84 As Button
 End Class

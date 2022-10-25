@@ -142,6 +142,21 @@
     Dim their_effect_value(9) As Integer
     Dim blank_effect_value(9) As Integer
     Dim score_table(KOMAKIKI_SUM, WH_OR_BL, KING_POS, EFFECT_POS) As Integer
+    Class EvalBuff
+        Public komatoku As Integer = 0
+        Public komakiki As Integer = 0
+        Public komaichi As Integer = 0
+        Public Function Init()
+            komatoku = 0
+            komakiki = 0
+            komaichi = 0
+        End Function
+    End Class
+    Dim WBuf As EvalBuff = New EvalBuff() 'WhiteBuff
+    Dim BBuf As EvalBuff = New EvalBuff() 'BlackBuff
+    Dim WTop As EvalBuff = New EvalBuff()
+    Dim BTop As EvalBuff = New EvalBuff()
+
     Private Function SetBoard(ByVal dist As Integer, ByVal koma As Integer) As Integer
         If 0 = koma Then
             board(dist) = koma
@@ -846,6 +861,8 @@
         Dim king_pos As Integer = 0
         Dim enem_pos As Integer = 0
         Dim d As Integer = 0
+        WBuf.Init()
+        BBuf.Init()
         Hyouka = 0
         For i = 0 To 80 Step 1
             If board(i) = 0 Then
@@ -863,24 +880,28 @@
                 Continue For
             End If
             If IsWB(WHITE, i) Then
-                Hyouka += KomaScore(board(i))
-                Hyouka += koma_position_score(board(i), i)
-                Dim s1 = score_table(komakiki_w(i), 0, enem_pos, i)
-                Dim s2 = score_table(komakiki_b(i), 1, king_pos, i)
-                Hyouka += s1 - s2
+                WBuf.komatoku += KomaScore(board(i))
+                WBuf.komaichi += koma_position_score(board(i), i)
+                WBuf.komakiki += score_table(komakiki_w(i), 0, enem_pos, i)
+                BBuf.komakiki += score_table(komakiki_b(i), 1, king_pos, i)
             End If
             If IsWB(BLACK, i) Then
-                Hyouka -= KomaScore(board(i))
-                Hyouka -= koma_position_score(board(i), i)
-                Dim s1 = score_table(komakiki_w(i), 1, enem_pos, i)
-                Dim s2 = score_table(komakiki_b(i), 0, king_pos, i)
-                Hyouka -= s2 - s1
+                BBuf.komatoku += KomaScore(board(i))
+                BBuf.komaichi += koma_position_score(board(i), i)
+                WBuf.komakiki += score_table(komakiki_w(i), 1, enem_pos, i)
+                BBuf.komakiki += score_table(komakiki_b(i), 0, king_pos, i)
             End If
         Next
         For i = 0 To 7 Step 1
-            Hyouka += tegomaw(i) * KomaScore(ARW(i)) * 1.05
-            Hyouka -= tegomab(i) * KomaScore(ARB(i)) * 1.05
+            WBuf.komatoku += tegomaw(i) * KomaScore(ARW(i)) * 1.05
+            BBuf.komatoku += tegomab(i) * KomaScore(ARB(i)) * 1.05
         Next
+        Hyouka += WBuf.komatoku
+        Hyouka += WBuf.komaichi
+        Hyouka += WBuf.komakiki
+        Hyouka -= BBuf.komatoku
+        Hyouka -= BBuf.komaichi
+        Hyouka -= BBuf.komakiki
         Hyouka = Hyouka / 2
         Return Hyouka
     End Function
@@ -902,6 +923,8 @@
                 alpha = a
                 If depth = YOMI_DEPTH Then
                     best = Node(i)
+                    WTop = WBuf
+                    BTop = BBuf
                 End If
             End If
             If alpha >= beta Then
@@ -2229,5 +2252,16 @@ LOG_WRITE:
         Dim s4 As String = Convert.ToString(bb_white.b2, 2)
         RichTextBox1.Clear()
         RichTextBox1.Text = s + vbCrLf + s2 + vbCrLf + s3 + vbCrLf + s4
+    End Sub
+
+    Private Sub Button84_Click(sender As Object, e As EventArgs) Handles Button84.Click
+        Dim s1 As String = "先手駒得:" + Convert.ToString(WTop.komatoku)
+        Dim s2 As String = "先手駒位:" + Convert.ToString(WTop.komaichi)
+        Dim s3 As String = "先手駒利:" + Convert.ToString(WTop.komakiki)
+        Dim s4 As String = "後手駒得:" + Convert.ToString(BTop.komatoku)
+        Dim s5 As String = "後手駒位:" + Convert.ToString(BTop.komaichi)
+        Dim s6 As String = "後手駒利:" + Convert.ToString(BTop.komakiki)
+        RichTextBox1.Clear()
+        RichTextBox1.Text = s1 + vbCrLf + s2 + vbCrLf + s3 + vbCrLf + s4 + vbCrLf + s5 + vbCrLf + s6
     End Sub
 End Class

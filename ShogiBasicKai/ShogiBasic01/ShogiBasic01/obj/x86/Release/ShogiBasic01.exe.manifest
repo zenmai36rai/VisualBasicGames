@@ -43,14 +43,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="ShogiBasic01.exe" size="465408">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="ShogiBasic01.exe" size="466944">
       <assemblyIdentity name="ShogiBasic01" version="1.0.0.0" language="neutral" processorArchitecture="x86" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>q/fPQ7RFlCWIlybXO83ACuPfO5E=</dsig:DigestValue>
+        <dsig:DigestValue>2RmR9mMRyJo5C1HlkDpIhzYu/Mw=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
