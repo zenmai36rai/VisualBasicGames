@@ -111,6 +111,11 @@
     Dim bb_white As BitBoard = New BitBoard
     Dim bb_black As BitBoard = New BitBoard
     Dim state As Integer
+    Const ST_FREE As Integer = 0
+    Const ST_WHITE_CHOOSE As Integer = 1
+    Const ST_WHITE_MOVE As Integer = 3
+    Const ST_BLACK_CHOOSE As Integer = 2
+    Const ST_BLACK_MOVE As Integer = 4
     Dim undo As Integer
     Dim range As Array
     Dim tegomaw As Array
@@ -199,7 +204,7 @@
                 End If
             End If
         Next
-        state = 0
+        state = ST_FREE
         undo = BLANK
         komaundo = BLANK
         kihumem = 0
@@ -1038,7 +1043,7 @@
         Dim c As Integer
         Dim r As Integer
         r = False
-        If state = 0 Then
+        If state = ST_FREE Then
             undo = locate
             range = UnitRange(locate)
             For i = 0 To range.Length - 1 Step 1
@@ -1050,9 +1055,9 @@
                 Exit Sub
             End If
             If IsWhite(locate) Then
-                state = 1
+                state = ST_WHITE_CHOOSE
             ElseIf IsBlack(locate) Then
-                state = 2
+                state = ST_BLACK_CHOOSE
             Else
                 Exit Sub
             End If
@@ -1066,7 +1071,7 @@
                     b.BackColor = Color.YellowGreen
                 End If
             Next
-        ElseIf state = 1 And RangeCheck(locate) Then
+        ElseIf state = ST_WHITE_CHOOSE And RangeCheck(locate) Then
             'MoveChara(locate)
             Dim d As MoveData = New MoveData
             d.hand = BLANK
@@ -1077,15 +1082,15 @@
             MakeMove(d, True)
             DispAll()
             AddKihu(locate)
-            state = 0
+            state = ST_FREE
             Me.Refresh()
             Me.Cursor = Cursors.WaitCursor
             RobotMove(-1)
             Me.Cursor = Cursors.Default
-        ElseIf (state = 1 Or state = 2) And undo = locate Then
+        ElseIf (state = ST_WHITE_CHOOSE Or state = ST_BLACK_CHOOSE) And undo = locate Then
             DispAll()
             state = 0
-        ElseIf state = 2 And RangeCheck(locate) Then
+        ElseIf state = ST_BLACK_CHOOSE And RangeCheck(locate) Then
             'MoveChara(locate)
             Dim d As MoveData = New MoveData
             d.hand = BLANK
@@ -1096,8 +1101,8 @@
             MakeMove(d, True)
             DispAll()
             AddKihu(locate)
-            state = 0
-        ElseIf state = 3 And RangeCheck(locate) Then
+            state = ST_FREE
+        ElseIf state = ST_WHITE_MOVE And RangeCheck(locate) Then
             'board(locate) = pop
             'tegomaw(pop - 1) = tegomaw(pop - 1) - 1
             Dim d As MoveData = New MoveData
@@ -1111,12 +1116,12 @@
             AddKihu(locate)
             undo = BLANK
             komaundo = BLANK
-            state = 0
+            state = ST_FREE
             Me.Refresh()
             Me.Cursor = Cursors.WaitCursor
             RobotMove(-1)
             Me.Cursor = Cursors.Default
-        ElseIf state = 4 And RangeCheck(locate) Then
+        ElseIf state = ST_BLACK_MOVE And RangeCheck(locate) Then
             'board(locate) = pop
             'tegomab(pop - 15) = tegomab(pop - 15) - 1
             Dim d As MoveData = New MoveData
@@ -1130,7 +1135,7 @@
             AddKihu(locate)
             undo = BLANK
             komaundo = BLANK
-            state = 0
+            state = ST_FREE
         End If
     End Sub
     Private Sub DispAll()
@@ -1263,21 +1268,21 @@
             range = {}
             DispAll()
             komaundo = BLANK
-            state = 0
+            state = ST_FREE
             TakeHand = range.Clone
             Exit Function
         Else
             komaundo = koma
         End If
         If 1 <= koma Or koma <= 14 Then
-            state = 3
+            state = ST_WHITE_MOVE
             For c = 0 To range.Length - 1 Step 1
                 b = GetButton(range(c))
                 b.BackColor = Color.RoyalBlue
             Next
         End If
         If 15 <= koma Then
-            state = 4
+            state = ST_BLACK_MOVE
             For c = 0 To range.Length - 1 Step 1
                 b = GetButton(range(c))
                 b.BackColor = Color.OrangeRed
@@ -1586,13 +1591,13 @@ LOG_WRITE:
                 dx = dl - Int(dl / 9) * 9
                 dy = Int(dl / 9)
                 If 1 <= yc Then
-                    If state = 1 Then
+                    If state = ST_WHITE_CHOOSE Then
                         If x < dx Then
                             lr = "右"
                         ElseIf dx < x Then
                             lr = "左"
                         End If
-                    ElseIf state = 2 Then
+                    ElseIf state = ST_BLACK_CHOOSE Then
                         If x < dx Then
                             lr = "左"
                         ElseIf dx < x Then
@@ -1601,13 +1606,13 @@ LOG_WRITE:
                     End If
                 End If
                 If 0 = xc Then
-                    If state = 1 Then
+                    If state = ST_WHITE_CHOOSE Then
                         If y < dy Then
                             ud = "引"
                         ElseIf dy < y Then
                             ud = "上"
                         End If
-                    ElseIf state = 2 Then
+                    ElseIf state = ST_BLACK_CHOOSE Then
                         If y < dy Then
                             ud = "上"
                         ElseIf dy < y Then
