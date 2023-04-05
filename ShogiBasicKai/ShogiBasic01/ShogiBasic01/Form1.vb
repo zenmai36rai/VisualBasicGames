@@ -940,7 +940,7 @@
         If Math.Abs(h) >= 15000 Then
             Return h
         End If
-        Dim last As Integer = GenerateMoves(first, wb)
+        Dim last As Integer = GenerateMoves(first, wb, depth)
         For i = first To last - 1
             MakeMove(Node(i), False)
             Dim a = -alphabeta(last, -wb, depth - 1, -beta, -alpha)
@@ -959,7 +959,8 @@
         Next
         Return alpha
     End Function
-    Private Function GenerateMoves(ByVal first As Integer, ByVal wb As Integer) As Integer
+    Private Function GenerateMoves(ByVal first As Integer, ByVal wb As Integer,
+                                   ByVal depth As Integer) As Integer
         Dim idx As Integer = first
         If KOMAKIKI_READ Then
             KomaKikiInit()
@@ -968,7 +969,7 @@
             nirami_w = 0
             nirami_b = 0
         End If
-        If HAND_READ Then
+        If HAND_READ And (depth > 1) Then
             For i = 0 To 6 '手駒の玉は読まない
                 If wb = WHITE Then
                     If tegomaw(i) > 0 Then
