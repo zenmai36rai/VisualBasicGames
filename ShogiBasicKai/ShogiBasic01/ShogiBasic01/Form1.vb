@@ -157,7 +157,7 @@
     Const WH_OR_BL As Integer = 2 '空きマスを考慮する場合は"3"
     Const KING_POS As Integer = 81
     Const EFFECT_POS As Integer = 81
-    Dim score As Array = {0, 90, 315, 405, 495, 540, 990, 855, 15000, 540, 540, 540, 540, 1395, 945, 90, 315, 405, 495, 540, 990, 855, 15000, 540, 540, 540, 540, 1395, 945}
+    Dim score As Array = {0, 90, 315, 405, 495, 540, 990, 855, 25000, 540, 540, 540, 540, 1395, 945, 90, 315, 405, 495, 540, 990, 855, 25000, 540, 540, 540, 540, 1395, 945}
     Const KOMA_POS As Integer = 81
     Const KOMA_KIND As Integer = 28
     Dim koma_position_score(KOMA_KIND, KOMA_POS) As Integer
@@ -266,7 +266,7 @@
         koma_position_score(22, 10) = 60
         koma_position_score(22, 11) = 40
         koma_position_score(22, 12) = 20
-        koma_position_score(22, 13) = 5
+        koma_position_score(22, 13) = -5
         '金銀は矢倉を目指す
         koma_position_score(19, 10) = 60
         koma_position_score(19, 11) = 40
@@ -931,7 +931,7 @@
         If depth = 0 Then
             Return h
         End If
-        If h < -15000 Or 15000 < h Then
+        If h < -10000 Or 10000 < h Then
             Return h
         End If
         Dim last As Integer = GenerateMoves(first, wb)
