@@ -24,12 +24,13 @@
         Sub New(ByVal i As Integer,
                 ByVal dist As Integer,
                 ByVal s As Integer,
-                ByVal d As Integer)
+                ByVal d As Integer,
+                ByVal h As Integer)
             r = i
             r2 = dist
             src = s
             dst = d
-            hand = BLANK
+            hand = h
         End Sub
 
         Sub New(ByVal i As Integer, ByVal j As Integer)
@@ -437,7 +438,7 @@
         If GenerationFlag = True Then
             Dim i As Integer = locate
             Dim idx As Integer = NodeIdx
-            Node(idx) = New MoveData(i, dist, board(i), board(dist))
+            Node(idx) = New MoveData(i, dist, board(i), board(dist), BLANK)
             NodeCount += 1
             NodeIdx += 1
             ''idx += 1
