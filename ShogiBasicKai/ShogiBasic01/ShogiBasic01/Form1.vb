@@ -18,6 +18,25 @@
         Public src As Byte
         Public dst As Byte
         Public hand As Byte = BLANK
+        Sub New()
+
+        End Sub
+        Sub New(ByVal i As Integer,
+                ByVal dist As Integer,
+                ByVal s As Integer,
+                ByVal d As Integer)
+            r = i
+            r2 = dist
+            src = s
+            dst = d
+            hand = BLANK
+        End Sub
+
+        Sub New(ByVal i As Integer, ByVal j As Integer)
+            hand = i
+            r2 = j
+        End Sub
+
     End Class
     Dim GenerationFlag As Boolean = False
     Dim best As MoveData = New MoveData
@@ -418,12 +437,7 @@
         If GenerationFlag = True Then
             Dim i As Integer = locate
             Dim idx As Integer = NodeIdx
-            Node(idx) = New MoveData
-            Node(idx).r = i
-            Node(idx).r2 = dist
-            Node(idx).src = board(i)
-            Node(idx).dst = board(dist)
-            Node(idx).hand = BLANK
+            Node(idx) = New MoveData(i, dist, board(i), board(dist))
             NodeCount += 1
             NodeIdx += 1
             ''idx += 1
@@ -954,9 +968,7 @@
                         range = HandRange(wb, i)
                         For j = 0 To range.Length - 1 Step 1
                             If range(j) <> BLANK Then
-                                Node(idx) = New MoveData
-                                Node(idx).hand = i
-                                Node(idx).r2 = range(j)
+                                Node(idx) = New MoveData(i, range(j))
                                 NodeCount += 1
                                 idx += 1
                             End If
@@ -967,9 +979,7 @@
                         range = HandRange(wb, i)
                         For j = 0 To range.Length - 1 Step 1
                             If range(j) <> BLANK Then
-                                Node(idx) = New MoveData
-                                Node(idx).hand = i + 15
-                                Node(idx).r2 = range(j)
+                                Node(idx) = New MoveData(i + 15, range(j))
                                 NodeCount += 1
                                 idx += 1
                             End If
