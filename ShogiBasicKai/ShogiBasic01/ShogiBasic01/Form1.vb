@@ -157,7 +157,7 @@
     Const WH_OR_BL As Integer = 2 '空きマスを考慮する場合は"3"
     Const KING_POS As Integer = 81
     Const EFFECT_POS As Integer = 81
-    Dim score As Array = {0, 90, 315, 405, 495, 540, 990, 855, 25000, 540, 540, 540, 540, 1395, 945, 90, 315, 405, 495, 540, 990, 855, 25000, 540, 540, 540, 540, 1395, 945}
+    Dim score As Array = {0, 90, 315, 405, 495, 540, 990, 855, 30000, 540, 540, 540, 540, 1395, 945, 90, 315, 405, 495, 540, 990, 855, 30000, 540, 540, 540, 540, 1395, 945}
     Const KOMA_POS As Integer = 81
     Const KOMA_KIND As Integer = 28
     Dim koma_position_score(KOMA_KIND, KOMA_POS) As Integer
@@ -878,8 +878,8 @@
         KomaDist = Math.Sqrt(x ^ 2 + y ^ 2) / 456
     End Function
     Private Function Hyouka() As Integer
-        Dim king_pos As Integer = 0
-        Dim enem_pos As Integer = 0
+        Dim king_pos As Integer = -1
+        Dim enem_pos As Integer = -1
         Dim d As Integer = 0
         WBuf.Init()
         BBuf.Init()
@@ -895,6 +895,12 @@
                 enem_pos = i
             End If
         Next
+        If enem_pos = -1 Then
+            Return 15000
+        End If
+        If king_pos = -1 Then
+            Return -15000
+        End If
         For i = 0 To 80 Step 1
             If board(i) = 0 Then
                 Continue For
@@ -931,7 +937,7 @@
         If depth = 0 Then
             Return h
         End If
-        If h < -10000 Or 10000 < h Then
+        If Math.Abs(h) >= 15000 Then
             Return h
         End If
         Dim last As Integer = GenerateMoves(first, wb)
