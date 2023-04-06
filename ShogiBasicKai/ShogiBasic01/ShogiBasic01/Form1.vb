@@ -19,6 +19,7 @@
         Public src As Byte
         Public dst As Byte
         Public hand As Byte = BLANK
+        Public classup As Boolean = True
         Sub New()
 
         End Sub
@@ -34,6 +35,19 @@
             hand = h
         End Sub
 
+        Sub New(ByVal i As Integer,
+                ByVal dist As Integer,
+                ByVal s As Integer,
+                ByVal d As Integer,
+                ByVal h As Integer,
+                ByVal c As Boolean)
+            r = i
+            r2 = dist
+            src = s
+            dst = d
+            hand = h
+            classup = c
+        End Sub
         Sub New(ByVal i As Integer, ByVal j As Integer)
             hand = i
             r2 = j
@@ -437,12 +451,15 @@
     Private Sub AddValue(ByVal locate As Integer, ByRef a As Array, ByVal dist As Integer, ByVal pos As Integer)
         a.SetValue(dist, pos)
         If GenerationFlag = True Then
-            Dim i As Integer = locate
-            Dim idx As Integer = NodeIdx
-            Node(idx) = New MoveData(i, dist, board(i), board(dist), BLANK)
+            Node(NodeIdx) = New MoveData(locate, dist, board(locate), board(dist), BLANK)
             NodeCount += 1
             NodeIdx += 1
             ''idx += 1
+            If (board(locate) >= 16) And (18 <= board(locate)) And ((locate >= 54) Or (dist >= 54)) Then
+                Node(NodeIdx) = New MoveData(locate, dist, board(locate), board(dist), BLANK, False)
+                NodeCount += 1
+                NodeIdx += 1
+            End If
         End If
     End Sub
 
@@ -1379,11 +1396,16 @@
         If mov Then
             narimem = board(d.r)
         End If
-        ClassUp(d.r)
+        If d.classup Then
+            ClassUp(d.r)
+        End If
         'board(d.r2) = board(d.r)
         SetBoard(d.r2, board(d.r))
         'board(d.r) = 0
         SetBoard(d.r, 0)
+        If d.classup Then
+            ClassUp(d.r2)
+        End If
         ClassUp(d.r2)
 LOG_WRITE:
         If DEBUG_LOG Then
