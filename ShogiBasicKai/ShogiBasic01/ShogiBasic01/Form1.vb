@@ -3,6 +3,7 @@
     Const BLACK As Integer = -1
     Const USE_AB As Boolean = True
     Const YOMI_DEPTH As Integer = 3
+    Const HAND_RIMIT As Integer = 1
     Const HAND_READ As Boolean = True
     Const KOMAKIKI_READ As Boolean = True
     Const NIRAMI_READ As Boolean = True
@@ -969,7 +970,7 @@
             nirami_w = 0
             nirami_b = 0
         End If
-        If HAND_READ And (depth > 1) Then
+        If HAND_READ And (depth > HAND_RIMIT) Then
             For i = 0 To 6 '手駒の玉は読まない
                 If wb = WHITE Then
                     If tegomaw(i) > 0 Then
