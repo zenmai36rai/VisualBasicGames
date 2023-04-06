@@ -13,6 +13,8 @@
     Const ROBO_TEBAN As Integer = BLACK
     Const BLANK As Integer = 255
     Const BRANCH_WIDTH As Integer = 800
+
+    Private CheckBit As Integer = 0
     Class MoveData
         Public r As Byte
         Public r2 As Byte
@@ -33,6 +35,7 @@
             src = s
             dst = d
             hand = h
+            classup = True
         End Sub
 
         Sub New(ByVal i As Integer,
@@ -455,7 +458,7 @@
             NodeCount += 1
             NodeIdx += 1
             ''idx += 1
-            If (board(locate) >= 16) And (18 <= board(locate)) And ((locate >= 54) Or (dist >= 54)) Then
+            If (16 <= board(locate)) And (board(locate) <= 18) And ((locate >= 54) Or (dist >= 54)) Then
                 Node(NodeIdx) = New MoveData(locate, dist, board(locate), board(dist), BLANK, False)
                 NodeCount += 1
                 NodeIdx += 1
@@ -1398,6 +1401,8 @@
         End If
         If d.classup Then
             ClassUp(d.r)
+        Else
+            CheckBit += 1
         End If
         'board(d.r2) = board(d.r)
         SetBoard(d.r2, board(d.r))
@@ -1405,8 +1410,9 @@
         SetBoard(d.r, 0)
         If d.classup Then
             ClassUp(d.r2)
+        Else
+            CheckBit += 1
         End If
-        ClassUp(d.r2)
 LOG_WRITE:
         If DEBUG_LOG Then
             AddYomi(d.r2)
