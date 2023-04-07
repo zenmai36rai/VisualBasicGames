@@ -5,6 +5,7 @@
     Const YOMI_DEPTH As Integer = 3
     Const HAND_RIMIT As Integer = 1
     Const HAND_READ As Boolean = True
+    Const NARAZU_READ As Boolean = False
     Const KOMAKIKI_READ As Boolean = True
     Const NIRAMI_READ As Boolean = True
     Const DEBUG_LOG As Boolean = False
@@ -59,6 +60,7 @@
     End Class
     Dim GenerationFlag As Boolean = False
     Dim best As MoveData = New MoveData
+    Dim BestScore As Integer = 0
     Dim modosi As MoveData = New MoveData
     Dim Node(BRANCH_WIDTH * (YOMI_DEPTH + 1)) As MoveData
     Dim NodeCount As Integer
@@ -176,6 +178,7 @@
     Const KING_POS As Integer = 81
     Const EFFECT_POS As Integer = 81
     Dim score As Array = {0, 90, 315, 405, 495, 540, 990, 855, 30000, 540, 540, 540, 540, 1395, 945, 90, 315, 405, 495, 540, 990, 855, 30000, 540, 540, 540, 540, 1395, 945}
+    Dim FINISH_SCORE = 15000
     Const KOMA_POS As Integer = 81
     Const KOMA_KIND As Integer = 28
     Dim koma_position_score(KOMA_KIND, KOMA_POS) As Integer
@@ -457,8 +460,7 @@
             Node(NodeIdx) = New MoveData(locate, dist, board(locate), board(dist), BLANK)
             NodeCount += 1
             NodeIdx += 1
-            ''idx += 1
-            If (16 <= board(locate)) And (board(locate) <= 18) And ((locate >= 54) Or (dist >= 54)) Then
+            If NARAZU_READ And (16 <= board(locate)) And (board(locate) <= 18) And ((locate >= 54) Or (dist >= 54)) Then
                 Node(NodeIdx) = New MoveData(locate, dist, board(locate), board(dist), BLANK, False)
                 NodeCount += 1
                 NodeIdx += 1
@@ -917,10 +919,10 @@
             End If
         Next
         If enem_pos = -1 Then
-            Return 15000
+            Return FINISH_SCORE
         End If
         If king_pos = -1 Then
-            Return -15000
+            Return -FINISH_SCORE
         End If
         For i = 0 To 80 Step 1
             If board(i) = 0 Then
@@ -958,7 +960,7 @@
         If depth = 0 Then
             Return h
         End If
-        If Math.Abs(h) >= 15000 Then
+        If Math.Abs(h) >= FINISH_SCORE Then
             Return h
         End If
         Dim last As Integer = GenerateMoves(first, wb, depth)
@@ -970,6 +972,7 @@
                 alpha = a
                 If depth = YOMI_DEPTH Then
                     best = Node(i)
+                    BestScore = alpha
                     WTop = WBuf
                     BTop = BBuf
                 End If
@@ -1059,7 +1062,7 @@
         End If
         robomode = True
         ResumeLayout()
-        If best.r = BLANK Then
+        If BestScore <= -FINISH_SCORE Then
             ListBox1.Items.Add("▽投了")
             ListBox1.TopIndex = ListBox1.Items.Count - 1
         ElseIf best.hand = BLANK Then
@@ -1074,6 +1077,10 @@
             GetHandBlack(r).PerformClick()
             GetButton(r2).PerformClick()
             robomode = False
+        End If
+        If BestScore >= FINISH_SCORE Then
+            ListBox1.Items.Add("▲詰み")
+            ListBox1.TopIndex = ListBox1.Items.Count - 1
         End If
     End Sub
     Private Sub UnitClick(ByVal locate As Integer)
