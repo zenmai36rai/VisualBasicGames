@@ -148,8 +148,74 @@
             Return 0
         End Function
     End Class
+    Const W_OR_B As Integer = 2
+    Const KOMA_KIND As Integer = 28
+    Const KOMA_POS As Integer = 81
+    Class KiKiBoard
+        Private Hu(W_OR_B, KOMA_POS) As BitBoard
+        Sub New()
+            For i = 0 To W_OR_B - 1 Step 1
+                For j = 0 To KOMA_POS - 1 Step 1
+                    Hu(i, j) = New BitBoard
+                Next
+            Next
+        End Sub
+        Public Function AndBB(ByVal bb1 As BitBoard,
+                     ByVal bb2 As BitBoard) As BitBoard
+            AndBB = New BitBoard
+            AndBB.b1 = bb1.b1 And bb2.b1
+            AndBB.b2 = bb1.b2 And bb2.b2
+            Return AndBB
+        End Function
+        Public Function XorBB(ByVal bb1 As BitBoard,
+                     ByVal bb2 As BitBoard) As BitBoard
+            XorBB = New BitBoard
+            XorBB.b1 = bb1.b1 Xor bb2.b1
+            XorBB.b2 = bb1.b2 Xor bb2.b2
+            Return XorBB
+        End Function
+        Private Function GetWB(ByVal wb As Integer) As Integer
+            If wb = WHITE Then
+                Return 0
+            End If
+            If wb = BLACK Then
+                Return 1
+            End If
+        End Function
+        Private Function CheckBoardRange(ByVal x As Integer, ByVal y As Integer) As Boolean
+            CheckBoardRange = True
+            If x < 0 Or 8 < x Then
+                CheckBoardRange = False
+            End If
+            If y < 0 Or 8 < y Then
+                CheckBoardRange = False
+            End If
+        End Function
+        Public Sub AddHuRange(ByVal locate As Integer,
+                                   ByVal wb As Integer,
+                                   ByVal dx As Integer,
+                                   ByVal dy As Integer)
+            Dim dist As Integer
+            If CheckBoardRange(dx, dy) = True Then
+                dist = dx + dy * 9
+                Hu(GetWB(wb), locate).AddBoard(dist)
+            End If
+        End Sub
+        Public Function GetHuRange(ByVal locate As Integer,
+                                   ByVal wb As Integer,
+                                   ByVal bb As BitBoard)
+            Dim BufBB = XorBB(Hu(GetWB(wb), locate), bb)
+            Dim RetBB = AndBB(Hu(GetWB(wb), locate), BufBB)
+            Dim RetValue As Integer = RetBB.GetFirst()
+            If RetValue = -1 Then
+                Return BLANK
+            End If
+            Return RetValue
+        End Function
+    End Class
     Dim bb_white As BitBoard = New BitBoard
     Dim bb_black As BitBoard = New BitBoard
+    Dim bb_kiki As KiKiBoard = New KiKiBoard
     Dim state As Integer
     Const ST_FREE As Integer = 0
     Const ST_WHITE_CHOOSE As Integer = 1
@@ -179,8 +245,6 @@
     Const EFFECT_POS As Integer = 81
     Dim score As Array = {0, 90, 315, 405, 495, 540, 990, 855, 30000, 540, 540, 540, 540, 1395, 945, 90, 315, 405, 495, 540, 990, 855, 30000, 540, 540, 540, 540, 1395, 945}
     Dim FINISH_SCORE = 15000
-    Const KOMA_POS As Integer = 81
-    Const KOMA_KIND As Integer = 28
     Dim koma_position_score(KOMA_KIND, KOMA_POS) As Integer
     Const POSITION_BIAS As Integer = 150
     Const HIGH_POSITION_SCORE As Integer = 1
@@ -318,6 +382,26 @@
         'For i = 0 To score.Length - 1 Step 1
         'score(i) = score(i) + Rnd() * score(i) * 0.1
         'Next
+        For i = 0 To KOMA_POS - 1 Step 1
+            For j = 0 To 1
+                Dim KomaColor As Integer = WHITE
+                If j = 1 Then
+                    KomaColor = BLACK
+                End If
+                CalcHuRange(i, KomaColor)
+            Next
+        Next
+    End Sub
+    Private Sub CalcHuRange(ByVal locate As Integer, ByVal wb As Integer)
+        Dim x As Integer
+        Dim y As Integer
+        Dim dx As Integer
+        Dim dy As Integer
+        x = locate Mod 9
+        y = Int(locate / 9)
+        dx = x
+        dy = y - 1 * wb
+        bb_kiki.AddHuRange(locate, wb, dx, dy)
     End Sub
     Private Sub KomaKikiInit()
         komakiki_w = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
@@ -468,17 +552,19 @@
         End If
     End Sub
 
+    Private Function GetWB_BB(ByVal wb As Integer) As BitBoard
+        If wb = WHITE Then
+            Return bb_white
+        Else
+            Return bb_black
+        End If
+    End Function
     Private Function HuRange(ByVal locate As Integer, ByVal wb As Integer) As Array
-        Dim x As Integer
-        Dim y As Integer
-        Dim dx As Integer
-        Dim dy As Integer
         HuRange = {BLANK}
-        x = locate Mod 9
-        y = Int(locate / 9)
-        dx = x
-        dy = y - 1 * wb
-        AddRange(locate, dx, dy, HuRange, 0)
+        Dim dist As Integer = bb_kiki.GetHuRange(locate, wb, GetWB_BB(wb))
+        If dist <> BLANK Then
+            AddValue(locate, HuRange, dist, 0)
+        End If
     End Function
     Private Function KyoRange(ByVal locate As Integer, ByVal wb As Integer) As Array
         Dim x As Integer
