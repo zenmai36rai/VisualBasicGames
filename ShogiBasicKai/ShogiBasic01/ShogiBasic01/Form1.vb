@@ -162,12 +162,14 @@
     Const KOMA_POS As Integer = 81
     Class KiKiBoard
         Private Hu(W_OR_B, KOMA_POS) As BitBoard
+        Private Gin(W_OR_B, KOMA_POS) As BitBoard
         Private Kin(W_OR_B, KOMA_POS) As BitBoard
 
         Sub New()
             For i = 0 To W_OR_B - 1 Step 1
                 For j = 0 To KOMA_POS - 1 Step 1
                     Hu(i, j) = New BitBoard
+                    Gin(i, j) = New BitBoard
                     Kin(i, j) = New BitBoard
                 Next
             Next
@@ -223,6 +225,16 @@
                 Kin(GetWB(wb), locate).AddBoard(dist)
             End If
         End Sub
+        Public Sub AddGinRange(ByVal locate As Integer,
+                                   ByVal wb As Integer,
+                                   ByVal dx As Integer,
+                                   ByVal dy As Integer)
+            Dim dist As Integer
+            If CheckBoardRange(dx, dy) = True Then
+                dist = dx + dy * 9
+                Gin(GetWB(wb), locate).AddBoard(dist)
+            End If
+        End Sub
         Public Function GetHuRange(ByVal locate As Integer,
                                    ByVal wb As Integer,
                                    ByVal bb As BitBoard)
@@ -239,6 +251,13 @@
                                    ByVal bb As BitBoard) As BitBoard
             Dim BufBB = XorBB(Kin(GetWB(wb), locate), bb)
             Dim RetBB = AndBB(Kin(GetWB(wb), locate), BufBB)
+            Return RetBB
+        End Function
+        Public Function GetGinRange(ByVal locate As Integer,
+                                   ByVal wb As Integer,
+                                   ByVal bb As BitBoard) As BitBoard
+            Dim BufBB = XorBB(Gin(GetWB(wb), locate), bb)
+            Dim RetBB = AndBB(Gin(GetWB(wb), locate), BufBB)
             Return RetBB
         End Function
         Public Sub GetHuKiki(ByVal locate As Integer,
@@ -259,7 +278,15 @@
             Dim BufBB = Kin(GetWB(wb), locate)
             GetKomaKiki(BufBB, locate, wb, bb_w, bb_b, kk_w, kk_b)
         End Sub
-
+        Public Sub GetGinKiki(ByVal locate As Integer,
+                                   ByVal wb As Integer,
+                                   ByVal bb_w As BitBoard,
+                                   ByVal bb_b As BitBoard,
+                                   ByRef kk_w As Array,
+                                   ByRef kk_b As Array)
+            Dim BufBB = Gin(GetWB(wb), locate)
+            GetKomaKiki(BufBB, locate, wb, bb_w, bb_b, kk_w, kk_b)
+        End Sub
         Public Sub GetKomaKiki(ByVal BufBB As BitBoard,
                                ByVal locate As Integer,
                                    ByVal wb As Integer,
@@ -462,6 +489,7 @@
                 End If
                 CalcHuRange(i, KomaColor)
                 CalcKinRange(i, KomaColor)
+                CalcGinRange(i, KomaColor)
             Next
         Next
     End Sub
@@ -497,6 +525,29 @@
         dx = x
         dy = y + 1
         bb_kiki.AddKinRange(locate, wb, dx, dy)
+    End Sub
+    Private Sub CalcGinRange(ByVal locate As Integer, ByVal wb As Integer)
+        Dim x As Integer
+        Dim y As Integer
+        Dim dx As Integer
+        Dim dy As Integer
+        x = locate Mod 9
+        y = Int(locate / 9)
+        dx = x
+        dy = y - 1 * wb
+        bb_kiki.AddGinRange(locate, wb, dx, dy)
+        dx = x + 1
+        dy = y - 1
+        bb_kiki.AddGinRange(locate, wb, dx, dy)
+        dx = x - 1
+        dy = y - 1
+        bb_kiki.AddGinRange(locate, wb, dx, dy)
+        dx = x + 1
+        dy = y + 1
+        bb_kiki.AddGinRange(locate, wb, dx, dy)
+        dx = x - 1
+        dy = y + 1
+        bb_kiki.AddGinRange(locate, wb, dx, dy)
     End Sub
     Private Sub KomaKikiInit()
         komakiki_w = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
@@ -918,28 +969,22 @@
         AddRange(locate, dx, dy, KeimaRange, 1)
     End Function
     Private Function GinRange(ByVal locate As Integer, ByVal wb As Integer) As Array
-        Dim x As Integer
-        Dim y As Integer
-        Dim dx As Integer
-        Dim dy As Integer
         GinRange = {BLANK, BLANK, BLANK, BLANK, BLANK}
-        x = locate Mod 9
-        y = Int(locate / 9)
-        dx = x
-        dy = y - 1 * wb
-        AddRange(locate, dx, dy, GinRange, 0)
-        dx = x + 1
-        dy = y - 1
-        AddRange(locate, dx, dy, GinRange, 1)
-        dx = x - 1
-        dy = y - 1
-        AddRange(locate, dx, dy, GinRange, 2)
-        dx = x + 1
-        dy = y + 1
-        AddRange(locate, dx, dy, GinRange, 3)
-        dx = x - 1
-        dy = y + 1
-        AddRange(locate, dx, dy, GinRange, 4)
+        Dim bb As BitBoard = bb_kiki.GetGinRange(locate, wb, GetWB_BB(wb))
+        Dim dist = bb.GetFirst()
+        If dist = -1 Then
+            dist = BLANK
+        End If
+        Dim idx = 0
+        While dist <> BLANK
+            AddValue(locate, GinRange, dist, idx)
+            dist = bb.GetNext()
+            If dist = -1 Then
+                dist = BLANK
+            End If
+            idx += 1
+        End While
+        bb_kiki.GetGinKiki(locate, wb, bb_white, bb_black, komakiki_w, komakiki_b)
     End Function
     Private Function KinRange(ByVal locate As Integer, ByVal wb As Integer) As Array
         Dim x As Integer
