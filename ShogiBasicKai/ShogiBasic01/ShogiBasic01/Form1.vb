@@ -212,6 +212,29 @@
             End If
             Return RetValue
         End Function
+        Public Sub GetHuKiki(ByVal locate As Integer,
+                                   ByVal wb As Integer,
+                                   ByVal bb_w As BitBoard,
+                                   ByVal bb_b As BitBoard,
+                                   ByRef kk_w As Array,
+                                   ByRef kk_b As Array)
+            Dim BufBB = Hu(GetWB(wb), locate)
+            Dim RetBB As BitBoard
+            Dim RetValue As Integer
+            If wb = WHITE Then
+                RetBB = AndBB(BufBB, bb_w)
+                RetValue = RetBB.GetFirst()
+                If RetValue <> -1 Then
+                    kk_w(RetValue) += 1
+                End If
+            ElseIf wb = BLACK Then
+                RetBB = AndBB(BufBB, bb_b)
+                RetValue = RetBB.GetFirst()
+                If RetValue <> -1 Then
+                    kk_b(RetValue) += 1
+                End If
+            End If
+        End Sub
     End Class
     Dim bb_white As BitBoard = New BitBoard
     Dim bb_black As BitBoard = New BitBoard
@@ -565,6 +588,7 @@
         If dist <> BLANK Then
             AddValue(locate, HuRange, dist, 0)
         End If
+        bb_kiki.GetHuKiki(locate, wb, bb_white, bb_black, komakiki_w, komakiki_b)
     End Function
     Private Function KyoRange(ByVal locate As Integer, ByVal wb As Integer) As Array
         Dim x As Integer
