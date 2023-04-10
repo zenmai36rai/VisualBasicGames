@@ -447,7 +447,31 @@
                                    ByRef kk_w As Array,
                                    ByRef kk_b As Array)
             Dim BufBB = Kyo(GetWB(wb), locate)
-            GetKomaKiki(BufBB, locate, wb, bb_w, bb_b, kk_w, kk_b)
+            Dim RetBB As BitBoard
+            Dim RetValue As Integer
+            If wb = WHITE Then
+                RetBB = AndBB(BufBB, bb_w)
+                RetValue = RetBB.GetLast()
+                If RetValue <> -1 Then
+                    kk_w(RetValue) += 1
+                End If
+                RetBB = AndBB(BufBB, bb_b)
+                RetValue = RetBB.GetLast()
+                If RetValue <> -1 Then
+                    kk_b(RetValue) += 1
+                End If
+            ElseIf wb = BLACK Then
+                RetBB = AndBB(BufBB, bb_b)
+                RetValue = RetBB.GetFirst()
+                If RetValue <> -1 Then
+                    kk_b(RetValue) += 1
+                End If
+                RetBB = AndBB(BufBB, bb_w)
+                RetValue = RetBB.GetFirst()
+                If RetValue <> -1 Then
+                    kk_w(RetValue) += 1
+                End If
+            End If
         End Sub
         Public Sub GetKomaKiki(ByVal BufBB As BitBoard,
                                ByVal locate As Integer,
