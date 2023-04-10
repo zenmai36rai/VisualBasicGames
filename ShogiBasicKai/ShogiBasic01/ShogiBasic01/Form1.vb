@@ -165,6 +165,7 @@
         Private Kei(W_OR_B, KOMA_POS) As BitBoard
         Private Gin(W_OR_B, KOMA_POS) As BitBoard
         Private Kin(W_OR_B, KOMA_POS) As BitBoard
+        Private Ou(W_OR_B, KOMA_POS) As BitBoard
 
         Sub New()
             For i = 0 To W_OR_B - 1 Step 1
@@ -173,6 +174,7 @@
                     Kei(i, j) = New BitBoard
                     Gin(i, j) = New BitBoard
                     Kin(i, j) = New BitBoard
+                    Ou(i, j) = New BitBoard
                 Next
             Next
         End Sub
@@ -247,6 +249,16 @@
                 Kei(GetWB(wb), locate).AddBoard(dist)
             End If
         End Sub
+        Public Sub AddOuRange(ByVal locate As Integer,
+                                   ByVal wb As Integer,
+                                   ByVal dx As Integer,
+                                   ByVal dy As Integer)
+            Dim dist As Integer
+            If CheckBoardRange(dx, dy) = True Then
+                dist = dx + dy * 9
+                Ou(GetWB(wb), locate).AddBoard(dist)
+            End If
+        End Sub
         Public Function GetHuRange(ByVal locate As Integer,
                                    ByVal wb As Integer,
                                    ByVal bb As BitBoard)
@@ -277,6 +289,13 @@
                                    ByVal bb As BitBoard) As BitBoard
             Dim BufBB = XorBB(Kei(GetWB(wb), locate), bb)
             Dim RetBB = AndBB(Kei(GetWB(wb), locate), BufBB)
+            Return RetBB
+        End Function
+        Public Function GetOuRange(ByVal locate As Integer,
+                                   ByVal wb As Integer,
+                                   ByVal bb As BitBoard) As BitBoard
+            Dim BufBB = XorBB(Ou(GetWB(wb), locate), bb)
+            Dim RetBB = AndBB(Ou(GetWB(wb), locate), BufBB)
             Return RetBB
         End Function
         Public Sub GetHuKiki(ByVal locate As Integer,
@@ -313,6 +332,15 @@
                                    ByRef kk_w As Array,
                                    ByRef kk_b As Array)
             Dim BufBB = Kei(GetWB(wb), locate)
+            GetKomaKiki(BufBB, locate, wb, bb_w, bb_b, kk_w, kk_b)
+        End Sub
+        Public Sub GetOuKiki(ByVal locate As Integer,
+                                   ByVal wb As Integer,
+                                   ByVal bb_w As BitBoard,
+                                   ByVal bb_b As BitBoard,
+                                   ByRef kk_w As Array,
+                                   ByRef kk_b As Array)
+            Dim BufBB = Ou(GetWB(wb), locate)
             GetKomaKiki(BufBB, locate, wb, bb_w, bb_b, kk_w, kk_b)
         End Sub
         Public Sub GetKomaKiki(ByVal BufBB As BitBoard,
@@ -519,6 +547,7 @@
                 CalcKeiRange(i, KomaColor)
                 CalcKinRange(i, KomaColor)
                 CalcGinRange(i, KomaColor)
+                CalcOuRange(i, KomaColor)
             Next
         Next
     End Sub
@@ -592,6 +621,38 @@
         dy = y + 1
         bb_kiki.AddGinRange(locate, wb, dx, dy)
     End Sub
+    Private Sub CalcOuRange(ByVal locate As Integer, ByVal wb As Integer)
+        Dim x As Integer
+        Dim y As Integer
+        Dim dx As Integer
+        Dim dy As Integer
+        x = locate Mod 9
+        y = Int(locate / 9)
+        dx = x
+        dy = y - 1
+        bb_kiki.AddOuRange(locate, wb, dx, dy)
+        dx = x + 1
+        dy = y - 1
+        bb_kiki.AddOuRange(locate, wb, dx, dy)
+        dx = x - 1
+        dy = y - 1
+        bb_kiki.AddOuRange(locate, wb, dx, dy)
+        dx = x + 1
+        dy = y + 1
+        bb_kiki.AddOuRange(locate, wb, dx, dy)
+        dx = x - 1
+        dy = y + 1
+        bb_kiki.AddOuRange(locate, wb, dx, dy)
+        dx = x + 1
+        dy = y
+        bb_kiki.AddOuRange(locate, wb, dx, dy)
+        dx = x - 1
+        dy = y
+        bb_kiki.AddOuRange(locate, wb, dx, dy)
+        dx = x
+        dy = y + 1
+        bb_kiki.AddOuRange(locate, wb, dx, dy)
+    End Sub
     Private Sub KomaKikiInit()
         komakiki_w = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
         komakiki_b = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
@@ -641,7 +702,7 @@
             Case 7
                 UnitRange = KakuRange(locate, 1, False)
             Case 8
-                UnitRange = OuRange(locate)
+                UnitRange = OuRange(locate, 1)
             Case 13
                 UnitRange = HisyaRange(locate, 1, True)
             Case 14
@@ -661,7 +722,7 @@
             Case 21
                 UnitRange = KakuRange(locate, -1, False)
             Case 22
-                UnitRange = OuRange(locate)
+                UnitRange = OuRange(locate, -1)
             Case 27
                 UnitRange = HisyaRange(locate, -1, True)
             Case 28
@@ -1033,10 +1094,6 @@
         bb_kiki.GetGinKiki(locate, wb, bb_white, bb_black, komakiki_w, komakiki_b)
     End Function
     Private Function KinRange(ByVal locate As Integer, ByVal wb As Integer) As Array
-        Dim x As Integer
-        Dim y As Integer
-        Dim dx As Integer
-        Dim dy As Integer
         KinRange = {BLANK, BLANK, BLANK, BLANK, BLANK, BLANK}
         Dim bb As BitBoard = bb_kiki.GetKinRange(locate, wb, GetWB_BB(wb))
         Dim dist = bb.GetFirst()
@@ -1054,38 +1111,23 @@
         End While
         bb_kiki.GetKinKiki(locate, wb, bb_white, bb_black, komakiki_w, komakiki_b)
     End Function
-    Private Function OuRange(ByVal locate As Integer) As Array
-        Dim x As Integer
-        Dim y As Integer
-        Dim dx As Integer
-        Dim dy As Integer
+    Private Function OuRange(ByVal locate As Integer, ByVal wb As Integer) As Array
         OuRange = {BLANK, BLANK, BLANK, BLANK, BLANK, BLANK, BLANK, BLANK}
-        x = locate Mod 9
-        y = Int(locate / 9)
-        dx = x
-        dy = y - 1
-        AddRange(locate, dx, dy, OuRange, 0)
-        dx = x + 1
-        dy = y - 1
-        AddRange(locate, dx, dy, OuRange, 1)
-        dx = x - 1
-        dy = y - 1
-        AddRange(locate, dx, dy, OuRange, 2)
-        dx = x + 1
-        dy = y + 1
-        AddRange(locate, dx, dy, OuRange, 3)
-        dx = x - 1
-        dy = y + 1
-        AddRange(locate, dx, dy, OuRange, 4)
-        dx = x + 1
-        dy = y
-        AddRange(locate, dx, dy, OuRange, 5)
-        dx = x - 1
-        dy = y
-        AddRange(locate, dx, dy, OuRange, 6)
-        dx = x
-        dy = y + 1
-        AddRange(locate, dx, dy, OuRange, 7)
+        Dim bb As BitBoard = bb_kiki.GetOuRange(locate, wb, GetWB_BB(wb))
+        Dim dist = bb.GetFirst()
+        If dist = -1 Then
+            dist = BLANK
+        End If
+        Dim idx = 0
+        While dist <> BLANK
+            AddValue(locate, OuRange, dist, idx)
+            dist = bb.GetNext()
+            If dist = -1 Then
+                dist = BLANK
+            End If
+            idx += 1
+        End While
+        bb_kiki.GetOuKiki(locate, wb, bb_white, bb_black, komakiki_w, komakiki_b)
     End Function
     Private Function CheckBoardRange(ByVal x As Integer, ByVal y As Integer) As Boolean
         CheckBoardRange = True
