@@ -128,6 +128,15 @@
             End If
             GetNext = ret
         End Function
+
+        Public Function GetLast() As Integer
+            GetLast = -1
+            Dim Buff = GetFirst()
+            While Buff <> -1
+                GetLast = Buff
+                Buff = GetNext()
+            End While
+        End Function
         Public Function AddBoard(ByVal pos As Integer) As Integer
             If 0 <= pos And pos < BB_JOINT Then
                 Dim x As Int64 = bit << pos
@@ -161,12 +170,13 @@
     Const KOMA_KIND As Integer = 28
     Const KOMA_POS As Integer = 81
     Class KiKiBoard
+        Private bit As Int64 = 1
         Private Hu(W_OR_B, KOMA_POS) As BitBoard
         Private Kei(W_OR_B, KOMA_POS) As BitBoard
         Private Gin(W_OR_B, KOMA_POS) As BitBoard
         Private Kin(W_OR_B, KOMA_POS) As BitBoard
         Private Ou(W_OR_B, KOMA_POS) As BitBoard
-
+        Private Kyo(W_OR_B, KOMA_POS) As BitBoard
         Sub New()
             For i = 0 To W_OR_B - 1 Step 1
                 For j = 0 To KOMA_POS - 1 Step 1
@@ -175,6 +185,7 @@
                     Gin(i, j) = New BitBoard
                     Kin(i, j) = New BitBoard
                     Ou(i, j) = New BitBoard
+                    Kyo(i, j) = New BitBoard
                 Next
             Next
         End Sub
@@ -259,6 +270,16 @@
                 Ou(GetWB(wb), locate).AddBoard(dist)
             End If
         End Sub
+        Public Sub AddKyoRange(ByVal locate As Integer,
+                                   ByVal wb As Integer,
+                                   ByVal dx As Integer,
+                                   ByVal dy As Integer)
+            Dim dist As Integer
+            If CheckBoardRange(dx, dy) = True Then
+                dist = dx + dy * 9
+                Kyo(GetWB(wb), locate).AddBoard(dist)
+            End If
+        End Sub
         Public Function GetHuRange(ByVal locate As Integer,
                                    ByVal wb As Integer,
                                    ByVal bb As BitBoard)
@@ -296,6 +317,82 @@
                                    ByVal bb As BitBoard) As BitBoard
             Dim BufBB = XorBB(Ou(GetWB(wb), locate), bb)
             Dim RetBB = AndBB(Ou(GetWB(wb), locate), BufBB)
+            Return RetBB
+        End Function
+        Public Function GetKyoRange(ByVal locate As Integer,
+                                   ByVal wb As Integer,
+                                   ByVal bb_w As BitBoard,
+                                   ByVal bb_b As BitBoard) As BitBoard
+            Dim BufBB_W = AndBB(Kyo(GetWB(wb), locate), bb_w)
+            Dim BufBB_B = AndBB(Kyo(GetWB(wb), locate), bb_b)
+            Dim RetBB = CutRange(locate, wb, Kyo(GetWB(wb), locate), BufBB_W, BufBB_B)
+            Return RetBB
+        End Function
+        Public Function CutRange(ByVal locate As Integer,
+                                 ByVal wb As Integer,
+                                 ByVal bb_k As BitBoard,
+                                 ByVal bb_w As BitBoard,
+                                 ByVal bb_b As BitBoard) As BitBoard
+            Dim RetBB = bb_k
+            If wb = BLACK Then
+                Dim bb_c As BitBoard = AndBB(bb_k, bb_b)
+                Dim pos = bb_b.GetFirst()
+                If pos <> -1 Then
+                    If 0 <= pos And pos < BB_JOINT Then
+                        Dim x As Int64 = bit << pos
+                        bb_c.b1 = x - 1
+                    ElseIf BB_JOINT <= pos And pos <= 80 Then
+                        Dim x As Int64 = bit << (pos - BB_JOINT)
+                        bb_c.b1 = x - 1
+                        bb_c.b2 = 0
+                    End If
+                    RetBB = AndBB(bb_k, bb_c)
+                End If
+                bb_c = AndBB(bb_k, bb_w)
+                pos = bb_c.GetFirst()
+                If pos <> -1 Then
+                    If 0 <= pos And pos < BB_JOINT Then
+                        Dim x As Int64 = bit << pos
+                        bb_c.b1 = (x - 1) + x
+                    ElseIf BB_JOINT <= pos And pos <= 80 Then
+                        Dim x As Int64 = bit << (pos - BB_JOINT)
+                        bb_c.b1 = (x - 1) + x
+                        bb_c.b2 = 0
+                    End If
+                    RetBB = AndBB(RetBB, bb_c)
+                End If
+            Else
+                Dim bb_c As BitBoard = AndBB(bb_k, bb_w)
+                Dim pos = bb_c.GetLast()
+                If pos <> -1 Then
+                    If 0 <= pos And pos < BB_JOINT Then
+                        Dim x As Int64 = bit << pos
+                        bb_c.b1 = (x - 1) + x
+                    ElseIf BB_JOINT <= pos And pos <= 80 Then
+                        Dim x As Int64 = bit << (pos - BB_JOINT)
+                        bb_c.b1 = (x - 1) + x
+                        bb_c.b2 = 0
+                    End If
+                    bb_c.b1 = Not bb_c.b1
+                    bb_c.b2 = Not bb_c.b2
+                    RetBB = AndBB(bb_k, bb_c)
+                End If
+                bb_c = AndBB(bb_k, bb_b)
+                pos = bb_c.GetLast()
+                If pos <> -1 Then
+                    If 0 <= pos And pos < BB_JOINT Then
+                        Dim x As Int64 = bit << pos
+                        bb_c.b1 = x - 1
+                    ElseIf BB_JOINT <= pos And pos <= 80 Then
+                        Dim x As Int64 = bit << (pos - BB_JOINT)
+                        bb_c.b1 = x - 1
+                        bb_c.b2 = 0
+                    End If
+                    bb_c.b1 = Not bb_c.b1
+                    bb_c.b2 = Not bb_c.b2
+                    RetBB = AndBB(RetBB, bb_c)
+                End If
+            End If
             Return RetBB
         End Function
         Public Sub GetHuKiki(ByVal locate As Integer,
@@ -341,6 +438,15 @@
                                    ByRef kk_w As Array,
                                    ByRef kk_b As Array)
             Dim BufBB = Ou(GetWB(wb), locate)
+            GetKomaKiki(BufBB, locate, wb, bb_w, bb_b, kk_w, kk_b)
+        End Sub
+        Public Sub GetKyoKiki(ByVal locate As Integer,
+                                   ByVal wb As Integer,
+                                   ByVal bb_w As BitBoard,
+                                   ByVal bb_b As BitBoard,
+                                   ByRef kk_w As Array,
+                                   ByRef kk_b As Array)
+            Dim BufBB = Kyo(GetWB(wb), locate)
             GetKomaKiki(BufBB, locate, wb, bb_w, bb_b, kk_w, kk_b)
         End Sub
         Public Sub GetKomaKiki(ByVal BufBB As BitBoard,
@@ -548,6 +654,7 @@
                 CalcKinRange(i, KomaColor)
                 CalcGinRange(i, KomaColor)
                 CalcOuRange(i, KomaColor)
+                CalcKyoRange(i, KomaColor)
             Next
         Next
     End Sub
@@ -652,6 +759,20 @@
         dx = x
         dy = y + 1
         bb_kiki.AddOuRange(locate, wb, dx, dy)
+    End Sub
+    Private Sub CalcKyoRange(ByVal locate As Integer, ByVal wb As Integer)
+        Dim x As Integer
+        Dim y As Integer
+        Dim dx As Integer
+        Dim dy As Integer
+        Dim i As Integer
+        x = locate Mod 9
+        y = Int(locate / 9)
+        For i = 1 To 8 Step 1
+            dx = x
+            dy = y - i * wb
+            bb_kiki.AddKyoRange(locate, wb, dx, dy)
+        Next
     End Sub
     Private Sub KomaKikiInit()
         komakiki_w = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
@@ -818,35 +939,22 @@
         bb_kiki.GetHuKiki(locate, wb, bb_white, bb_black, komakiki_w, komakiki_b)
     End Function
     Private Function KyoRange(ByVal locate As Integer, ByVal wb As Integer) As Array
-        Dim x As Integer
-        Dim y As Integer
-        Dim dx As Integer
-        Dim dy As Integer
-        Dim i As Integer
-        Dim dist As Integer
-        Dim a As Array
-        Dim kf As Boolean = False
-        a = {BLANK, BLANK, BLANK, BLANK, BLANK, BLANK, BLANK, BLANK, BLANK}
-        x = locate Mod 9
-        y = Int(locate / 9)
-        For i = 1 To 8 Step 1
-            dx = x
-            dy = y - i * wb
-            If CheckBoardRange(dx, dy) = True Then
-                dist = dx + dy * 9
-                If JigomaCheck(locate, dist) = False Then
-                    AddKomakiki(dx, dy)
-                    Exit For
-                End If
-                AddValue(locate, a, dist, i)
-                If AB(wb, locate, dist) Then
-                    Exit For
-                End If
-            Else
-                Exit For
+        KyoRange = {BLANK, BLANK, BLANK, BLANK, BLANK, BLANK, BLANK, BLANK, BLANK}
+        Dim bb As BitBoard = bb_kiki.GetKyoRange(locate, wb, bb_white, bb_black)
+        Dim dist = bb.GetFirst()
+        If dist = -1 Then
+            dist = BLANK
+        End If
+        Dim idx = 0
+        While dist <> BLANK
+            AddValue(locate, KyoRange, dist, idx)
+            dist = bb.GetNext()
+            If dist = -1 Then
+                dist = BLANK
             End If
-        Next
-        KyoRange = a
+            idx += 1
+        End While
+        bb_kiki.GetKeiKiki(locate, wb, bb_white, bb_black, komakiki_w, komakiki_b)
     End Function
     Private Function AB(ByVal wb As Integer, ByVal locate As Integer, ByVal dist As Integer)
         AB = False
