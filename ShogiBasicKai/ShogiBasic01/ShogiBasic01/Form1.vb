@@ -939,7 +939,7 @@
         bb_kiki.GetHuKiki(locate, wb, bb_white, bb_black, komakiki_w, komakiki_b)
     End Function
     Private Function KyoRange(ByVal locate As Integer, ByVal wb As Integer) As Array
-        KyoRange = {BLANK, BLANK, BLANK, BLANK, BLANK, BLANK, BLANK, BLANK, BLANK}
+        KyoRange = {BLANK, BLANK, BLANK, BLANK, BLANK, BLANK, BLANK, BLANK}
         Dim bb As BitBoard = bb_kiki.GetKyoRange(locate, wb, bb_white, bb_black)
         Dim dist = bb.GetFirst()
         If dist = -1 Then
