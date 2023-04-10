@@ -954,7 +954,7 @@
             End If
             idx += 1
         End While
-        bb_kiki.GetKeiKiki(locate, wb, bb_white, bb_black, komakiki_w, komakiki_b)
+        bb_kiki.GetKyoKiki(locate, wb, bb_white, bb_black, komakiki_w, komakiki_b)
     End Function
     Private Function AB(ByVal wb As Integer, ByVal locate As Integer, ByVal dist As Integer)
         AB = False
