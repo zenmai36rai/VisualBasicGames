@@ -354,16 +354,18 @@
                                  ByVal bb_b As BitBoard) As BitBoard
             Dim RetBB = bb_k
             If wb = BLACK Then
+                Dim All_F As Int64 = -1
                 Dim bb_c As BitBoard = AndBB(bb_k, bb_b)
                 Dim pos = bb_b.GetFirst()
                 If pos <> -1 Then
                     If 0 <= pos And pos < BB_JOINT Then
                         Dim x As Int64 = bit << pos
                         bb_c.b1 = x - 1
+                        bb_c.b2 = 0
                     ElseIf BB_JOINT <= pos And pos <= 80 Then
                         Dim x As Int64 = bit << (pos - BB_JOINT)
-                        bb_c.b1 = x - 1
-                        bb_c.b2 = 0
+                        bb_c.b1 = All_F
+                        bb_c.b2 = x - 1
                     End If
                     RetBB = AndBB(bb_k, bb_c)
                 End If
@@ -373,10 +375,11 @@
                     If 0 <= pos And pos < BB_JOINT Then
                         Dim x As Int64 = bit << pos
                         bb_c.b1 = (x - 1) + x
+                        bb_c.b2 = 0
                     ElseIf BB_JOINT <= pos And pos <= 80 Then
                         Dim x As Int64 = bit << (pos - BB_JOINT)
-                        bb_c.b1 = (x - 1) + x
-                        bb_c.b2 = 0
+                        bb_c.b1 = All_F
+                        bb_c.b2 = (x - 1) + x
                     End If
                     RetBB = AndBB(RetBB, bb_c)
                 End If
