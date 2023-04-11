@@ -111,6 +111,16 @@
             Next
             Return -1
         End Function
+        Public Function ReverseCount(ByVal bits As Int64) As Integer
+            Dim mask As Int64 = 0
+            For i = BB_JOINT To 0 Step -1
+                mask = bit << i
+                If bits And mask Then
+                    Return i
+                End If
+            Next
+            Return -1
+        End Function
         Public Function GetFirst() As Integer
             n1 = b1
             n2 = b2
@@ -129,13 +139,22 @@
             GetNext = ret
         End Function
 
+        Public Function GetReverse() As Integer
+            Dim ret As Integer = -1
+            If 0 <> n2 Then
+                ret = ReverseCount(n2)
+                n2 -= bit << ret
+                ret += BB_JOINT
+            ElseIf 0 <> n1 Then
+                ret = ReverseCount(n1)
+                n1 -= bit << ret
+            End If
+            GetReverse = ret
+        End Function
         Public Function GetLast() As Integer
-            GetLast = -1
-            Dim Buff = GetFirst()
-            While Buff <> -1
-                GetLast = Buff
-                Buff = GetNext()
-            End While
+            n1 = b1
+            n2 = b2
+            Return GetReverse()
         End Function
         Public Function AddBoard(ByVal pos As Integer) As Integer
             If 0 <= pos And pos < BB_JOINT Then
@@ -348,7 +367,7 @@
                     End If
                     RetBB = AndBB(bb_k, bb_c)
                 End If
-                bb_c = AndBB(bb_k, bb_w)
+                bb_c = AndBB(RetBB, bb_w)
                 pos = bb_c.GetFirst()
                 If pos <> -1 Then
                     If 0 <= pos And pos < BB_JOINT Then
@@ -377,7 +396,7 @@
                     bb_c.b2 = Not bb_c.b2
                     RetBB = AndBB(bb_k, bb_c)
                 End If
-                bb_c = AndBB(bb_k, bb_b)
+                bb_c = AndBB(RetBB, bb_b)
                 pos = bb_c.GetLast()
                 If pos <> -1 Then
                     If 0 <= pos And pos < BB_JOINT Then
