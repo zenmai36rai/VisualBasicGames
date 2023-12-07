@@ -50,17 +50,17 @@
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>9f1+x/1kX5Uu8LkzOoq5OH4zQoQ=</dsig:DigestValue>
+        <dsig:DigestValue>YYamQqbJXwOw1ucA9usy2cH8A8Y=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
-  <file name="JD\book.txt" size="10333">
+  <file name="JD\book.txt" size="17175">
     <hash>
       <dsig:Transforms>
         <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
       </dsig:Transforms>
       <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-      <dsig:DigestValue>vhkpCHea0u4FZQtkKvZbTRgeoYI=</dsig:DigestValue>
+      <dsig:DigestValue>RExoh8z7Ups/PC8M+oXoaHOnzGI=</dsig:DigestValue>
     </hash>
   </file>
   <file name="robot.ico" size="370070">
