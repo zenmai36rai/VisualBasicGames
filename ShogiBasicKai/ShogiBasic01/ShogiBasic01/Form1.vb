@@ -77,7 +77,10 @@
                 dst = a(3)
                 hand = a(4)
                 classup = a(5)
+            Else
+                Return False
             End If
+            Return True
         End Function
     End Class
     Dim GenerationFlag As Boolean = False
@@ -616,9 +619,9 @@
         Return 0
     End Function
     Class ShogiBoard
-        Public komaname = {"", "歩", "香", "桂", "銀", "金", "飛", "角", "王", "と", "杏", "圭", "全", "龍", "馬"}
-        Public all = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80}
-        Public board = {16, 17, 18, 19, 22, 19, 18, 17, 16,
+        Public _komaname = {"", "歩", "香", "桂", "銀", "金", "飛", "角", "王", "と", "杏", "圭", "全", "龍", "馬"}
+        Public _all = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80}
+        Public _board = {16, 17, 18, 19, 22, 19, 18, 17, 16,
                     0, 21, 0, 0, 0, 0, 0, 20, 0,
                     15, 15, 15, 15, 15, 15, 15, 15, 15,
                     0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -627,31 +630,33 @@
                     1, 1, 1, 1, 1, 1, 1, 1, 1,
                     0, 6, 0, 0, 0, 0, 0, 7, 0,
                     2, 3, 4, 5, 8, 5, 4, 3, 2}
-        Public tegomaw = {0, 0, 0, 0, 0, 0, 0, 0}
-        Public tegomab = {0, 0, 0, 0, 0, 0, 0, 0}
+        Public _tegomaw = {0, 0, 0, 0, 0, 0, 0, 0}
+        Public _tegomab = {0, 0, 0, 0, 0, 0, 0, 0}
         Public _retstring As String
-        Public Function GetBoardString() As String
+        Public Function GetBoardString(ByVal bd As Array) As String
+            _board = bd
             _retstring = ""
             For i = 0 To 80
-                _retstring += board(i).ToString() + ","
+                _retstring += _board(i).ToString() + ","
             Next
             For i = 0 To 7
-                _retstring += tegomaw(i).ToString() + ","
+                _retstring += _tegomaw(i).ToString() + ","
             Next
             For i = 0 To 7
-                _retstring += tegomab(i).ToString() + ","
+                _retstring += _tegomab(i).ToString() + ","
             Next
             Return _retstring
         End Function
     End Class
     Public _b As ShogiBoard = New ShogiBoard()
+    Public _JyosekiDictionary As Dictionary(Of String, String) = New Dictionary(Of String, String)
     Private Sub Init() Handles Me.HandleCreated
-        komaname = _b.komaname
-        all = _b.all
-        board = _b.board
-        tegomaw = _b.tegomaw
-        tegomab = _b.tegomab
-        Dim s As String = _b.GetBoardString()
+        komaname = _b._komaname
+        all = _b._all
+        board = _b._board
+        tegomaw = _b._tegomaw
+        tegomab = _b._tegomab
+        Dim s As String = _b.GetBoardString(board)
         For i = 0 To 80 Step 1
             Dim k = board(i)
             If k <> 0 Then
@@ -1564,9 +1569,16 @@
         nodemin = -214748364
         Dim MakeBuff As MoveData = New MoveData
         SuspendLayout()
+        Dim ret As Integer = 0
         best.r = BLANK
-        Dim ret As Integer = alphabeta(0, wb, YOMI_DEPTH, nodemin, nodemax)
-        Dim s As String = best.GetMoveDataString()
+        Dim s As String = _b.GetBoardString(board)
+        If _JyosekiDictionary.ContainsKey(s) Then
+            best.SetMoveDataFromString(_JyosekiDictionary(s))
+        Else
+            ret = alphabeta(0, wb, YOMI_DEPTH, nodemin, nodemax)
+            Dim s2 As String = best.GetMoveDataString()
+            _JyosekiDictionary.Add(s, s2)
+        End If
         If RETURN_LOG Then
             ListBox1.Items.Add(ret)
         End If
