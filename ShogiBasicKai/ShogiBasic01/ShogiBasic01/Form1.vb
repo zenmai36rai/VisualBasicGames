@@ -753,6 +753,7 @@
                 CalcKyoRange(i, KomaColor)
             Next
         Next
+        LoadJyoseki()
     End Sub
     Private Sub CalcHuRange(ByVal locate As Integer, ByVal wb As Integer)
         Dim x As Integer
@@ -2846,8 +2847,7 @@ LOG_WRITE:
         RichTextBox1.Text = s1 + vbCrLf + s2 + vbCrLf + s3 + vbCrLf + s4 + vbCrLf + s5 + vbCrLf + s6
     End Sub
 
-    Private Sub Button85_Click(sender As Object, e As EventArgs) Handles Button85.Click
-        'save
+    Private Sub SaveJyoseki()
         Dim encoding = System.Text.Encoding.UTF8
         Dim filePath As String = "..\..\JD\book.txt"
         Using strm As IO.StreamWriter = New IO.StreamWriter(filePath, False, encoding)
@@ -2857,9 +2857,7 @@ LOG_WRITE:
             Next
         End Using
     End Sub
-
-    Private Sub Button86_Click(sender As Object, e As EventArgs) Handles Button86.Click
-        'load
+    Private Sub LoadJyoseki()
         Dim encoding = System.Text.Encoding.UTF8
         Dim filePath As String = "..\..\JD\book.txt"
         Dim line As String = String.Empty
@@ -2879,4 +2877,14 @@ LOG_WRITE:
             End While
         End Using
     End Sub
+    Private Sub Button85_Click(sender As Object, e As EventArgs) Handles Button85.Click
+        'save
+        SaveJyoseki()
+    End Sub
+
+    Private Sub Button86_Click(sender As Object, e As EventArgs) Handles Button86.Click
+        'load
+        LoadJyoseki()
+    End Sub
+
 End Class
