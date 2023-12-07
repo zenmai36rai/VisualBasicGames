@@ -2845,4 +2845,38 @@ LOG_WRITE:
         RichTextBox1.Clear()
         RichTextBox1.Text = s1 + vbCrLf + s2 + vbCrLf + s3 + vbCrLf + s4 + vbCrLf + s5 + vbCrLf + s6
     End Sub
+
+    Private Sub Button85_Click(sender As Object, e As EventArgs) Handles Button85.Click
+        'save
+        Dim encoding = System.Text.Encoding.UTF8
+        Dim filePath As String = "..\..\JD\book.txt"
+        Using strm As IO.StreamWriter = New IO.StreamWriter(filePath, False, encoding)
+            For Each a In _JyosekiDictionary
+                Dim Text As String = a.Key + "$" + a.Value
+                strm.WriteLine(Text)
+            Next
+        End Using
+    End Sub
+
+    Private Sub Button86_Click(sender As Object, e As EventArgs) Handles Button86.Click
+        'load
+        Dim encoding = System.Text.Encoding.UTF8
+        Dim filePath As String = "..\..\JD\book.txt"
+        Dim line As String = String.Empty
+        Dim arr As Array
+
+        ' StreamReaderのインスタンスを生成する
+        Using strm As IO.StreamReader = New IO.StreamReader(filePath, encoding)
+            line = strm.ReadLine()
+            While line IsNot Nothing
+                ' 読み込んだ1行を配列に格納する
+                arr = line.Split("$")
+                If arr.Length = 2 Then
+                    _JyosekiDictionary.Add(arr(0), arr(1))
+                End If
+                ' ファイルを1行読み込む
+                line = strm.ReadLine()
+            End While
+        End Using
+    End Sub
 End Class
