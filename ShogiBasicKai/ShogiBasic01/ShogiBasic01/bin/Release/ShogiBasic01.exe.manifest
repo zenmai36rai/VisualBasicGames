@@ -54,13 +54,13 @@
       </hash>
     </dependentAssembly>
   </dependency>
-  <file name="JD\book.txt" size="17646">
+  <file name="JD\book.txt" size="20214">
     <hash>
       <dsig:Transforms>
         <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
       </dsig:Transforms>
       <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-      <dsig:DigestValue>wXZC2xysNt9Wi4NsWOK6rhdxBDo=</dsig:DigestValue>
+      <dsig:DigestValue>HLRx5pKMMrc8Webfa2EbK+fEFXE=</dsig:DigestValue>
     </hash>
   </file>
   <file name="robot.ico" size="370070">
