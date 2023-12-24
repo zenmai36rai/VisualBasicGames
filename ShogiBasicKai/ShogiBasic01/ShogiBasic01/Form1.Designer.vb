@@ -1321,7 +1321,7 @@ Partial Class Form1
         '
         'PictureBox2
         '
-        Me.PictureBox2.Image = Global.WindowsApplication1.My.Resources.Resources.ロボット顔
+        Me.PictureBox2.Image = Global.WindowsApplication1.My.Resources.Resources.ロボット帽
         Me.PictureBox2.Location = New System.Drawing.Point(12, 254)
         Me.PictureBox2.Name = "PictureBox2"
         Me.PictureBox2.Size = New System.Drawing.Size(92, 110)

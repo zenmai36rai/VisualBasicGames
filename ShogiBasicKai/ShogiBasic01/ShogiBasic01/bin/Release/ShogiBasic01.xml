@@ -18,8 +18,23 @@ ShogiBasic01
 </member>
 <member name="P:WindowsApplication1.My.Resources.Resources.Culture">
 <summary>
-  厳密に型指定されたこのリソース クラスを使用して、すべての検索リソースに対し、
+  すべてについて、現在のスレッドの CurrentUICulture プロパティをオーバーライドします
   現在のスレッドの CurrentUICulture プロパティをオーバーライドします。
+</summary>
+</member>
+<member name="P:WindowsApplication1.My.Resources.Resources._2009_02_01">
+<summary>
+  型 System.Drawing.Bitmap のローカライズされたリソースを検索します。
+</summary>
+</member>
+<member name="P:WindowsApplication1.My.Resources.Resources.ロボット帽">
+<summary>
+  型 System.Drawing.Bitmap のローカライズされたリソースを検索します。
+</summary>
+</member>
+<member name="P:WindowsApplication1.My.Resources.Resources.ロボット顔">
+<summary>
+  型 System.Drawing.Bitmap のローカライズされたリソースを検索します。
 </summary>
 </member>
 </members>
