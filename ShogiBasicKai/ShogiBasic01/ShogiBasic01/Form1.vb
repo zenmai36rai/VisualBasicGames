@@ -2850,10 +2850,12 @@ LOG_WRITE:
     Private Sub SaveJyoseki()
         Dim encoding = System.Text.Encoding.UTF8
         Dim filePath As String = "..\..\JD\book.txt"
+        Dim id As Integer = 1
         Using strm As IO.StreamWriter = New IO.StreamWriter(filePath, False, encoding)
             For Each a In _JyosekiDictionary
-                Dim Text As String = a.Key + "$" + a.Value
+                Dim Text As String = id.ToString + "$" + a.Key + "$" + a.Value
                 strm.WriteLine(Text)
+                id = id + 1
             Next
         End Using
     End Sub
@@ -2869,8 +2871,8 @@ LOG_WRITE:
             While line IsNot Nothing
                 ' 読み込んだ1行を配列に格納する
                 arr = line.Split("$")
-                If arr.Length = 2 Then
-                    _JyosekiDictionary.Add(arr(0), arr(1))
+                If arr.Length = 3 Then
+                    _JyosekiDictionary.Add(arr(1), arr(2))
                 End If
                 ' ファイルを1行読み込む
                 line = strm.ReadLine()
