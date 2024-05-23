@@ -23,6 +23,9 @@
         Public dst As Byte
         Public hand As Byte = BLANK
         Public classup As Boolean = True
+        Public eval As Integer = 0
+        Public best_eval As Integer = 0
+        Public read_depth As Integer = 0
         Sub New()
 
         End Sub
@@ -66,11 +69,14 @@
             _RetString += dst.ToString() + ","
             _RetString += hand.ToString() + ","
             _RetString += classup.ToString() + ","
+            _RetString += eval.ToString() + ","
+            _RetString += best_eval.ToString() + ","
+            _RetString += read_depth.ToString() + ","
             Return _RetString
         End Function
         Function SetMoveDataFromString(ByVal str As String) As String
             Dim a As Array = str.Split(",")
-            If a.Length = 7 Then
+            If a.Length <= 7 Then
                 r = a(0)
                 r2 = a(1)
                 src = a(2)
@@ -1487,6 +1493,9 @@
                 alpha = a
                 If depth = YOMI_DEPTH Then
                     best = Node(i)
+                    best.eval = h
+                    best.best_eval = alpha
+                    best.read_depth = YOMI_DEPTH
                     BestScore = alpha
                     WTop = WBuf
                     BTop = BBuf
