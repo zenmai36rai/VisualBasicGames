@@ -13,7 +13,7 @@
     Const DEBUG_TIME As Boolean = False
     Const ROBO_TEBAN As Integer = BLACK
     Const BLANK As Integer = 255
-    Const BRANCH_WIDTH As Integer = 800
+    Const BRANCH_WIDTH As Integer = 600
 
     Private CheckBit As Integer = 0
     Class MoveData
