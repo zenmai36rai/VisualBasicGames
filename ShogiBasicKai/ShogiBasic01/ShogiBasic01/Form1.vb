@@ -76,7 +76,7 @@
         End Function
         Function SetMoveDataFromString(ByVal str As String) As String
             Dim a As Array = str.Split(",")
-            If a.Length <= 7 Then
+            If a.Length >= 7 Then
                 r = a(0)
                 r2 = a(1)
                 src = a(2)
@@ -577,12 +577,10 @@
     Dim komakiki_b As Array
     Dim nirami_w As Integer
     Dim nirami_b As Integer
-    Dim table As Array = {0, 1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 6, 7, 1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 6, 7}
     Const KOMAKIKI_SUM As Integer = 11
     Const WH_OR_BL As Integer = 2 '空きマスを考慮する場合は"3"
     Const KING_POS As Integer = 81
     Const EFFECT_POS As Integer = 81
-    Dim score As Array = {0, 90, 315, 405, 495, 540, 990, 855, 30000, 540, 540, 540, 540, 1395, 945, 90, 315, 405, 495, 540, 990, 855, 30000, 540, 540, 540, 540, 1395, 945}
     Dim FINISH_SCORE = 15000
     Dim koma_position_score(KOMA_KIND, KOMA_POS) As Integer
     Const POSITION_BIAS As Integer = 150
@@ -1410,6 +1408,7 @@
         End If
     End Function
     Private Function KomaScore(ByVal koma) As Integer
+        Static score As Array = {0, 90, 315, 405, 495, 540, 990, 855, 30000, 540, 540, 540, 540, 1395, 945, 90, 315, 405, 495, 540, 990, 855, 30000, 540, 540, 540, 540, 1395, 945}
         KomaScore = score(koma)
     End Function
     Private Function KomaDist(ByVal king_pos, ByVal koma) As Integer
@@ -2016,14 +2015,18 @@ LOG_WRITE:
             End Select
         End If
     End Sub
+    Private Function Ura_Omote(ByVal t As Integer) As Integer
+        Static table As Array = {0, 1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 6, 7, 1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 6, 7}
+        Return table(t) - 1
+    End Function
     Private Sub KomaTori(ByVal locate)
         Dim t As Integer
         t = board(locate)
         If 15 <= t Then
-            t = table(t) - 1
+            t = Ura_Omote(t)
             tegomaw(t) = tegomaw(t) + 1
         ElseIf 1 <= t And t <= 14 Then
-            t = table(t) - 1
+            t = Ura_Omote(t)
             tegomab(t) = tegomab(t) + 1
         End If
     End Sub
@@ -2031,10 +2034,10 @@ LOG_WRITE:
         Dim t As Integer
         t = board(locate)
         If 15 <= t Then
-            t = table(t) - 1
+            t = Ura_Omote(t)
             tegomab(t) = tegomab(t) + 1
         ElseIf 1 <= t And t <= 14 Then
-            t = table(t) - 1
+            t = Ura_Omote(t)
             tegomaw(t) = tegomaw(t) + 1
         End If
     End Sub
@@ -2042,10 +2045,10 @@ LOG_WRITE:
         'board(locate) = t
         SetBoard(locate, t)
         If 15 <= t Then
-            t = table(t) - 1
+            t = Ura_Omote(t)
             tegomab(t) = tegomab(t) - 1
         ElseIf 1 <= t And t <= 14 Then
-            t = table(t) - 1
+            t = Ura_Omote(t)
             tegomaw(t) = tegomaw(t) - 1
         End If
     End Sub
@@ -2053,10 +2056,10 @@ LOG_WRITE:
         'board(locate) = t
         SetBoard(locate, t)
         If 15 <= t Then
-            t = table(t) - 1
+            t = Ura_Omote(t)
             tegomaw(t) = tegomaw(t) - 1
         ElseIf 1 <= t And t <= 14 Then
-            t = table(t) - 1
+            t = Ura_Omote(t)
             tegomab(t) = tegomab(t) - 1
         End If
     End Sub

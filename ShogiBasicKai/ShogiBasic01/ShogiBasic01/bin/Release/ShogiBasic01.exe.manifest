@@ -43,24 +43,24 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="ShogiBasic01.exe" size="483840">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="ShogiBasic01.exe" size="484352">
       <assemblyIdentity name="ShogiBasic01" version="1.0.0.0" language="neutral" processorArchitecture="x86" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>NCUt4HiZT3b3KpiskaF2zy5+bag=</dsig:DigestValue>
+        <dsig:DigestValue>HemaBZffwcCuoZrBuee6vh/uNf8=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
-  <file name="JD\book.txt" size="48595">
+  <file name="JD\book.txt" size="53104">
     <hash>
       <dsig:Transforms>
         <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
       </dsig:Transforms>
       <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-      <dsig:DigestValue>ugwtwrSoqKrfe9vdS21zucaT9t0=</dsig:DigestValue>
+      <dsig:DigestValue>9CZpx7ApkX+SqoHdVpJROLQbwgQ=</dsig:DigestValue>
     </hash>
   </file>
   <file name="Resources\ロボット帽.jpg" size="6428">
