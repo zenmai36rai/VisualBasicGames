@@ -8,14 +8,14 @@
     <framework targetVersion="4.0" profile="Full" supportedRuntime="4.0.30319" />
   </compatibleFrameworks>
   <dependency>
-    <dependentAssembly dependencyType="install" codebase="ShogiBasic01.exe.manifest" size="5134">
+    <dependentAssembly dependencyType="install" codebase="ShogiBasic01.exe.manifest" size="5138">
       <assemblyIdentity name="ShogiBasic01.exe" version="2.0.0.0" publicKeyToken="0000000000000000" language="neutral" processorArchitecture="x86" type="win32" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>10f9bvmk8KLcuuo/qBOCKc96EmY=</dsig:DigestValue>
+        <dsig:DigestValue>t8Tsno4eY4d5tjijGITmCfbnAAY=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
