@@ -686,9 +686,9 @@
         robomode = False
         KomaKikiInit()
         For d = 0 To 8 Step 1
-            our_effect_value(d) = 24 * 1024 / (d + 1)
-            their_effect_value(d) = 36 * 1024 / (d + 1)
-            'blank_effect_value(d) = 1 * 1024 / (d + 1)
+            our_effect_value(d) = 1 * 1024 / (d + 1)
+            their_effect_value(d) = 24 * 1024 / (d + 1)
+            blank_effect_value(d) = 36 * 1024 / (d + 1)
         Next
         Dim k_sum_val(KOMAKIKI_SUM) As Integer
         For m = 0 To KOMAKIKI_SUM - 1 Step 1
@@ -703,7 +703,7 @@
                 For i = 0 To 80 Step 1
                     score_table(m, 0, kp, i) = k_sum_val(m) * our_effect_value(KomaDist(kp, i)) / 1024
                     score_table(m, 1, kp, i) = k_sum_val(m) * their_effect_value(KomaDist(kp, i)) / 1024
-                    'score_table(m, 2, kp, i) = k_sum_val(m) * blank_effect_value(KomaDist(kp, i)) / 1024
+                    score_table(m, 2, kp, i) = k_sum_val(m) * blank_effect_value(KomaDist(kp, i)) / 1024
                 Next
             Next
         Next
@@ -1460,12 +1460,14 @@
                 WBuf.komaichi += koma_position_score(board(i), i)
                 WBuf.komakiki += score_table(komakiki_w(i), 0, enem_pos, i)
                 BBuf.komakiki += score_table(komakiki_b(i), 1, king_pos, i)
+                WBuf.komakiki += score_table(komakiki_b(i), 2, king_pos, i)
             End If
             If IsWB(BLACK, i) Then
                 BBuf.komatoku += KomaScore(board(i))
                 BBuf.komaichi += koma_position_score(board(i), i)
                 WBuf.komakiki += score_table(komakiki_w(i), 1, enem_pos, i)
                 BBuf.komakiki += score_table(komakiki_b(i), 0, king_pos, i)
+                BBuf.komakiki += score_table(komakiki_w(i), 2, enem_pos, i)
             End If
         Next
         For i = 0 To 7 Step 1

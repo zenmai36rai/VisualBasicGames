@@ -50,17 +50,17 @@
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>HGHOaEXQ63zx/jQvtEbwgyFvVeI=</dsig:DigestValue>
+        <dsig:DigestValue>F/DygrjCDV/img2thHxCJRlILW8=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
-  <file name="JD\book.txt" size="53104">
+  <file name="JD\book.txt" size="0">
     <hash>
       <dsig:Transforms>
         <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
       </dsig:Transforms>
       <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-      <dsig:DigestValue>9CZpx7ApkX+SqoHdVpJROLQbwgQ=</dsig:DigestValue>
+      <dsig:DigestValue>2jmj7l5rSw0yVb/vlWAYkK/YBwk=</dsig:DigestValue>
     </hash>
   </file>
   <file name="Resources\ロボット帽.jpg" size="6428">
