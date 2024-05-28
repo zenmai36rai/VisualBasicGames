@@ -565,8 +565,15 @@
     Dim range As Array
     Dim tegomaw As Array
     Dim tegomab As Array
-    Dim ARW As Array = {1, 2, 3, 4, 5, 6, 7, 8}
-    Dim ARB As Array = {15, 16, 17, 18, 19, 20, 21, 22}
+    Private Function KomaIdx(ByVal i As Integer, ByVal wb As Integer) As Integer
+        Static ARW As Array = {1, 2, 3, 4, 5, 6, 7, 8}
+        Static ARB As Array = {15, 16, 17, 18, 19, 20, 21, 22}
+        If wb = WHITE Then
+            Return ARW(i)
+        Else
+            Return ARB(i)
+        End If
+    End Function
     Dim pop As Integer
     Dim all As Array
     Dim komaundo As Integer
@@ -1462,8 +1469,8 @@
             End If
         Next
         For i = 0 To 7 Step 1
-            WBuf.komatoku += tegomaw(i) * KomaScore(ARW(i)) * 1.05
-            BBuf.komatoku += tegomab(i) * KomaScore(ARB(i)) * 1.05
+            WBuf.komatoku += tegomaw(i) * KomaScore(KomaIdx(i, WHITE)) * 1.05
+            BBuf.komatoku += tegomab(i) * KomaScore(KomaIdx(i, BLACK)) * 1.05
         Next
         Hyouka += WBuf.komatoku
         Hyouka += WBuf.komaichi
@@ -1724,10 +1731,7 @@
         TextBox4.Text = -Hyouka().ToString
     End Sub
     Private Function HandRange(ByVal wb As Integer, ByVal idx As Integer) As Array
-        Dim koma = ARB(idx)
-        If wb = 1 Then
-            koma = ARW(idx)
-        End If
+        Dim koma = KomaIdx(idx, wb)
         range = all.Clone()
         For i = 0 To 80 Step 1
             If board(i) <> 0 Then
