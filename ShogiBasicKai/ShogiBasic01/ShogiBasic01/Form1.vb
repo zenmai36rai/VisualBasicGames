@@ -2906,5 +2906,13 @@ LOG_WRITE:
         'load
         LoadJyoseki()
     End Sub
+    Private Sub クリップボードにコピーToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles クリップボードにコピーToolStripMenuItem.Click
+        Dim max As Integer = ListBox1.Items.Count
+        Dim Clip As String = ""
+        For i = 0 To max - 1
+            Clip += ListBox1.Items.Item(i) + vbCrLf
+        Next
+        Clipboard.SetText(Clip)
 
+    End Sub
 End Class

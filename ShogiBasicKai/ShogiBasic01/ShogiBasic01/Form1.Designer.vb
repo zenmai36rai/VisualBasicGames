@@ -22,6 +22,7 @@ Partial Class Form1
     'コード エディターを使って変更しないでください。
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
+        Me.components = New System.ComponentModel.Container()
         Me.Button9 = New System.Windows.Forms.Button()
         Me.Button8 = New System.Windows.Forms.Button()
         Me.Button7 = New System.Windows.Forms.Button()
@@ -137,11 +138,14 @@ Partial Class Form1
         Me.Button84 = New System.Windows.Forms.Button()
         Me.Button85 = New System.Windows.Forms.Button()
         Me.Button86 = New System.Windows.Forms.Button()
+        Me.ContextMenuStrip1 = New System.Windows.Forms.ContextMenuStrip(Me.components)
+        Me.クリップボードにコピーToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.Panel1.SuspendLayout()
         Me.Panel3.SuspendLayout()
         Me.Panel2.SuspendLayout()
         CType(Me.PictureBox2, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.ContextMenuStrip1.SuspendLayout()
         Me.SuspendLayout()
         '
         'Button9
@@ -1349,6 +1353,7 @@ Partial Class Form1
         '
         'ListBox1
         '
+        Me.ListBox1.ContextMenuStrip = Me.ContextMenuStrip1
         Me.ListBox1.FormattingEnabled = True
         Me.ListBox1.ItemHeight = 12
         Me.ListBox1.Location = New System.Drawing.Point(518, 176)
@@ -1470,6 +1475,18 @@ Partial Class Form1
         Me.Button86.Text = "load"
         Me.Button86.UseVisualStyleBackColor = True
         '
+        'ContextMenuStrip1
+        '
+        Me.ContextMenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.クリップボードにコピーToolStripMenuItem})
+        Me.ContextMenuStrip1.Name = "ContextMenuStrip1"
+        Me.ContextMenuStrip1.Size = New System.Drawing.Size(169, 26)
+        '
+        'クリップボードにコピーToolStripMenuItem
+        '
+        Me.クリップボードにコピーToolStripMenuItem.Name = "クリップボードにコピーToolStripMenuItem"
+        Me.クリップボードにコピーToolStripMenuItem.Size = New System.Drawing.Size(168, 22)
+        Me.クリップボードにコピーToolStripMenuItem.Text = "クリップボードにコピー"
+        '
         'Form1
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 12.0!)
@@ -1501,6 +1518,7 @@ Partial Class Form1
         Me.Panel2.ResumeLayout(False)
         CType(Me.PictureBox2, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.ContextMenuStrip1.ResumeLayout(False)
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -1620,4 +1638,6 @@ Partial Class Form1
     Friend WithEvents Button84 As Button
     Friend WithEvents Button85 As Button
     Friend WithEvents Button86 As Button
+    Friend WithEvents ContextMenuStrip1 As ContextMenuStrip
+    Friend WithEvents クリップボードにコピーToolStripMenuItem As ToolStripMenuItem
 End Class
