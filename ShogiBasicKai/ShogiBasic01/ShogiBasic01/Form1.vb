@@ -1460,14 +1460,14 @@
             If IsWB(WHITE, i) Then
                 WBuf.komatoku += KomaScore(board(i))
                 WBuf.komaichi += koma_position_score(board(i), i)
-                WBuf.komakiki += score_table(komakiki_w(i), 0, enem_pos, i)
+                'WBuf.komakiki += score_table(komakiki_w(i), 0, enem_pos, i)
                 BBuf.komakiki += score_table(komakiki_b(i), 1, king_pos, i)
             End If
             If IsWB(BLACK, i) Then
                 BBuf.komatoku += KomaScore(board(i))
                 BBuf.komaichi += koma_position_score(board(i), i)
                 WBuf.komakiki += score_table(komakiki_w(i), 1, enem_pos, i)
-                BBuf.komakiki += score_table(komakiki_b(i), 0, king_pos, i)
+                'BBuf.komakiki += score_table(komakiki_b(i), 0, king_pos, i)
             End If
         Next
         For i = 0 To 7 Step 1
