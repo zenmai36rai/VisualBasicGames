@@ -1483,6 +1483,15 @@
         Hyouka = Hyouka / 2
         Return Hyouka
     End Function
+    Private Function MontecarloNum() As Integer
+        Static NORMAL_SEARCH As Boolean = True
+        If NORMAL_SEARCH Then
+            Return 1
+        Else
+            Static SEARCH_RATE_VALUE As Integer = 3
+            Return (VBMath.Rnd() * SEARCH_RATE_VALUE)
+        End If
+    End Function
     Private Function alphabeta(ByVal first As Integer, ByVal wb As Integer, ByVal depth As Integer,
                                 ByVal alpha As Integer, ByVal beta As Integer) As Integer
         Dim h As Integer = Hyouka() * wb
@@ -1493,7 +1502,7 @@
             Return h
         End If
         Dim last As Integer = GenerateMoves(first, wb, depth)
-        For i = first To last - 1
+        For i = first To last - 1 Step MontecarloNum()
             MakeMove(Node(i), False)
             Dim a = -alphabeta(last, -wb, depth - 1, -beta, -alpha)
             UnmakeMove(Node(i))
