@@ -1483,10 +1483,10 @@
         Hyouka = Hyouka / 2
         Return Hyouka
     End Function
+    Const NORMAL_SEARCH = 0
+    Const MONTE_SEARCH = 1
+    Const SEARCH_TYPE = MONTE_SEARCH
     Private Function MontecarloNum() As Integer
-        Static NORMAL_SEARCH = 0
-        Static MONTE_SEARCH = 1
-        Static SEARCH_TYPE = NORMAL_SEARCH
         If SEARCH_TYPE = NORMAL_SEARCH Then
             Return 1
         Else
@@ -1504,7 +1504,12 @@
             Return h
         End If
         Dim last As Integer = GenerateMoves(first, wb, depth)
-        For i = first To last - 1 Step MontecarloNum()
+        For i = first To last - 1 Step 1
+            If (SEARCH_TYPE = MONTE_SEARCH And
+                IsWB(-wb, Node(i).dst) = False And
+                MontecarloNum() > 1) Then
+                Continue For
+            End If
             MakeMove(Node(i), False)
             Dim a = -alphabeta(last, -wb, depth - 1, -beta, -alpha)
             UnmakeMove(Node(i))
