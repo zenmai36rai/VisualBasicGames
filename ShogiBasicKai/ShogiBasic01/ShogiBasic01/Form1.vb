@@ -1484,12 +1484,14 @@
         Return Hyouka
     End Function
     Private Function MontecarloNum() As Integer
-        Static NORMAL_SEARCH As Boolean = True
-        If NORMAL_SEARCH Then
+        Static NORMAL_SEARCH = 0
+        Static MONTE_SEARCH = 1
+        Static SEARCH_TYPE = NORMAL_SEARCH
+        If SEARCH_TYPE = NORMAL_SEARCH Then
             Return 1
         Else
-            Static SEARCH_RATE_VALUE As Integer = 3
-            Return (VBMath.Rnd() * SEARCH_RATE_VALUE)
+            Static SEARCH_RATE_VALUE As Integer = 2
+            Return (VBMath.Rnd() * SEARCH_RATE_VALUE + 1)
         End If
     End Function
     Private Function alphabeta(ByVal first As Integer, ByVal wb As Integer, ByVal depth As Integer,
