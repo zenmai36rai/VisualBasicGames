@@ -14,6 +14,10 @@
     Const ROBO_TEBAN As Integer = BLACK
     Const BLANK As Integer = 255
     Const BRANCH_WIDTH As Integer = 600
+    Const NORMAL_SEARCH = 0
+    Const MONTE_SEARCH = 1
+    Const SEARCH_TYPE = NORMAL_SEARCH
+
 
     Private CheckBit As Integer = 0
     Class MoveData
@@ -1483,9 +1487,6 @@
         Hyouka = Hyouka / 2
         Return Hyouka
     End Function
-    Const NORMAL_SEARCH = 0
-    Const MONTE_SEARCH = 1
-    Const SEARCH_TYPE = MONTE_SEARCH
     Private Function MontecarloNum() As Integer
         If SEARCH_TYPE = NORMAL_SEARCH Then
             Return 1
