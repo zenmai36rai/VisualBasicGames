@@ -18,7 +18,6 @@
     Const MONTE_SEARCH = 1
     Const SEARCH_TYPE = NORMAL_SEARCH
 
-
     Private CheckBit As Integer = 0
     Class MoveData
         Public r As Byte
@@ -1495,6 +1494,9 @@
             Return (VBMath.Rnd() * SEARCH_RATE_VALUE + 1)
         End If
     End Function
+    Private Function IsKillerMove(ByVal wb As Integer, ByVal dst As Integer) As Boolean
+        Return IsWB(-wb, dst)
+    End Function
     Private Function alphabeta(ByVal first As Integer, ByVal wb As Integer, ByVal depth As Integer,
                                 ByVal alpha As Integer, ByVal beta As Integer) As Integer
         Dim h As Integer = Hyouka() * wb
@@ -1507,7 +1509,7 @@
         Dim last As Integer = GenerateMoves(first, wb, depth)
         For i = first To last - 1 Step 1
             If (SEARCH_TYPE = MONTE_SEARCH And
-                IsWB(-wb, Node(i).dst) = False And
+                IsKillerMove(-wb, Node(i).dst) = False And
                 MontecarloNum() > 1) Then
                 Continue For
             End If
