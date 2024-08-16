@@ -2935,4 +2935,4 @@ LOG_WRITE:
 
     End Sub
 End Class
-' 2016 - 2024 Wrote By Kyosuke Miyazawa ShogiBasic
+' 2015 - 2024 Wrote By Kyosuke Miyazawa ShogiBasic
