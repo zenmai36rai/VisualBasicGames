@@ -95,10 +95,11 @@
     Dim GenerationFlag As Boolean = False
     Dim best As MoveData = New MoveData
     Dim BestScore As Integer = 0
-    Dim modosi As MoveData = New MoveData
+    Dim modosi(YOMI_DEPTH + 1) As MoveData
     Dim Node As List(Of MoveData)
     Dim NodeCount As Integer
     Dim NodeIdx As Integer
+    Dim PosRange(40) As List(Of Integer)
     ''Dim ArrayCount As Integer
     Dim komaname As Array
     Dim board As Array
@@ -666,8 +667,11 @@
     Public _JyosekiDictionary As Dictionary(Of String, String) = New Dictionary(Of String, String)
     Private Sub Init() Handles Me.HandleCreated
         Node = New List(Of MoveData)
-        For n = 0 To (BRANCH_WIDTH * (YOMI_DEPTH + 1))
+        For n = 0 To (BRANCH_WIDTH * (YOMI_DEPTH + 1)) Step 1
             Node.Add(New MoveData())
+        Next
+        For n = 0 To 40 - 1 Step 1
+            PosRange(n) = New List(Of Integer)
         Next
         komaname = _b._komaname
         all = _b._all
@@ -917,6 +921,8 @@
             b.ForeColor = Color.White
         End If
     End Sub
+    Dim InitGenerate As Boolean = True
+    Dim PosID = 0
     Private Function UnitRange(ByVal locate As Integer) As Array
         Dim unit As Integer
         locate = locate
@@ -1517,9 +1523,9 @@
                 MontecarloNum() > 1) Then
                 Continue For
             End If
-            MakeMove(Node(i), False)
+            MakeMove(Node(i), False, ModosiIdx)
             Dim a = -alphabeta(last, -wb, depth - 1, -beta, -alpha)
-            UnmakeMove(Node(i))
+            UnmakeMove(Node(i), ModosiIdx)
             If (a > alpha) Then
                 alpha = a
                 If depth = YOMI_DEPTH Then
@@ -1589,12 +1595,21 @@
                 undo = pos
                 GenerationFlag = True
                 NodeIdx = idx
-                UnitRange(pos)
+                If InitGenerate Then
+                    Dim UnitArray As Array = UnitRange(pos)
+                    For i = 0 To UnitArray.GetLength(0) - 1 Step 1
+                        PosRange(PosID).Add(UnitArray(i))
+                    Next
+                    PosID = PosID + 1
+                Else
+                    UnitRange(pos)
+                End If
                 GenerationFlag = False
                 idx += (NodeIdx - idx)
             End If
             pos = bb.GetNext()
         End While
+        InitGenerate = False
         Return idx
     End Function
     Private Sub RobotMove(ByVal wb As Integer)
@@ -1688,7 +1703,7 @@
             d.dst_pos = locate
             d.src_komaid = board(undo)
             d.dst_komaid = board(locate)
-            MakeMove(d, True)
+            MakeMove(d, True, 0)
             DispAll()
             AddKihu(locate)
             state = ST_FREE
@@ -1707,7 +1722,7 @@
             d.dst_pos = locate
             d.src_komaid = board(undo)
             d.dst_komaid = board(locate)
-            MakeMove(d, True)
+            MakeMove(d, True, 0)
             DispAll()
             AddKihu(locate)
             state = ST_FREE
@@ -1720,7 +1735,7 @@
             d.dst_pos = locate
             'd.src_komaid = board(undo)
             'd.dst_komaid = board(locate)
-            MakeMove(d, True)
+            MakeMove(d, True, 0)
             DispAll()
             AddKihu(locate)
             undo = BLANK
@@ -1739,7 +1754,7 @@
             d.dst_pos = locate
             'd.src_komaid = board(undo)
             'd.dst_komaid = board(locate)
-            MakeMove(d, True)
+            MakeMove(d, True, 0)
             DispAll()
             AddKihu(locate)
             undo = BLANK
@@ -1956,8 +1971,10 @@
         kihumem = locate
         narimem = BLANK
     End Sub
-    Private Sub MakeMove(ByVal d As MoveData, ByVal mov As Boolean)
-        modosi = d
+    Dim ModosiIdx As Integer
+    Private Sub MakeMove(ByVal d As MoveData, ByVal mov As Boolean, ByRef MIdx As Integer)
+        modosi(MIdx) = d
+        MIdx = MIdx + 1
         If d.hand <> BLANK Then
             KomaOki(d.dst_pos, d.hand)
             GoTo LOG_WRITE
@@ -1985,7 +2002,8 @@ LOG_WRITE:
             AddYomi(d.dst_pos)
         End If
     End Sub
-    Private Sub UnmakeMove(ByVal d As MoveData)
+    Private Sub UnmakeMove(ByVal d As MoveData, ByRef MIdx As Integer)
+        MIdx = MIdx - 1
         If d.hand <> BLANK Then
             KomaModosi(d.dst_pos)
             'board(d.r2) = 0
@@ -2842,7 +2860,7 @@ LOG_WRITE:
     End Sub
 
     Private Sub Button82_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button82.Click
-        UnmakeMove(modosi)
+        UnmakeMove(modosi(ModosiIdx), ModosiIdx)
         DispAll()
     End Sub
 
