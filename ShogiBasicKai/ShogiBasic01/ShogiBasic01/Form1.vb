@@ -20,10 +20,10 @@
 
     Private CheckBit As Integer = 0
     Class MoveData
-        Public r As Byte
-        Public r2 As Byte
-        Public src As Byte
-        Public dst As Byte
+        Public org_pos As Byte
+        Public dst_pos As Byte
+        Public src_komaid As Byte
+        Public dst_komaid As Byte
         Public hand As Byte = BLANK
         Public classup As Boolean = True
         Public eval As Integer = 0
@@ -37,10 +37,10 @@
                 ByVal s As Integer,
                 ByVal d As Integer,
                 ByVal h As Integer)
-            r = i
-            r2 = dist
-            src = s
-            dst = d
+            org_pos = i
+            dst_pos = dist
+            src_komaid = s
+            dst_komaid = d
             hand = h
             classup = True
         End Sub
@@ -51,25 +51,25 @@
                 ByVal d As Integer,
                 ByVal h As Integer,
                 ByVal c As Boolean)
-            r = i
-            r2 = dist
-            src = s
-            dst = d
+            org_pos = i
+            dst_pos = dist
+            src_komaid = s
+            dst_komaid = d
             hand = h
             classup = c
         End Sub
         Sub New(ByVal i As Integer, ByVal j As Integer)
             hand = i
-            r2 = j
+            dst_pos = j
         End Sub
 
         Public _RetString As String
         Function GetMoveDataString() As String
             _RetString = ""
-            _RetString += r.ToString() + ","
-            _RetString += r2.ToString() + ","
-            _RetString += src.ToString() + ","
-            _RetString += dst.ToString() + ","
+            _RetString += org_pos.ToString() + ","
+            _RetString += dst_pos.ToString() + ","
+            _RetString += src_komaid.ToString() + ","
+            _RetString += dst_komaid.ToString() + ","
             _RetString += hand.ToString() + ","
             _RetString += classup.ToString() + ","
             _RetString += eval.ToString() + ","
@@ -80,10 +80,10 @@
         Function SetMoveDataFromString(ByVal str As String) As String
             Dim a As Array = str.Split(",")
             If a.Length >= 7 Then
-                r = a(0)
-                r2 = a(1)
-                src = a(2)
-                dst = a(3)
+                org_pos = a(0)
+                dst_pos = a(1)
+                src_komaid = a(2)
+                dst_komaid = a(3)
                 hand = a(4)
                 classup = a(5)
             Else
@@ -1513,7 +1513,7 @@
         Dim last As Integer = GenerateMoves(first, wb, depth)
         For i = first To last - 1 Step 1
             If (SEARCH_TYPE = MONTE_SEARCH And
-                IsKillerMove(-wb, Node(i).dst) = False And
+                IsKillerMove(-wb, Node(i).dst_komaid) = False And
                 MontecarloNum() > 1) Then
                 Continue For
             End If
@@ -1599,19 +1599,19 @@
     End Function
     Private Sub RobotMove(ByVal wb As Integer)
         Dim c As Integer
-        Dim r As Integer
-        Dim r2 As Integer
+        Dim org_pos As Integer
+        Dim dst_pos As Integer
         Dim nodemax As Integer
         Dim nodemin As Integer
         c = 0
         NodeCount = 0
-        Dim starttime As Long = Now.Hour * 3600 + Now.Minute * 60 + Now.Second
+        'Dim starttime As Long = Now.Hour * 3600 + Now.Minute * 60 + Now.Second
         nodemax = 214748364
         nodemin = -214748364
         Dim MakeBuff As MoveData = New MoveData
         SuspendLayout()
         Dim ret As Integer = 0
-        best.r = BLANK
+        best.org_pos = BLANK
         Dim s As String = _b.GetBoardString(board)
         If _JyosekiDictionary.ContainsKey(s) Then
             best.SetMoveDataFromString(_JyosekiDictionary(s))
@@ -1629,16 +1629,16 @@
             ListBox1.Items.Add("▽投了")
             ListBox1.TopIndex = ListBox1.Items.Count - 1
         ElseIf best.hand = BLANK Then
-            r = best.r
-            r2 = best.r2
-            GetButton(r).PerformClick()
-            GetButton(r2).PerformClick()
+            org_pos = best.org_pos
+            dst_pos = best.dst_pos
+            GetButton(org_pos).PerformClick()
+            GetButton(dst_pos).PerformClick()
             robomode = False
         Else
-            r = best.hand - 14
-            r2 = best.r2
-            GetHandBlack(r).PerformClick()
-            GetButton(r2).PerformClick()
+            org_pos = best.hand - 14
+            dst_pos = best.dst_pos
+            GetHandBlack(org_pos).PerformClick()
+            GetButton(dst_pos).PerformClick()
             robomode = False
         End If
         If BestScore >= FINISH_SCORE Then
@@ -1684,10 +1684,10 @@
             'MoveChara(locate)
             Dim d As MoveData = New MoveData
             d.hand = BLANK
-            d.r = undo
-            d.r2 = locate
-            d.src = board(undo)
-            d.dst = board(locate)
+            d.org_pos = undo
+            d.dst_pos = locate
+            d.src_komaid = board(undo)
+            d.dst_komaid = board(locate)
             MakeMove(d, True)
             DispAll()
             AddKihu(locate)
@@ -1703,10 +1703,10 @@
             'MoveChara(locate)
             Dim d As MoveData = New MoveData
             d.hand = BLANK
-            d.r = undo
-            d.r2 = locate
-            d.src = board(undo)
-            d.dst = board(locate)
+            d.org_pos = undo
+            d.dst_pos = locate
+            d.src_komaid = board(undo)
+            d.dst_komaid = board(locate)
             MakeMove(d, True)
             DispAll()
             AddKihu(locate)
@@ -1716,10 +1716,10 @@
             'tegomaw(pop - 1) = tegomaw(pop - 1) - 1
             Dim d As MoveData = New MoveData
             d.hand = pop
-            d.r = undo
-            d.r2 = locate
-            'd.src = board(undo)
-            'd.dst = board(locate)
+            d.org_pos = undo
+            d.dst_pos = locate
+            'd.src_komaid = board(undo)
+            'd.dst_komaid = board(locate)
             MakeMove(d, True)
             DispAll()
             AddKihu(locate)
@@ -1735,10 +1735,10 @@
             'tegomab(pop - 15) = tegomab(pop - 15) - 1
             Dim d As MoveData = New MoveData
             d.hand = pop
-            d.r = undo
-            d.r2 = locate
-            'd.src = board(undo)
-            'd.dst = board(locate)
+            d.org_pos = undo
+            d.dst_pos = locate
+            'd.src_komaid = board(undo)
+            'd.dst_komaid = board(locate)
             MakeMove(d, True)
             DispAll()
             AddKihu(locate)
@@ -1959,42 +1959,42 @@
     Private Sub MakeMove(ByVal d As MoveData, ByVal mov As Boolean)
         modosi = d
         If d.hand <> BLANK Then
-            KomaOki(d.r2, d.hand)
+            KomaOki(d.dst_pos, d.hand)
             GoTo LOG_WRITE
         End If
-        KomaTori(d.r2)
+        KomaTori(d.dst_pos)
         If mov Then
-            narimem = board(d.r)
+            narimem = board(d.org_pos)
         End If
         If d.classup Then
-            ClassUp(d.r)
+            ClassUp(d.org_pos)
         Else
             CheckBit += 1
         End If
-        'board(d.r2) = board(d.r)
-        SetBoard(d.r2, board(d.r))
-        'board(d.r) = 0
-        SetBoard(d.r, 0)
+        'board(d.dst_pos) = board(d.org_pos)
+        SetBoard(d.dst_pos, board(d.org_pos))
+        'board(d.org_pos) = 0
+        SetBoard(d.org_pos, 0)
         If d.classup Then
-            ClassUp(d.r2)
+            ClassUp(d.dst_pos)
         Else
             CheckBit += 1
         End If
 LOG_WRITE:
         If DEBUG_LOG Then
-            AddYomi(d.r2)
+            AddYomi(d.dst_pos)
         End If
     End Sub
     Private Sub UnmakeMove(ByVal d As MoveData)
         If d.hand <> BLANK Then
-            KomaModosi(d.r2)
+            KomaModosi(d.dst_pos)
             'board(d.r2) = 0
-            SetBoard(d.r2, 0)
+            SetBoard(d.dst_pos, 0)
             Exit Sub
         End If
         'board(d.r) = d.src
-        SetBoard(d.r, d.src)
-        KomaKaeshi(d.r2, d.dst)
+        SetBoard(d.org_pos, d.src_komaid)
+        KomaKaeshi(d.dst_pos, d.dst_komaid)
     End Sub
     Private Function Question() As Boolean
         Question = True
