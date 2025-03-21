@@ -96,7 +96,7 @@
     Dim best As MoveData = New MoveData
     Dim BestScore As Integer = 0
     Dim modosi As MoveData = New MoveData
-    Dim Node(BRANCH_WIDTH * (YOMI_DEPTH + 1)) As MoveData
+    Dim Node As List(Of MoveData)
     Dim NodeCount As Integer
     Dim NodeIdx As Integer
     ''Dim ArrayCount As Integer
@@ -665,6 +665,10 @@
     Public _b As ShogiBoard = New ShogiBoard()
     Public _JyosekiDictionary As Dictionary(Of String, String) = New Dictionary(Of String, String)
     Private Sub Init() Handles Me.HandleCreated
+        Node = New List(Of MoveData)
+        For n = 0 To (BRANCH_WIDTH * (YOMI_DEPTH + 1))
+            Node.Add(New MoveData())
+        Next
         komaname = _b._komaname
         all = _b._all
         board = _b._board
