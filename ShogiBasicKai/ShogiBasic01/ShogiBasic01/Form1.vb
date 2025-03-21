@@ -604,11 +604,11 @@
         Public komatoku As Integer = 0
         Public komakiki As Integer = 0
         Public komaichi As Integer = 0
-        Public Function Init()
+        Public Sub Init()
             komatoku = 0
             komakiki = 0
             komaichi = 0
-        End Function
+        End Sub
     End Class
     Dim WBuf As EvalBuff = New EvalBuff() 'WhiteBuff
     Dim BBuf As EvalBuff = New EvalBuff() 'BlackBuff
@@ -923,11 +923,11 @@
     End Sub
     Dim InitGenerate As Boolean = True
     Dim PosID = 0
-    Private Function UnitRange(ByVal locate As Integer) As Array
+    Private Function UnitRange(ByVal locate As Integer) As List(Of Integer)
         Dim unit As Integer
         locate = locate
         unit = board(locate)
-        UnitRange = all
+        UnitRange = New List(Of Integer)
         Select Case unit
             Case 1
                 UnitRange = HuRange(locate, 1)
@@ -1001,12 +1001,12 @@
             End If
         End If
     End Sub
-    Private Sub AddRange(ByVal locate As Integer, ByVal dx As Integer, ByVal dy As Integer, ByRef array As Array, ByVal pos As Integer)
+    Private Sub AddRange(ByVal locate As Integer, ByVal dx As Integer, ByVal dy As Integer, ByRef list As List(Of Integer), ByVal pos As Integer)
         Dim dist As Integer
         If CheckBoardRange(dx, dy) = True Then
             dist = dx + dy * 9
             If JigomaCheck(locate, dist) Then
-                AddValue(locate, array, dist, pos)
+                AddValue(locate, list, dist, pos)
             End If
         End If
     End Sub
@@ -1030,8 +1030,8 @@
         End If
         Return JigomaCheck
     End Function
-    Private Sub AddValue(ByVal locate As Integer, ByRef a As Array, ByVal dist As Integer, ByVal pos As Integer)
-        a.SetValue(dist, pos)
+    Private Sub AddValue(ByVal locate As Integer, ByRef l As List(Of Integer), ByVal dist As Integer, ByVal pos As Integer)
+        l.Add(dist)
         If GenerationFlag = True Then
             Node(NodeIdx) = New MoveData(locate, dist, board(locate), board(dist), BLANK)
             NodeCount += 1
@@ -1051,16 +1051,16 @@
             Return bb_black
         End If
     End Function
-    Private Function HuRange(ByVal locate As Integer, ByVal wb As Integer) As Array
-        HuRange = {BLANK}
+    Private Function HuRange(ByVal locate As Integer, ByVal wb As Integer) As List(Of Integer)
+        HuRange = New List(Of Integer)
         Dim dist As Integer = bb_kiki.GetHuRange(locate, wb, GetWB_BB(wb))
         If dist <> BLANK Then
             AddValue(locate, HuRange, dist, 0)
         End If
         bb_kiki.GetHuKiki(locate, wb, bb_white, bb_black, komakiki_w, komakiki_b)
     End Function
-    Private Function KyoRange(ByVal locate As Integer, ByVal wb As Integer) As Array
-        KyoRange = {BLANK, BLANK, BLANK, BLANK, BLANK, BLANK, BLANK, BLANK}
+    Private Function KyoRange(ByVal locate As Integer, ByVal wb As Integer) As List(Of Integer)
+        KyoRange = New List(Of Integer)
         Dim bb As BitBoard = bb_kiki.GetKyoRange(locate, wb, bb_white, bb_black)
         Dim dist = bb.GetFirst()
         If dist = -1 Then
@@ -1084,19 +1084,14 @@
         End If
         Return AB
     End Function
-    Private Function HisyaRange(ByVal locate As Integer, ByVal wb As Integer, ByVal c As Boolean) As Array
+    Private Function HisyaRange(ByVal locate As Integer, ByVal wb As Integer, ByVal c As Boolean) As List(Of Integer)
+        HisyaRange = New List(Of Integer)
         Dim x As Integer
         Dim y As Integer
         Dim dx As Integer
         Dim dy As Integer
         Dim i As Integer
         Dim dist As Integer
-        Dim a As Array
-        a = {BLANK, BLANK, BLANK, BLANK, BLANK, BLANK, BLANK, BLANK,
-                    BLANK, BLANK, BLANK, BLANK, BLANK, BLANK, BLANK, BLANK,
-                    BLANK, BLANK, BLANK, BLANK, BLANK, BLANK, BLANK, BLANK,
-                    BLANK, BLANK, BLANK, BLANK, BLANK, BLANK, BLANK, BLANK,
-                    BLANK, BLANK, BLANK, BLANK}
         x = locate Mod 9
         y = Int(locate / 9)
         For i = 1 To 8 Step 1
@@ -1108,7 +1103,7 @@
                     AddKomakiki(dx, dy)
                     Exit For
                 End If
-                AddValue(locate, a, dist, i)
+                AddValue(locate, HisyaRange, dist, i)
                 If AB(wb, locate, dist) Then
                     Exit For
                 End If
@@ -1125,7 +1120,7 @@
                     AddKomakiki(dx, dy)
                     Exit For
                 End If
-                AddValue(locate, a, dist, i + 7)
+                AddValue(locate, HisyaRange, dist, i + 7)
                 If AB(wb, locate, dist) Then
                     Exit For
                 End If
@@ -1142,7 +1137,7 @@
                     AddKomakiki(dx, dy)
                     Exit For
                 End If
-                AddValue(locate, a, dist, i + 15)
+                AddValue(locate, HisyaRange, dist, i + 15)
                 If AB(wb, locate, dist) Then
                     Exit For
                 End If
@@ -1159,7 +1154,7 @@
                     AddKomakiki(dx, dy)
                     Exit For
                 End If
-                AddValue(locate, a, dist, i + 23)
+                AddValue(locate, HisyaRange, dist, i + 23)
                 If AB(wb, locate, dist) Then
                     Exit For
                 End If
@@ -1170,32 +1165,26 @@
         If c = True Then
             dx = x - 1
             dy = y - 1
-            AddRange(locate, dx, dy, a, 32)
+            AddRange(locate, dx, dy, HisyaRange, 32)
             dx = x + 1
             dy = y + 1
-            AddRange(locate, dx, dy, a, 33)
+            AddRange(locate, dx, dy, HisyaRange, 33)
             dx = x - 1
             dy = y + 1
-            AddRange(locate, dx, dy, a, 34)
+            AddRange(locate, dx, dy, HisyaRange, 34)
             dx = x + 1
             dy = y - 1
-            AddRange(locate, dx, dy, a, 35)
+            AddRange(locate, dx, dy, HisyaRange, 35)
         End If
-        HisyaRange = a
     End Function
-    Private Function KakuRange(ByVal locate As Integer, ByVal wb As Integer, ByVal c As Boolean) As Array
+    Private Function KakuRange(ByVal locate As Integer, ByVal wb As Integer, ByVal c As Boolean) As List(Of Integer)
+        KakuRange = New List(Of Integer)
         Dim x As Integer
         Dim y As Integer
         Dim dx As Integer
         Dim dy As Integer
         Dim i As Integer
         Dim dist As Integer
-        Dim a As Array
-        a = {BLANK, BLANK, BLANK, BLANK, BLANK, BLANK, BLANK, BLANK,
-                    BLANK, BLANK, BLANK, BLANK, BLANK, BLANK, BLANK, BLANK,
-                    BLANK, BLANK, BLANK, BLANK, BLANK, BLANK, BLANK, BLANK,
-                    BLANK, BLANK, BLANK, BLANK, BLANK, BLANK, BLANK, BLANK,
-                    BLANK, BLANK, BLANK, BLANK}
         x = locate Mod 9
         y = Int(locate / 9)
         For i = 1 To 8 Step 1
@@ -1207,10 +1196,10 @@
                     Exit For
                 End If
                 If AB(wb, locate, dist) Then
-                    AddValue(locate, a, dist, i)
+                    AddValue(locate, KakuRange, dist, i)
                     Exit For
                 Else
-                    AddValue(locate, a, dist, i)
+                    AddValue(locate, KakuRange, dist, i)
                 End If
             Else
                 Exit For
@@ -1225,10 +1214,10 @@
                     Exit For
                 End If
                 If AB(wb, locate, dist) Then
-                    AddValue(locate, a, dist, i + 7)
+                    AddValue(locate, KakuRange, dist, i + 7)
                     Exit For
                 Else
-                    AddValue(locate, a, dist, i + 7)
+                    AddValue(locate, KakuRange, dist, i + 7)
                 End If
             Else
                 Exit For
@@ -1243,10 +1232,10 @@
                     Exit For
                 End If
                 If AB(wb, locate, dist) Then
-                    AddValue(locate, a, dist, i + 15)
+                    AddValue(locate, KakuRange, dist, i + 15)
                     Exit For
                 Else
-                    AddValue(locate, a, dist, i + 15)
+                    AddValue(locate, KakuRange, dist, i + 15)
                 End If
             Else
                 Exit For
@@ -1261,10 +1250,10 @@
                     Exit For
                 End If
                 If AB(wb, locate, dist) Then
-                    AddValue(locate, a, dist, i + 23)
+                    AddValue(locate, KakuRange, dist, i + 23)
                     Exit For
                 Else
-                    AddValue(locate, a, dist, i + 23)
+                    AddValue(locate, KakuRange, dist, i + 23)
                 End If
             Else
                 Exit For
@@ -1273,21 +1262,20 @@
         If c = True Then
             dx = x
             dy = y - 1
-            AddRange(locate, dx, dy, a, 32)
+            AddRange(locate, dx, dy, KakuRange, 32)
             dx = x
             dy = y + 1
-            AddRange(locate, dx, dy, a, 33)
+            AddRange(locate, dx, dy, KakuRange, 33)
             dx = x - 1
             dy = y
-            AddRange(locate, dx, dy, a, 34)
+            AddRange(locate, dx, dy, KakuRange, 34)
             dx = x + 1
             dy = y
-            AddRange(locate, dx, dy, a, 35)
+            AddRange(locate, dx, dy, KakuRange, 35)
         End If
-        KakuRange = a
     End Function
-    Private Function KeimaRange(ByVal locate As Integer, ByVal wb As Integer) As Array
-        KeimaRange = {BLANK, BLANK}
+    Private Function KeimaRange(ByVal locate As Integer, ByVal wb As Integer) As List(Of Integer)
+        KeimaRange = New List(Of Integer)
         Dim bb As BitBoard = bb_kiki.GetKeiRange(locate, wb, GetWB_BB(wb))
         Dim dist = bb.GetFirst()
         If dist = -1 Then
@@ -1304,8 +1292,8 @@
         End While
         bb_kiki.GetKeiKiki(locate, wb, bb_white, bb_black, komakiki_w, komakiki_b)
     End Function
-    Private Function GinRange(ByVal locate As Integer, ByVal wb As Integer) As Array
-        GinRange = {BLANK, BLANK, BLANK, BLANK, BLANK}
+    Private Function GinRange(ByVal locate As Integer, ByVal wb As Integer) As List(Of Integer)
+        GinRange = New List(Of Integer)
         Dim bb As BitBoard = bb_kiki.GetGinRange(locate, wb, GetWB_BB(wb))
         Dim dist = bb.GetFirst()
         If dist = -1 Then
@@ -1322,8 +1310,8 @@
         End While
         bb_kiki.GetGinKiki(locate, wb, bb_white, bb_black, komakiki_w, komakiki_b)
     End Function
-    Private Function KinRange(ByVal locate As Integer, ByVal wb As Integer) As Array
-        KinRange = {BLANK, BLANK, BLANK, BLANK, BLANK, BLANK}
+    Private Function KinRange(ByVal locate As Integer, ByVal wb As Integer) As List(Of Integer)
+        KinRange = New List(Of Integer)
         Dim bb As BitBoard = bb_kiki.GetKinRange(locate, wb, GetWB_BB(wb))
         Dim dist = bb.GetFirst()
         If dist = -1 Then
@@ -1340,8 +1328,8 @@
         End While
         bb_kiki.GetKinKiki(locate, wb, bb_white, bb_black, komakiki_w, komakiki_b)
     End Function
-    Private Function OuRange(ByVal locate As Integer, ByVal wb As Integer) As Array
-        OuRange = {BLANK, BLANK, BLANK, BLANK, BLANK, BLANK, BLANK, BLANK}
+    Private Function OuRange(ByVal locate As Integer, ByVal wb As Integer) As List(Of Integer)
+        OuRange = New List(Of Integer)
         Dim bb As BitBoard = bb_kiki.GetOuRange(locate, wb, GetWB_BB(wb))
         Dim dist = bb.GetFirst()
         If dist = -1 Then
@@ -1596,10 +1584,8 @@
                 GenerationFlag = True
                 NodeIdx = idx
                 If InitGenerate Then
-                    Dim UnitArray As Array = UnitRange(pos)
-                    For i = 0 To UnitArray.GetLength(0) - 1 Step 1
-                        PosRange(PosID).Add(UnitArray(i))
-                    Next
+                    Dim RangeList As List(Of Integer) = UnitRange(pos)
+                    PosRange(PosID) = RangeList
                     PosID = PosID + 1
                 Else
                     UnitRange(pos)
@@ -1669,7 +1655,7 @@
         r = False
         If state = ST_FREE Then
             undo = locate
-            range = UnitRange(locate)
+            range = UnitRange(locate).ToArray
             For i = 0 To range.Length - 1 Step 1
                 If range(i) <> BLANK Then
                     r = True
@@ -2191,7 +2177,7 @@ LOG_WRITE:
         For i = 0 To 80 Step 1
             If i = undo Then
             ElseIf prev(i) = prev(undo) Then
-                Range = UnitRange(i)
+                Range = UnitRange(i).ToArray
                 For j = 0 To Range.Length - 1 Step 1
                     If Range(j) = locate Then
                         Kouho(ki) = i
