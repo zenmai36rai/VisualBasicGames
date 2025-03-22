@@ -264,6 +264,7 @@
             If wb = BLACK Then
                 Return 1
             End If
+            Return 2 'Error
         End Function
         Private Function CheckBoardRange(ByVal x As Integer, ByVal y As Integer) As Boolean
             CheckBoardRange = True
@@ -2943,4 +2944,4 @@ LOG_WRITE:
 
     End Sub
 End Class
-' 2015 - 2024 Written By Kyosuke Miyazawa ShogiBasic
+' 2015 - 2025 Written By Kyosuke Miyazawa ShogiBasic
