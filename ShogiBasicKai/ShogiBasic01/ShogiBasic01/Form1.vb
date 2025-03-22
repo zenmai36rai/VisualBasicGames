@@ -92,13 +92,15 @@
             Return True
         End Function
     End Class
-    Class KomaRange
+    Class KomaParameter
         Public ID As Integer
+        Public Kind As Integer
         Public Pos As Integer
         Public Range As List(Of Integer)
         Public Captured As Integer
-        Public Blocked As BitBoard
     End Class
+    Dim KomaRange(40) As KomaParameter
+    Dim KomaBlocked(81, 40) As Integer
     Dim GenerationFlag As Boolean = False
     Dim best As MoveData = New MoveData
     Dim BestScore As Integer = 0
