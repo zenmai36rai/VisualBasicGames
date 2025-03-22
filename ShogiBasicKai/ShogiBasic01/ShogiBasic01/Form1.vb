@@ -100,7 +100,7 @@
         Public Captured As Integer
     End Class
     Dim KomaRange(40) As KomaParameter
-    Dim KomaBlocked(81, 40) As Integer
+    Dim KomaBlocked(81) As List(Of Integer)
     Dim GenerationFlag As Boolean = False
     Dim best As MoveData = New MoveData
     Dim BestScore As Integer = 0
