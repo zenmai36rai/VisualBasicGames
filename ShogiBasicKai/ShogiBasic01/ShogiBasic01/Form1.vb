@@ -92,6 +92,13 @@
             Return True
         End Function
     End Class
+    Class KomaRange
+        Public ID As Integer
+        Public Pos As Integer
+        Public Range As List(Of Integer)
+        Public Captured As Integer
+        Public Blocked As BitBoard
+    End Class
     Dim GenerationFlag As Boolean = False
     Dim best As MoveData = New MoveData
     Dim BestScore As Integer = 0
@@ -1496,7 +1503,7 @@
     Private Function IsKillerMove(ByVal wb As Integer, ByVal dst As Integer) As Boolean
         Return IsWB(-wb, dst)
     End Function
-    Private Function alphabeta(ByVal first As Integer, ByVal wb As Integer, ByVal depth As Integer,
+    Private Function alphabeta(ByVal i As Integer, ByVal first As Integer, ByVal wb As Integer, ByVal depth As Integer,
                                 ByVal alpha As Integer, ByVal beta As Integer) As Integer
         Dim h As Integer = Hyouka() * wb
         If depth = 0 Then
@@ -1505,7 +1512,7 @@
         If Math.Abs(h) >= FINISH_SCORE Then
             Return h
         End If
-        Dim last As Integer = GenerateMoves(first, wb, depth)
+        Dim last As Integer = GenerateMoves(i, first, wb, depth)
         For i = first To last - 1 Step 1
             If (SEARCH_TYPE = MONTE_SEARCH And
                 IsKillerMove(-wb, Node(i).dst_komaid) = False And
@@ -1513,7 +1520,7 @@
                 Continue For
             End If
             MakeMove(Node(i), False, ModosiIdx)
-            Dim a = -alphabeta(last, -wb, depth - 1, -beta, -alpha)
+            Dim a = -alphabeta(i, last, -wb, depth - 1, -beta, -alpha)
             UnmakeMove(Node(i), ModosiIdx)
             If (a > alpha) Then
                 alpha = a
@@ -1533,7 +1540,7 @@
         Next
         Return alpha
     End Function
-    Private Function GenerateMoves(ByVal first As Integer, ByVal wb As Integer,
+    Private Function GenerateMoves(ByVal NodeMakeMoved As Integer, ByVal first As Integer, ByVal wb As Integer,
                                         ByVal depth As Integer) As Integer
         Dim idx As Integer = first
         If KOMAKIKI_READ Then
@@ -1618,7 +1625,7 @@
         If _JyosekiDictionary.ContainsKey(s) Then
             best.SetMoveDataFromString(_JyosekiDictionary(s))
         Else
-            ret = alphabeta(0, wb, YOMI_DEPTH, nodemin, nodemax)
+            ret = alphabeta(-1, 0, wb, YOMI_DEPTH, nodemin, nodemax)
             Dim s2 As String = best.GetMoveDataString()
             _JyosekiDictionary.Add(s, s2)
         End If
