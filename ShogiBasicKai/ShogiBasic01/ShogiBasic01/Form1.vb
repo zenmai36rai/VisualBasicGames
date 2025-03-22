@@ -97,14 +97,6 @@
             Return True
         End Function
     End Class
-    Class KomaParameter
-        Public ID As Integer
-        Public Kind As Integer
-        Public Pos As Integer
-        Public Range As List(Of Integer)
-        Public Captured As Integer
-    End Class
-    Dim KomaRange(40) As KomaParameter
     Dim KikiBlocked As BitBoard
     Dim KomaBlocked(81) As List(Of Integer)
     Dim GenerationFlag As Boolean = False
@@ -113,7 +105,6 @@
     Dim modosi(1024) As MoveData
     Dim KomaIDNode(40) As List(Of MoveData)
     Dim Node As List(Of MoveData)
-    Dim NodeCount As Integer
     Dim NodeIdx As Integer
     Dim PosRange(40) As List(Of Integer)
     ''Dim ArrayCount As Integer
@@ -1011,7 +1002,6 @@
         If 0 <= id And id < 40 Then
             Node.InsertRange(NodeIdx, KomaIDNode(id))
             NodeIdx += KomaIDNode(id).Count
-            NodeCount += KomaIDNode(id).Count
         End If
         If 0 < unit And unit <= 26 And unit <> 2 And unit <> 6 And unit <> 7 And unit <> 13 And unit <> 14 And unit <> 16 And unit <> 20 And unit <> 21 Then
             Dim dist = KikiBlocked.GetFirst()
@@ -1612,7 +1602,6 @@
                         For j = 0 To range.Length - 1 Step 1
                             If range(j) <> BLANK Then
                                 Node(idx) = New MoveData(i, range(j))
-                                NodeCount += 1
                                 idx += 1
                             End If
                         Next
@@ -1623,7 +1612,6 @@
                         For j = 0 To range.Length - 1 Step 1
                             If range(j) <> BLANK Then
                                 Node(idx) = New MoveData(i + 15, range(j))
-                                NodeCount += 1
                                 idx += 1
                             End If
                         Next
@@ -1666,7 +1654,6 @@
         Dim nodemax As Integer
         Dim nodemin As Integer
         c = 0
-        NodeCount = 0
         'Dim starttime As Long = Now.Hour * 3600 + Now.Minute * 60 + Now.Second
         nodemax = 214748364
         nodemin = -214748364
