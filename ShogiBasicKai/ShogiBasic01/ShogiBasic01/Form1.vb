@@ -100,11 +100,14 @@
     Dim KikiBlocked As BitBoard
     Dim KomaBlocked(81) As List(Of Integer)
     Dim GenerationFlag As Boolean = False
+    Dim Node As List(Of MoveData)
+    Dim NodeIdx As Integer
     Dim best As MoveData = New MoveData
     Dim BestScore As Integer = 0
     Dim modosi(1024) As MoveData
     Dim KomaIDNode(40) As List(Of MoveData)
     Dim PosRange(40) As List(Of Integer)
+    Dim TegomaRange(40) As List(Of MoveData)
     ''Dim ArrayCount As Integer
     Dim komaname As Array
     Dim board As Array
@@ -663,16 +666,7 @@
         Public _tegomaw = {0, 0, 0, 0, 0, 0, 0, 0}
         Public _tegomab = {0, 0, 0, 0, 0, 0, 0, 0}
         Public _retstring As String
-        Public Node As List(Of MoveData)
-        Public NodeIdx As Integer
-        Public Child As ShogiBoard
 
-        Public Sub New()
-            Node = New List(Of MoveData)
-            For n = 0 To (BRANCH_WIDTH * (YOMI_DEPTH + 1)) Step 1
-                Node.Add(New MoveData())
-            Next
-        End Sub
         Public Function GetBoardString(ByVal bd As Array) As String
             _board = bd
             _retstring = ""
@@ -691,9 +685,14 @@
     Public _b As ShogiBoard = New ShogiBoard()
     Public _JyosekiDictionary As Dictionary(Of String, String) = New Dictionary(Of String, String)
     Private Sub Init() Handles Me.HandleCreated
+        Node = New List(Of MoveData)
+        For n = 0 To (BRANCH_WIDTH * (YOMI_DEPTH + 1)) Step 1
+            Node.Add(New MoveData())
+        Next
         For n = 0 To 40 - 1 Step 1
             KomaIDNode(n) = New List(Of MoveData)
             PosRange(n) = New List(Of Integer)
+            TegomaRange(n) = New List(Of MoveData)
         Next
         For n = 0 To 81 - 1 Step 1
             KomaBlocked(n) = New List(Of Integer)
@@ -701,6 +700,12 @@
         For n = 0 To YOMI_DEPTH
             modosi(n) = New MoveData
         Next
+        For n = 0 To 40 - 1
+            For m = 0 To 81 - 1
+                TegomaRange(n).Add(New MoveData(n, m))
+            Next
+        Next
+
 
         komaname = {"", "歩", "香", "桂", "銀", "金", "飛", "角", "王", "と", "杏", "圭", "全", "龍", "馬"}
         all = _b._all
@@ -1003,8 +1008,8 @@
                 UnitRange = KakuRange(id, locate, -1, True)
         End Select
         If 0 <= id And id < 40 Then
-            _b.Node.InsertRange(_b.NodeIdx, KomaIDNode(id))
-            _b.NodeIdx += KomaIDNode(id).Count
+            Node.InsertRange(NodeIdx, KomaIDNode(id))
+            NodeIdx += KomaIDNode(id).Count
         End If
         If 0 < unit And unit <= 26 And unit <> 2 And unit <> 6 And unit <> 7 And unit <> 13 And unit <> 14 And unit <> 16 And unit <> 20 And unit <> 21 Then
             Dim dist = KikiBlocked.GetFirst()
@@ -1561,17 +1566,17 @@
         Dim last As Integer = GenerateMoves(i, first, wb, depth)
         For i = first To last - 1 Step 1
             If (SEARCH_TYPE = MONTE_SEARCH And
-                IsKillerMove(-wb, _b.Node(i).dst_komaid) = False And
+                IsKillerMove(-wb, Node(i).dst_komaid) = False And
                 MontecarloNum() > 1) Then
                 Continue For
             End If
-            MakeMove(_b.Node(i), False, ModosiIdx)
+            MakeMove(Node(i), False, ModosiIdx)
             Dim a = -alphabeta(i, last, -wb, depth - 1, -beta, -alpha)
-            UnmakeMove(_b.Node(i), ModosiIdx)
+            UnmakeMove(Node(i), ModosiIdx)
             If (a > alpha) Then
                 alpha = a
                 If depth = YOMI_DEPTH Then
-                    best = _b.Node(i)
+                    best = Node(i)
                     best.eval = h
                     best.best_eval = alpha
                     best.read_depth = YOMI_DEPTH
@@ -1604,7 +1609,7 @@
                         range = HandRange(wb, i)
                         For j = 0 To range.Length - 1 Step 1
                             If range(j) <> BLANK Then
-                                _b.Node(idx) = New MoveData(i, range(j))
+                                Node(idx) = TegomaRange(i)(range(j))
                                 idx += 1
                             End If
                         Next
@@ -1614,7 +1619,7 @@
                         range = HandRange(wb, i)
                         For j = 0 To range.Length - 1 Step 1
                             If range(j) <> BLANK Then
-                                _b.Node(idx) = New MoveData(i + 15, range(j))
+                                Node(idx) = TegomaRange(i + 15)(range(j))
                                 idx += 1
                             End If
                         Next
@@ -1635,15 +1640,15 @@
             If True = IsWB(wb, pos) Then
                 undo = pos
                 GenerationFlag = True
-                _b.NodeIdx = idx
+                NodeIdx = idx
                 If MakeMovedID <> -1 Then
-                    UnitRange(_b.Node(MakeMovedID).komaID, PosID, pos)
+                    UnitRange(Node(MakeMovedID).komaID, PosID, pos)
                 Else
                     UnitRange(-1, PosID, pos)
                 End If
                 PosID = PosID + 1
                 GenerationFlag = False
-                idx += (_b.NodeIdx - idx)
+                idx += (NodeIdx - idx)
             End If
             pos = bb.GetNext()
         End While
