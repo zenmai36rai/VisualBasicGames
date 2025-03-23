@@ -2,7 +2,7 @@
     Const WHITE As Integer = 1
     Const BLACK As Integer = -1
     Const USE_AB As Boolean = True
-    Const YOMI_DEPTH As Integer = 3
+    Const YOMI_DEPTH As Integer = 1
     Const HAND_RIMIT As Integer = 1
     Const HAND_READ As Boolean = True
     Const NARAZU_READ As Boolean = False
@@ -634,7 +634,7 @@
     Dim WTop As EvalBuff = New EvalBuff()
     Dim BTop As EvalBuff = New EvalBuff()
 
-    Private Function SetBoard(ByVal dist As Integer, ByVal koma As Integer) As Integer
+    Private Function SetBoard(ByVal dist As Integer, ByVal koma As Integer, ByVal id As Integer) As Integer
         If 0 = koma Then
             board(dist) = koma
             bb_white.RemoveBoard(dist)
@@ -642,11 +642,15 @@
         End If
         If 1 <= koma And koma <= 14 Then
             board(dist) = koma
+            Piece(id).place = dist
+            Piece(id).captured = 0
             bb_white.AddBoard(dist)
             bb_black.RemoveBoard(dist)
         End If
         If 15 <= koma Then
             board(dist) = koma
+            Piece(id).place = dist
+            Piece(id).captured = 0
             bb_black.AddBoard(dist)
             bb_white.RemoveBoard(dist)
         End If
@@ -655,10 +659,27 @@
     Class PieceID
         Public id As Integer = -1
         Public kind As Integer = 0
+        Public place As Integer = BLANK
         Public owner As Integer = 0
         Public captured As Integer = 0
     End Class
     Dim Piece As List(Of PieceID)
+    Private Function FindID(ByVal pos As Integer)
+        For i = 0 To Piece.Count - 1
+            If Piece(i).place = pos Then
+                Return Piece(i).id
+            End If
+        Next
+        Return -1
+    End Function
+    Private Function FindIDPop(ByVal pop As Integer, ByVal wb As Integer)
+        For i = 0 To Piece.Count - 1
+            If Piece(i).kind = pop Then
+                Return Piece(i).id
+            End If
+        Next
+        Return -1
+    End Function
     Class ShogiBoard
         Public _all = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80}
         Public _board = {16, 17, 18, 19, 22, 19, 18, 17, 16,
@@ -727,6 +748,7 @@
                 Dim pi As PieceID = New PieceID
                 pi.id = id
                 pi.kind = k
+                pi.place = i
                 pi.captured = 0
                 If k <= 14 Then
                     pi.owner = WHITE
@@ -1758,6 +1780,7 @@
             'MoveChara(locate)
             Dim d As MoveData = New MoveData
             d.hand = BLANK
+            d.komaID = FindID(undo)
             d.org_pos = undo
             d.dst_pos = locate
             d.src_komaid = board(undo)
@@ -1777,6 +1800,7 @@
             'MoveChara(locate)
             Dim d As MoveData = New MoveData
             d.hand = BLANK
+            d.komaID = FindID(undo)
             d.org_pos = undo
             d.dst_pos = locate
             d.src_komaid = board(undo)
@@ -1790,6 +1814,7 @@
             'tegomaw(pop - 1) = tegomaw(pop - 1) - 1
             Dim d As MoveData = New MoveData
             d.hand = pop
+            d.komaID = FindIDPop(pop - 1, WHITE)
             d.org_pos = undo
             d.dst_pos = locate
             'd.src_komaid = board(undo)
@@ -1809,6 +1834,7 @@
             'tegomab(pop - 15) = tegomab(pop - 15) - 1
             Dim d As MoveData = New MoveData
             d.hand = pop
+            d.komaID = FindIDPop(pop - 15, BLACK)
             d.org_pos = undo
             d.dst_pos = locate
             'd.src_komaid = board(undo)
@@ -2039,7 +2065,7 @@
         modosi(MIdx) = d
         MIdx = MIdx + 1
         If d.hand <> BLANK Then
-            KomaOki(d.dst_pos, d.hand)
+            KomaOki(d.dst_pos, d.hand, d.komaID)
             GoTo LOG_WRITE
         End If
         KomaTori(d.dst_pos)
@@ -2052,9 +2078,9 @@
             CheckBit += 1
         End If
         'board(d.dst_pos) = board(d.org_pos)
-        SetBoard(d.dst_pos, board(d.org_pos))
+        SetBoard(d.dst_pos, board(d.org_pos), d.komaID)
         'board(d.org_pos) = 0
-        SetBoard(d.org_pos, 0)
+        SetBoard(d.org_pos, 0, d.komaID)
         If d.classup Then
             ClassUp(d.dst_pos)
         Else
@@ -2066,17 +2092,17 @@ LOG_WRITE:
         End If
     End Sub
     Private Sub UnmakeMove(ByVal d As MoveData, ByRef MIdx As Integer)
-        modosi(MIdx) = d
         MIdx = MIdx - 1
+        modosi(MIdx) = d
         If d.hand <> BLANK Then
             KomaModosi(d.dst_pos)
             'board(d.r2) = 0
-            SetBoard(d.dst_pos, 0)
+            SetBoard(d.dst_pos, 0, d.komaID)
             Exit Sub
         End If
         'board(d.r) = d.src
-        SetBoard(d.org_pos, d.src_komaid)
-        KomaKaeshi(d.dst_pos, d.dst_komaid)
+        SetBoard(d.org_pos, d.src_komaid, d.komaID)
+        KomaKaeshi(d.dst_pos, d.dst_komaid, d.komaID)
     End Sub
     Private Function Question() As Boolean
         Question = True
@@ -2133,28 +2159,51 @@ LOG_WRITE:
     Private Sub KomaTori(ByVal locate)
         Dim t As Integer
         t = board(locate)
+        If t = 0 Then
+            Exit Sub
+        End If
+        Dim id = FindID(locate)
+        Dim p As PieceID = Piece(id)
         If 15 <= t Then
+            p.captured = WHITE
+            p.owner = WHITE
             t = Ura_Omote(t)
             tegomaw(t) = tegomaw(t) + 1
         ElseIf 1 <= t And t <= 14 Then
+            p.captured = BLACK
+            p.owner = BLACK
             t = Ura_Omote(t)
             tegomab(t) = tegomab(t) + 1
         End If
+        p.kind = t
+        Piece(id) = p
     End Sub
     Private Sub KomaModosi(ByVal locate)
         Dim t As Integer
         t = board(locate)
+        If t = 0 Then
+            Exit Sub
+        End If
+        Dim id = FindID(locate)
+        Dim p As PieceID = Piece(id)
         If 15 <= t Then
+            p.captured = BLACK
+            p.owner = BLACK
             t = Ura_Omote(t)
             tegomab(t) = tegomab(t) + 1
         ElseIf 1 <= t And t <= 14 Then
+            p.captured = WHITE
+            p.owner = WHITE
             t = Ura_Omote(t)
             tegomaw(t) = tegomaw(t) + 1
         End If
+        p.kind = t
+        Piece(id) = p
     End Sub
-    Private Sub KomaOki(ByVal locate, ByVal t)
+    Private Sub KomaOki(ByVal locate, ByVal t, ByVal id)
         'board(locate) = t
-        SetBoard(locate, t)
+        SetBoard(locate, t, id)
+        Dim p As PieceID = Piece(id)
         If 15 <= t Then
             t = Ura_Omote(t)
             tegomab(t) = tegomab(t) - 1
@@ -2162,10 +2211,13 @@ LOG_WRITE:
             t = Ura_Omote(t)
             tegomaw(t) = tegomaw(t) - 1
         End If
+        p.kind = t
+        Piece(id) = p
     End Sub
-    Private Sub KomaKaeshi(ByVal locate, ByVal t)
+    Private Sub KomaKaeshi(ByVal locate, ByVal t, ByVal id)
         'board(locate) = t
-        SetBoard(locate, t)
+        SetBoard(locate, t, id)
+        Dim p As PieceID = Piece(id)
         If 15 <= t Then
             t = Ura_Omote(t)
             tegomaw(t) = tegomaw(t) - 1
@@ -2173,6 +2225,8 @@ LOG_WRITE:
             t = Ura_Omote(t)
             tegomab(t) = tegomab(t) - 1
         End If
+        p.kind = t
+        Piece(id) = p
     End Sub
     Private Sub AddKihu(ByVal locate As Integer)
         Dim x As Integer
@@ -2972,7 +3026,7 @@ LOG_WRITE:
         Dim s1 As String
         For i = 0 To Piece.Count - 1
             Dim p = Piece(i)
-            s1 += p.id.ToString + "," + p.kind.ToString + "," + p.owner.ToString + "," + p.captured.ToString + " "
+            s1 += p.id.ToString + "," + p.kind.ToString + "," + p.place.ToString + "," + p.owner.ToString + "," + p.captured.ToString + " "
             If i Mod 2 = 1 Then
                 s1 += vbCrLf
             End If
