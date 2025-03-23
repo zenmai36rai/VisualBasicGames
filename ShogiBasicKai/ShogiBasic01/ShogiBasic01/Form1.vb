@@ -652,6 +652,12 @@
         End If
         Return 0
     End Function
+    Class PieceID
+        Public id As Integer = -1
+        Public kind As Integer = 0
+        Public captured As Integer = 0
+    End Class
+    Dim Piece As List(Of PieceID)
     Class ShogiBoard
         Public _all = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80}
         Public _board = {16, 17, 18, 19, 22, 19, 18, 17, 16,
@@ -685,6 +691,7 @@
     Public _b As ShogiBoard = New ShogiBoard()
     Public _JyosekiDictionary As Dictionary(Of String, String) = New Dictionary(Of String, String)
     Private Sub Init() Handles Me.HandleCreated
+        Piece = New List(Of PieceID)
         Node = New List(Of MoveData)
         For n = 0 To (BRANCH_WIDTH * (YOMI_DEPTH + 1)) Step 1
             Node.Add(New MoveData())
@@ -712,6 +719,18 @@
         board = _b._board
         tegomaw = _b._tegomaw
         tegomab = _b._tegomab
+        Dim id = 0
+        For i = 0 To 80 Step 1
+            Dim k = board(i)
+            If k <> 0 Then
+                Dim pi As PieceID = New PieceID
+                pi.id = id
+                pi.kind = k
+                pi.captured = 0
+                Piece.Add(pi)
+                id += 1
+            End If
+        Next
         Dim s As String = _b.GetBoardString(board)
         For i = 0 To 80 Step 1
             Dim k = board(i)
@@ -2906,7 +2925,7 @@ LOG_WRITE:
     Private Sub RichTextBox1_TextChanged(sender As Object, e As EventArgs) Handles RichTextBox1.TextChanged
 
     End Sub
-    Private Sub Button83_Click(sender As Object, e As EventArgs) Handles Button83.Click
+    Private Sub DispBitBoard()
         Dim s As String
         Dim mask As Int64 = &B111111111
         For i = 0 To 6 Step 1
@@ -2933,8 +2952,7 @@ LOG_WRITE:
         RichTextBox1.Clear()
         RichTextBox1.Text = s + vbCrLf + s2 + vbCrLf + s3 + vbCrLf + s4
     End Sub
-
-    Private Sub Button84_Click(sender As Object, e As EventArgs) Handles Button84.Click
+    Private Sub DispEval()
         Dim s1 As String = "先手駒得:" + Convert.ToString(WTop.komatoku)
         Dim s2 As String = "先手駒位:" + Convert.ToString(WTop.komaichi)
         Dim s3 As String = "先手駒利:" + Convert.ToString(WTop.komakiki)
@@ -2943,6 +2961,26 @@ LOG_WRITE:
         Dim s6 As String = "後手駒利:" + Convert.ToString(BTop.komakiki)
         RichTextBox1.Clear()
         RichTextBox1.Text = s1 + vbCrLf + s2 + vbCrLf + s3 + vbCrLf + s4 + vbCrLf + s5 + vbCrLf + s6
+    End Sub
+    Private Sub DispPiece()
+        Dim s1 As String
+        For i = 0 To Piece.Count - 1
+            Dim p = Piece(i)
+            s1 += p.id.ToString + "," + p.kind.ToString + "," + p.captured.ToString + " "
+            If i Mod 2 = 1 Then
+                s1 += vbCrLf
+            End If
+        Next
+        RichTextBox1.Clear()
+        RichTextBox1.Text = s1
+    End Sub
+    Private Sub Button83_Click(sender As Object, e As EventArgs) Handles Button83.Click
+        DispBitBoard()
+    End Sub
+
+    Private Sub Button84_Click(sender As Object, e As EventArgs) Handles Button84.Click
+        DispPiece()
+        'DispEval()
     End Sub
 
     Private Sub SaveJyoseki()

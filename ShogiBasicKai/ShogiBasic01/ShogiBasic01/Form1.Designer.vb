@@ -127,6 +127,8 @@ Partial Class Form1
         Me.PictureBox1 = New System.Windows.Forms.PictureBox()
         Me.Button255 = New System.Windows.Forms.Button()
         Me.ListBox1 = New System.Windows.Forms.ListBox()
+        Me.ContextMenuStrip1 = New System.Windows.Forms.ContextMenuStrip(Me.components)
+        Me.クリップボードにコピーToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.TextBox1 = New System.Windows.Forms.TextBox()
         Me.TextBox2 = New System.Windows.Forms.TextBox()
         Me.ButtonRobo = New System.Windows.Forms.Button()
@@ -138,8 +140,6 @@ Partial Class Form1
         Me.Button84 = New System.Windows.Forms.Button()
         Me.Button85 = New System.Windows.Forms.Button()
         Me.Button86 = New System.Windows.Forms.Button()
-        Me.ContextMenuStrip1 = New System.Windows.Forms.ContextMenuStrip(Me.components)
-        Me.クリップボードにコピーToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.Panel1.SuspendLayout()
         Me.Panel3.SuspendLayout()
         Me.Panel2.SuspendLayout()
@@ -1361,6 +1361,18 @@ Partial Class Form1
         Me.ListBox1.Size = New System.Drawing.Size(94, 40)
         Me.ListBox1.TabIndex = 100
         '
+        'ContextMenuStrip1
+        '
+        Me.ContextMenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.クリップボードにコピーToolStripMenuItem})
+        Me.ContextMenuStrip1.Name = "ContextMenuStrip1"
+        Me.ContextMenuStrip1.Size = New System.Drawing.Size(169, 26)
+        '
+        'クリップボードにコピーToolStripMenuItem
+        '
+        Me.クリップボードにコピーToolStripMenuItem.Name = "クリップボードにコピーToolStripMenuItem"
+        Me.クリップボードにコピーToolStripMenuItem.Size = New System.Drawing.Size(168, 22)
+        Me.クリップボードにコピーToolStripMenuItem.Text = "クリップボードにコピー"
+        '
         'TextBox1
         '
         Me.TextBox1.BackColor = System.Drawing.Color.LimeGreen
@@ -1435,7 +1447,6 @@ Partial Class Form1
         Me.RichTextBox1.Size = New System.Drawing.Size(174, 349)
         Me.RichTextBox1.TabIndex = 107
         Me.RichTextBox1.Text = ""
-        Me.RichTextBox1.Visible = False
         '
         'Button83
         '
@@ -1445,7 +1456,6 @@ Partial Class Form1
         Me.Button83.TabIndex = 108
         Me.Button83.Text = "Button83"
         Me.Button83.UseVisualStyleBackColor = True
-        Me.Button83.Visible = False
         '
         'Button84
         '
@@ -1455,7 +1465,6 @@ Partial Class Form1
         Me.Button84.TabIndex = 109
         Me.Button84.Text = "Button84"
         Me.Button84.UseVisualStyleBackColor = True
-        Me.Button84.Visible = False
         '
         'Button85
         '
@@ -1475,24 +1484,12 @@ Partial Class Form1
         Me.Button86.Text = "load"
         Me.Button86.UseVisualStyleBackColor = True
         '
-        'ContextMenuStrip1
-        '
-        Me.ContextMenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.クリップボードにコピーToolStripMenuItem})
-        Me.ContextMenuStrip1.Name = "ContextMenuStrip1"
-        Me.ContextMenuStrip1.Size = New System.Drawing.Size(169, 26)
-        '
-        'クリップボードにコピーToolStripMenuItem
-        '
-        Me.クリップボードにコピーToolStripMenuItem.Name = "クリップボードにコピーToolStripMenuItem"
-        Me.クリップボードにコピーToolStripMenuItem.Size = New System.Drawing.Size(168, 22)
-        Me.クリップボードにコピーToolStripMenuItem.Text = "クリップボードにコピー"
-        '
         'Form1
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 12.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.BackColor = System.Drawing.Color.DarkGreen
-        Me.ClientSize = New System.Drawing.Size(624, 416)
+        Me.ClientSize = New System.Drawing.Size(820, 416)
         Me.Controls.Add(Me.Button86)
         Me.Controls.Add(Me.Button85)
         Me.Controls.Add(Me.Button84)
