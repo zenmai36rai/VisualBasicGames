@@ -655,6 +655,7 @@
     Class PieceID
         Public id As Integer = -1
         Public kind As Integer = 0
+        Public owner As Integer = 0
         Public captured As Integer = 0
     End Class
     Dim Piece As List(Of PieceID)
@@ -727,6 +728,11 @@
                 pi.id = id
                 pi.kind = k
                 pi.captured = 0
+                If k <= 14 Then
+                    pi.owner = WHITE
+                Else
+                    pi.owner = BLACK
+                End If
                 Piece.Add(pi)
                 id += 1
             End If
@@ -2966,7 +2972,7 @@ LOG_WRITE:
         Dim s1 As String
         For i = 0 To Piece.Count - 1
             Dim p = Piece(i)
-            s1 += p.id.ToString + "," + p.kind.ToString + "," + p.captured.ToString + " "
+            s1 += p.id.ToString + "," + p.kind.ToString + "," + p.owner.ToString + "," + p.captured.ToString + " "
             If i Mod 2 = 1 Then
                 s1 += vbCrLf
             End If
