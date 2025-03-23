@@ -1606,22 +1606,18 @@
             For i = 0 To 6 '手駒の玉は読まない
                 If wb = WHITE Then
                     If tegomaw(i) > 0 Then
-                        range = HandRange(wb, i)
+                        range = HandRange(wb, i).ToArray
                         For j = 0 To range.Length - 1 Step 1
-                            If range(j) <> BLANK Then
-                                Node(idx) = TegomaRange(i)(range(j))
-                                idx += 1
-                            End If
+                            Node(idx) = TegomaRange(i)(range(j))
+                            idx += 1
                         Next
                     End If
                 Else
                     If tegomab(i) > 0 Then
-                        range = HandRange(wb, i)
+                        range = HandRange(wb, i).ToArray
                         For j = 0 To range.Length - 1 Step 1
-                            If range(j) <> BLANK Then
-                                Node(idx) = TegomaRange(i + 15)(range(j))
-                                idx += 1
-                            End If
+                            Node(idx) = TegomaRange(i + 15)(range(j))
+                            idx += 1
                         Next
                     End If
                 End If
@@ -1812,7 +1808,7 @@
         TextBox3.Text = Hyouka().ToString
         TextBox4.Text = -Hyouka().ToString
     End Sub
-    Private Function HandRange(ByVal wb As Integer, ByVal idx As Integer) As Array
+    Private Function HandRange(ByVal wb As Integer, ByVal idx As Integer) As List(Of Integer)
         Dim koma = KomaIdx(idx, wb)
         range = all.Clone()
         For i = 0 To 80 Step 1
@@ -1868,7 +1864,10 @@
                 range(i) = BLANK
             Next
         End If
-        HandRange = range.Clone
+        Dim ret As List(Of Integer) = New List(Of Integer)
+        ret.AddRange(range)
+        ret.RemoveAll(Function(n) n = BLANK)
+        HandRange = ret
     End Function
     Private Function TakeHand(ByVal koma As Integer) As Array
         Dim b As Button
