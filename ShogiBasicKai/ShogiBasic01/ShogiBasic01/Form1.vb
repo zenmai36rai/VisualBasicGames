@@ -2,7 +2,7 @@
     Const WHITE As Integer = 1
     Const BLACK As Integer = -1
     Const USE_AB As Boolean = True
-    Const YOMI_DEPTH As Integer = 1
+    Const YOMI_DEPTH As Integer = 3
     Const HAND_RIMIT As Integer = 1
     Const HAND_READ As Boolean = True
     Const NARAZU_READ As Boolean = False
@@ -2167,20 +2167,22 @@ LOG_WRITE:
         End If
         Dim id = FindID(locate)
         Dim b = board(locate)
-        Dim p As PieceID = Piece(id)
+        Dim wb = WHITE
         If 15 <= t Then
-            p.captured = WHITE
-            p.owner = WHITE
             t = Ura_Omote(t)
             tegomaw(t) = tegomaw(t) + 1
         ElseIf 1 <= t And t <= 14 Then
-            p.captured = BLACK
-            p.owner = BLACK
+            wb = BLACK
             t = Ura_Omote(t)
             tegomab(t) = tegomab(t) + 1
         End If
-        p.kind = t
-        Piece(id) = p
+        If id <> -1 Then
+            Dim p As PieceID = Piece(id)
+            p.captured = wb
+            p.owner = wb
+            p.kind = t
+            Piece(id) = p
+        End If
     End Sub
     Private Sub KomaModosi(ByVal locate)
         Dim t As Integer
@@ -2189,20 +2191,22 @@ LOG_WRITE:
             Exit Sub
         End If
         Dim id = FindID(locate)
-        Dim p As PieceID = Piece(id)
+        Dim wb = BLACK
         If 15 <= t Then
-            p.captured = BLACK
-            p.owner = BLACK
             t = Ura_Omote(t)
             tegomab(t) = tegomab(t) + 1
         ElseIf 1 <= t And t <= 14 Then
-            p.captured = WHITE
-            p.owner = WHITE
+            wb = WHITE
             t = Ura_Omote(t)
             tegomaw(t) = tegomaw(t) + 1
         End If
-        p.kind = t
-        Piece(id) = p
+        If id <> -1 Then
+            Dim p As PieceID = Piece(id)
+            p.captured = wb
+            p.owner = wb
+            p.kind = t
+            Piece(id) = p
+        End If
     End Sub
     Private Sub KomaOki(ByVal locate, ByVal t, ByVal id)
         'board(locate) = t
