@@ -20,12 +20,12 @@
 
     Private CheckBit As Integer = 0
     Class MoveData
-        Public komaID As Byte
-        Public org_pos As Byte
-        Public dst_pos As Byte
-        Public src_komaid As Byte
-        Public dst_komaid As Byte
-        Public hand As Byte = BLANK
+        Public komaID As Integer
+        Public org_pos As Integer
+        Public dst_pos As Integer
+        Public src_komaid As Integer
+        Public dst_komaid As Integer
+        Public hand As Integer = BLANK
         Public classup As Boolean = True
         Public eval As Integer = 0
         Public best_eval As Integer = 0
@@ -642,15 +642,17 @@
         End If
         If 1 <= koma And koma <= 14 Then
             board(dist) = koma
-            Piece(id).place = dist
-            Piece(id).captured = 0
+            If id <> -1 Then
+                Piece(id).place = dist
+            End If
             bb_white.AddBoard(dist)
             bb_black.RemoveBoard(dist)
         End If
         If 15 <= koma Then
             board(dist) = koma
-            Piece(id).place = dist
-            Piece(id).captured = 0
+            If id <> -1 Then
+                Piece(id).place = dist
+            End If
             bb_black.AddBoard(dist)
             bb_white.RemoveBoard(dist)
         End If
@@ -1747,6 +1749,7 @@
         Dim b As Button
         Dim c As Integer
         Dim r As Integer
+        Dim d As MoveData = New MoveData
         r = False
         If state = ST_FREE Then
             undo = locate
@@ -1778,14 +1781,13 @@
             Next
         ElseIf state = ST_WHITE_CHOOSE And RangeCheck(locate) Then
             'MoveChara(locate)
-            Dim d As MoveData = New MoveData
             d.hand = BLANK
             d.komaID = FindID(undo)
             d.org_pos = undo
             d.dst_pos = locate
             d.src_komaid = board(undo)
             d.dst_komaid = board(locate)
-            MakeMove(d, True, DummyIdx)
+            MakeMove(d, True, ModosiIdx)
             DispAll()
             AddKihu(locate)
             state = ST_FREE
@@ -1798,27 +1800,27 @@
             state = 0
         ElseIf state = ST_BLACK_CHOOSE And RangeCheck(locate) Then
             'MoveChara(locate)
-            Dim d As MoveData = New MoveData
             d.hand = BLANK
             d.komaID = FindID(undo)
             d.org_pos = undo
             d.dst_pos = locate
             d.src_komaid = board(undo)
             d.dst_komaid = board(locate)
-            MakeMove(d, True, DummyIdx)
+            MakeMove(d, True, ModosiIdx)
             DispAll()
             AddKihu(locate)
             state = ST_FREE
         ElseIf state = ST_WHITE_MOVE And RangeCheck(locate) Then
             'board(locate) = pop
             'tegomaw(pop - 1) = tegomaw(pop - 1) - 1
-            Dim d As MoveData = New MoveData
             d.hand = pop
             d.komaID = FindIDPop(pop - 1, WHITE)
             d.org_pos = undo
             d.dst_pos = locate
-            'd.src_komaid = board(undo)
-            'd.dst_komaid = board(locate)
+            If undo <> 255 Then
+                d.src_komaid = board(undo)
+            End If
+            d.dst_komaid = board(locate)
             MakeMove(d, True, 0)
             DispAll()
             AddKihu(locate)
@@ -1832,14 +1834,15 @@
         ElseIf state = ST_BLACK_MOVE And RangeCheck(locate) Then
             'board(locate) = pop
             'tegomab(pop - 15) = tegomab(pop - 15) - 1
-            Dim d As MoveData = New MoveData
             d.hand = pop
             d.komaID = FindIDPop(pop - 15, BLACK)
             d.org_pos = undo
             d.dst_pos = locate
-            'd.src_komaid = board(undo)
-            'd.dst_komaid = board(locate)
-            MakeMove(d, True, DummyIdx)
+            If undo <> 255 Then
+                d.src_komaid = board(undo)
+            End If
+            d.dst_komaid = board(locate)
+            MakeMove(d, True, ModosiIdx)
             DispAll()
             AddKihu(locate)
             undo = BLANK
@@ -2163,6 +2166,7 @@ LOG_WRITE:
             Exit Sub
         End If
         Dim id = FindID(locate)
+        Dim b = board(locate)
         Dim p As PieceID = Piece(id)
         If 15 <= t Then
             p.captured = WHITE
@@ -2978,7 +2982,7 @@ LOG_WRITE:
     End Sub
 
     Private Sub Button82_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button82.Click
-        UnmakeMove(modosi(DummyIdx), DummyIdx)
+        UnmakeMove(modosi(ModosiIdx), ModosiIdx)
         DispAll()
     End Sub
 
