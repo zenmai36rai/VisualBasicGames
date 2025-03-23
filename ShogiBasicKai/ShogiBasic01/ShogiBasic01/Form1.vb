@@ -1602,27 +1602,6 @@
             nirami_w = 0
             nirami_b = 0
         End If
-        If HAND_READ And (depth > HAND_RIMIT) Then
-            For i = 0 To 6 '手駒の玉は読まない
-                If wb = WHITE Then
-                    If tegomaw(i) > 0 Then
-                        range = HandRange(wb, i).ToArray
-                        For j = 0 To range.Length - 1 Step 1
-                            Node(idx) = TegomaRange(i)(range(j))
-                            idx += 1
-                        Next
-                    End If
-                Else
-                    If tegomab(i) > 0 Then
-                        range = HandRange(wb, i).ToArray
-                        For j = 0 To range.Length - 1 Step 1
-                            Node(idx) = TegomaRange(i + 15)(range(j))
-                            idx += 1
-                        Next
-                    End If
-                End If
-            Next
-        End If
         Dim bb As BitBoard = New BitBoard
         If wb = WHITE Then
             bb.b1 = bb_white.b1
@@ -1649,6 +1628,23 @@
             pos = bb.GetNext()
         End While
         InitGenerate = False
+        If HAND_READ And (depth > HAND_RIMIT) Then
+            For i = 0 To 6 '手駒の玉は読まない
+                If wb = WHITE And tegomaw(i) > 0 Then
+                    range = HandRange(wb, i).ToArray
+                    For j = 0 To range.Length - 1 Step 1
+                        Node(idx) = TegomaRange(i)(range(j))
+                        idx += 1
+                    Next
+                ElseIf tegomab(i) > 0 Then
+                    range = HandRange(wb, i).ToArray
+                    For j = 0 To range.Length - 1 Step 1
+                        Node(idx) = TegomaRange(i + 15)(range(j))
+                        idx += 1
+                    Next
+                End If
+            Next
+        End If
         Return idx
     End Function
     Private Sub RobotMove(ByVal wb As Integer)
