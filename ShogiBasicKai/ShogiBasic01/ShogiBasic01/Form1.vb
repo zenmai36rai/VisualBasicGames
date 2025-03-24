@@ -3,7 +3,7 @@
     Const BLACK As Integer = -1
     Const USE_AB As Boolean = True
     Const USE_JYOSEKI As Boolean = False
-    Const YOMI_DEPTH As Integer = 3
+    Const YOMI_DEPTH As Integer = 1
     Const HAND_RIMIT As Integer = 1
     Const HAND_READ As Boolean = True
     Const NARAZU_READ As Boolean = False
@@ -575,12 +575,10 @@
         If wb = WHITE And it < tegomaw.Count Then
             Dim p As PieceID = Piece(tegomaw(it))
             Dim ret = p.kind
-            ret = ClassDown(ret)
             Return ret
-        ElseIf it < tegomab.Count Then
+        ElseIf wb = BLACK And it < tegomab.Count Then
             Dim p As PieceID = Piece(tegomab(it))
             Dim ret = p.kind
-            ret = ClassDown(ret)
             Return ret
         End If
         Return DUMMY_ID
@@ -591,15 +589,15 @@
         Dim i As Integer
         If wb = WHITE Then
             For i = 0 To tegomaw.Count - 1 Step 1
-                Dim koma = GetTegoma(i, WHITE)
-                If koma = k Or koma + 14 = k Then
+                Dim koma = ClassDown(GetTegoma(i, WHITE))
+                If koma = k Or koma + 14 Then
                     Dim p As PieceID = Piece(tegomaw(i))
                     Return p.id
                 End If
             Next
         Else
             For i = 0 To tegomab.Count - 1 Step 1
-                Dim koma = GetTegoma(i, BLACK)
+                Dim koma = ClassDown(GetTegoma(i, BLACK))
                 If koma = k Or koma + 14 = k Then
                     Dim p As PieceID = Piece(tegomab(i))
                     Return p.id
@@ -655,30 +653,45 @@
     Dim WTop As EvalBuff = New EvalBuff()
     Dim BTop As EvalBuff = New EvalBuff()
 
-    Private Function SetBoard(ByVal dist As Integer, ByVal koma As Integer, ByVal id As Integer) As Integer
-        If 0 = koma Then
-            board(dist) = koma
-            If id <> DUMMY_ID Then
-                Piece(id).place = dist
+    Private Function SetBoard(ByVal from As Integer, ByVal dist As Integer, ByVal id As Integer) As Integer
+        If id <> DUMMY_ID Then
+            Dim koma = Piece(id).kind
+            If 1 <= koma And koma <= 14 Then
+                board(dist) = koma
+                bb_white.AddBoard(dist)
+                bb_black.RemoveBoard(dist)
             End If
-            bb_white.RemoveBoard(dist)
-            bb_black.RemoveBoard(dist)
+            If 15 <= koma Then
+                board(dist) = koma
+                bb_black.AddBoard(dist)
+                bb_white.RemoveBoard(dist)
+            End If
+            Piece(id).place = dist
         End If
+        If from <> BLANK Then
+            board(from) = 0
+            bb_white.RemoveBoard(from)
+            bb_black.RemoveBoard(from)
+        End If
+        Return 0
+    End Function
+    Private Function SetBoardKind(ByVal from As Integer, ByVal dist As Integer, ByVal id As Integer, ByVal kind As Integer) As Integer
+        Dim koma = kind
         If 1 <= koma And koma <= 14 Then
             board(dist) = koma
-            If id <> DUMMY_ID Then
-                Piece(id).place = dist
-            End If
             bb_white.AddBoard(dist)
             bb_black.RemoveBoard(dist)
         End If
         If 15 <= koma Then
             board(dist) = koma
-            If id <> DUMMY_ID Then
-                Piece(id).place = dist
-            End If
             bb_black.AddBoard(dist)
             bb_white.RemoveBoard(dist)
+        End If
+        Piece(id).place = dist
+        If from <> BLANK Then
+            board(from) = 0
+            bb_white.RemoveBoard(from)
+            bb_black.RemoveBoard(from)
         End If
         Return 0
     End Function
@@ -1606,10 +1619,10 @@
             'BBuf.komatoku += tegomab(i) * KomaScore(KomaIdx(i, BLACK)) * 1.05
         Next
         For i = 0 To tegomaw.Count - 1
-            WBuf.komatoku += KomaScore(GetTegoma(i, WHITE)) * 1.05
+            WBuf.komatoku += KomaScore(ClassDown(GetTegoma(i, WHITE))) * 1.05
         Next
         For i = 0 To tegomab.Count - 1
-            BBuf.komatoku += KomaScore(GetTegoma(i, BLACK)) * 1.05
+            BBuf.komatoku += KomaScore(ClassDown(GetTegoma(i, BLACK))) * 1.05
         Next
         Hyouka += WBuf.komatoku
         Hyouka += WBuf.komaichi
@@ -1806,7 +1819,7 @@
             state = ST_FREE
             Me.Refresh()
             Me.Cursor = Cursors.WaitCursor
-            RobotMove(-1)
+            'RobotMove(-1)
             Me.Cursor = Cursors.Default
         ElseIf (state = ST_WHITE_CHOOSE Or state = ST_BLACK_CHOOSE) And undo = locate Then
             DispAll()
@@ -1838,7 +1851,7 @@
             state = ST_FREE
             Me.Refresh()
             Me.Cursor = Cursors.WaitCursor
-            RobotMove(-1)
+            'RobotMove(-1)
             Me.Cursor = Cursors.Default
         ElseIf state = ST_BLACK_MOVE And RangeCheck(Range, locate) Then
             'board(locate) = pop
@@ -1866,7 +1879,7 @@
     End Sub
     Private Function HandRange(ByVal wb As Integer, ByVal idx As Integer) As List(Of Integer)
         'Dim koma = KomaIdx(idx, wb)
-        Dim koma = GetTegoma(idx, wb)
+        Dim koma = ClassDown(GetTegoma(idx, wb))
         range = all.Clone()
         For i = 0 To 80 Step 1
             If board(i) <> 0 Then
@@ -2019,13 +2032,13 @@
         Dim tb = {0, 0, 0, 0, 0, 0, 0, 0}
         Dim i As Integer
         For i = 0 To tegomaw.Count - 1 Step 1
-            Dim koma = GetTegoma(i, WHITE)
+            Dim koma = ClassDown(GetTegoma(i, WHITE))
             If koma <> DUMMY_ID And 1 <= koma Then
                 tw(koma - 1) += 1
             End If
         Next
         For i = 0 To tegomab.Count - 1 Step 1
-            Dim koma = GetTegoma(i, BLACK)
+            Dim koma = ClassDown(GetTegoma(i, BLACK))
             If koma <> DUMMY_ID And 1 <= koma Then
                 If 15 <= koma Then
                     koma = koma - 14
@@ -2101,7 +2114,7 @@
         d.dst_kind = board(d.dst_pos)
         If d.hand <> BLANK Then
             Dim id = GetTegomaIDFromKind(d.hand, d.teban)
-            KomaOki(d.dst_pos, d.hand, id)
+            KomaOki(d.hand, d.dst_pos, id)
             GoTo LOG_WRITE
         End If
         d.capture = KomaTori(d.dst_pos)
@@ -2109,18 +2122,9 @@
             narimem = board(d.org_pos)
         End If
         If d.classup Then
-            ClassUp(d.org_pos, d.komaID)
+            ClassUp(d.org_pos, d.dst_pos, d.komaID)
         Else
-            CheckBit += 1
-        End If
-        'board(d.dst_pos) = board(d.org_pos)
-        SetBoard(d.dst_pos, d.src_kind, d.komaID)
-        'board(d.org_pos) = 0
-        SetBoard(d.org_pos, 0, DUMMY_ID)
-        If d.classup Then
-            ClassUp(d.dst_pos, d.komaID)
-        Else
-            CheckBit += 1
+            SetBoard(d.org_pos, d.dst_pos, d.komaID)
         End If
 LOG_WRITE:
         If DEBUG_LOG Then
@@ -2131,14 +2135,16 @@ LOG_WRITE:
     Private Sub UnmakeMove()
         Dim d As MoveData = modosi.Pop
         If d.hand <> BLANK Then
-            KomaModosi(d.dst_pos)
+            KomaModosi(d.komaID, d.teban)
             'board(d.r2) = 0
-            SetBoard(d.dst_pos, 0, d.komaID)
+            SetBoard(BLANK, d.dst_pos, d.komaID)
             Exit Sub
         End If
         'board(d.r) = d.src
-        SetBoard(d.org_pos, d.src_kind, d.komaID)
-        KomaKaeshi(d.dst_pos, d.dst_kind, d.capture)
+        SetBoardKind(d.dst_pos, d.org_pos, d.komaID, d.src_kind)
+        If d.capture <> BLANK And d.capture <> DUMMY_ID Then
+            KomaKaeshi(BLANK, d.dst_pos, d.capture, d.dst_kind)
+        End If
     End Sub
     Private Function Question() As Boolean
         Question = True
@@ -2149,13 +2155,13 @@ LOG_WRITE:
             Question = False
         End If
     End Function
-    Private Sub ClassUp(ByVal locate As Integer, ByVal id As Integer)
+    Private Sub ClassUp(ByVal org As Integer, ByVal locate As Integer, ByVal id As Integer)
         Dim unit As Integer
-        unit = board(locate)
+        unit = board(org)
         Dim unit_up As Integer = unit
-        If IsWhite(locate) And 0 <= locate And locate <= 26 Then
+        If IsWhite(org) And ((0 <= locate And locate <= 26) Or (0 <= org And org <= 26)) Then
             If Question() = False Then
-                Exit Sub
+                GoTo SET_BOARD
             End If
             Select Case unit
                 Case 1, 2, 3, 4
@@ -2164,7 +2170,7 @@ LOG_WRITE:
                     unit_up = unit + 7
             End Select
         End If
-        If IsBlack(locate) And 54 <= locate And locate <= 80 Then
+        If IsBlack(org) And ((54 <= locate And locate <= 80) Or (54 <= org And org <= 80)) Then
             Select Case unit
                 Case 15, 16, 17, 18
                     unit_up = unit + 8
@@ -2173,9 +2179,10 @@ LOG_WRITE:
             End Select
         End If
         If unit <> unit_up Then
-            SetBoard(locate, unit_up, id)
             Piece(id).kind = unit_up
         End If
+SET_BOARD:
+        SetBoard(org, locate, id)
     End Sub
     Private Function ClassDown(ByVal kind As Integer) As Integer
         Dim unit As Integer = kind
@@ -2202,7 +2209,6 @@ LOG_WRITE:
             Return DUMMY_ID
         End If
         Dim id = FindID(locate)
-        Dim b = board(locate)
         Dim wb = WHITE
         If 15 <= t Then
             t = Ura_Omote(t)
@@ -2221,37 +2227,22 @@ LOG_WRITE:
         End If
         Return id
     End Function
-    Private Sub KomaModosi(ByVal locate)
-        Dim t As Integer
-        t = board(locate)
-        If t = 0 Then
-            Exit Sub
-        End If
-        Dim id = FindID(locate)
-        If id = DUMMY_ID Then
-            Exit Sub
-        End If
-        Dim wb = BLACK
-        If 15 <= t Then
-            t = Ura_Omote(t)
-            'tegomab(t) = tegomab(t) + 1
+    Private Sub KomaModosi(ByVal id, ByVal teban)
+        If teban = WHITE Then
             tegomab.Add(id)
-        ElseIf 1 <= t And t <= 14 Then
-            wb = WHITE
-            t = Ura_Omote(t)
-            'tegomaw(t) = tegomaw(t) + 1
+        Else
             tegomaw.Add(id)
         End If
         If id <> DUMMY_ID Then
-            Piece(id).captured = wb
-            Piece(id).owner = wb
-            Piece(id).kind = t
+            Piece(id).captured = teban
+            Piece(id).owner = teban
         End If
     End Sub
-    Private Sub KomaOki(ByVal locate, ByVal t, ByVal id)
+    Private Sub KomaOki(ByVal hand As Integer, ByVal locate As Integer, ByVal id As Integer)
         'board(locate) = t
-        SetBoard(locate, t, id)
+        SetBoard(hand, locate, id)
         Dim p As PieceID = Piece(id)
+        Dim t As Integer = hand
         If 15 <= t Then
             't = Ura_Omote(t)
             'tegomab(t) = tegomab(t) - 1
@@ -2263,9 +2254,10 @@ LOG_WRITE:
         End If
         Piece(id).kind = t
     End Sub
-    Private Sub KomaKaeshi(ByVal locate, ByVal t, ByVal id)
+    Private Sub KomaKaeshi(ByVal org, ByVal locate, ByVal id, ByVal kind)
         'board(locate) = t
-        SetBoard(locate, t, DUMMY_ID)
+        SetBoardKind(org, locate, id, kind)
+        Dim t = Piece(id).kind
         If 15 <= t Then
             't = Ura_Omote(t)
             'tegomaw(t) = tegomaw(t) - 1
