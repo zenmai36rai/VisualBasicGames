@@ -582,6 +582,9 @@
             For i = 0 To tegomaw.Count - 1
                 Dim p As PieceID = Piece(tegomaw(i))
                 Dim ret = p.kind
+                If ret < 1 Or 8 < ret Then
+                    Dim dbg = ret
+                End If
                 Return ret
             Next
         Else
@@ -1587,7 +1590,7 @@
             WBuf.komatoku += KomaScore(GetTegoma(i, WHITE)) * 1.05
         Next
         For i = 0 To tegomab.Count - 1
-            WBuf.komatoku += KomaScore(GetTegoma(i, BLACK)) * 1.05
+            BBuf.komatoku += KomaScore(GetTegoma(i, BLACK)) * 1.05
         Next
         Hyouka += WBuf.komatoku
         Hyouka += WBuf.komaichi
