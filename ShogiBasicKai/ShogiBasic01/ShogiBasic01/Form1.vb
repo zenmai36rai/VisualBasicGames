@@ -2184,7 +2184,7 @@ LOG_WRITE:
         End If
         If unit <> unit_up Then
             SetBoard(locate, unit_up, id)
-            Piece(id).kind = unit
+            Piece(id).kind = unit_up
         End If
     End Sub
     Private Function ClassDown(ByVal kind As Integer) As Integer
