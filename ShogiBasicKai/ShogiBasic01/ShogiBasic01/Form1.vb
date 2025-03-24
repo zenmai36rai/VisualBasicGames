@@ -574,31 +574,34 @@
     Private Function GetTegoma(ByVal it As Integer, ByVal wb As Integer) As Integer
         If wb = WHITE And it < tegomaw.Count Then
             Dim p As PieceID = Piece(tegomaw(it))
+            If p.id <> tegomaw(it) Then
+                Return DUMMY_ID
+            End If
             Dim ret = p.kind
             Return ret
         ElseIf wb = BLACK And it < tegomab.Count Then
             Dim p As PieceID = Piece(tegomab(it))
+            If p.id <> tegomaw(it) Then
+                Return DUMMY_ID
+            End If
             Dim ret = p.kind
             Return ret
         End If
         Return DUMMY_ID
     End Function
     Private Function GetTegomaIDFromKind(ByVal k As Integer, ByVal wb As Integer) As Integer
-        Dim tw = {0, 0, 0, 0, 0, 0, 0, 0}
-        Dim tb = {0, 0, 0, 0, 0, 0, 0, 0}
-        Dim i As Integer
         If wb = WHITE Then
             For i = 0 To tegomaw.Count - 1 Step 1
-                Dim koma = ClassDown(GetTegoma(i, WHITE))
-                If koma = k Or koma + 14 Then
+                Dim koma = Piece(tegomaw(i)).omote
+                If koma = k Then
                     Dim p As PieceID = Piece(tegomaw(i))
                     Return p.id
                 End If
             Next
         Else
             For i = 0 To tegomab.Count - 1 Step 1
-                Dim koma = ClassDown(GetTegoma(i, BLACK))
-                If koma = k Or koma + 14 = k Then
+                Dim koma = Piece(tegomab(i)).omote + 14
+                If koma = k Then
                     Dim p As PieceID = Piece(tegomab(i))
                     Return p.id
                 End If
@@ -698,6 +701,7 @@
     Class PieceID
         Public id As Integer = -1
         Public kind As Integer = 0
+        Public omote As Integer = 0
         Public place As Integer = BLANK
         Public owner As Integer = 0
         Public captured As Integer = 0
@@ -782,6 +786,11 @@
                 Dim pi As PieceID = New PieceID
                 pi.id = id
                 pi.kind = k
+                Dim omt = k
+                If omt >= 15 Then
+                    omt -= 14
+                End If
+                pi.omote = omt
                 pi.place = i
                 pi.captured = 0
                 If k <= 14 Then
@@ -1701,13 +1710,15 @@
         InitGenerate = False
         If False And HAND_READ And (depth > HAND_RIMIT) Then
             For i = 0 To 6 '手駒の玉は読まない
-                If wb = WHITE And tegomaw(i) > 0 Then
-                    range = HandRange(wb, i).ToArray
-                    For j = 0 To range.Length - 1 Step 1
-                        Node(idx) = TegomaRange(i)(range(j))
-                        Node(idx).teban = wb
-                        idx += 1
-                    Next
+                If wb = WHITE Then
+                    If tegomaw(i) > 0 Then
+                        range = HandRange(wb, i).ToArray
+                        For j = 0 To range.Length - 1 Step 1
+                            Node(idx) = TegomaRange(i)(range(j))
+                            Node(idx).teban = wb
+                            idx += 1
+                        Next
+                    End If
                 ElseIf tegomab(i) > 0 Then
                     range = HandRange(wb, i).ToArray
                     For j = 0 To range.Length - 1 Step 1
@@ -2032,22 +2043,15 @@
         Dim tb = {0, 0, 0, 0, 0, 0, 0, 0}
         Dim i As Integer
         For i = 0 To tegomaw.Count - 1 Step 1
-            Dim koma = ClassDown(GetTegoma(i, WHITE))
-            If koma <> DUMMY_ID And 1 <= koma Then
-                tw(koma - 1) += 1
-            End If
+            Dim koma = Piece(tegomaw(i)).omote
+            tw(koma - 1) += 1
         Next
         For i = 0 To tegomab.Count - 1 Step 1
-            Dim koma = ClassDown(GetTegoma(i, BLACK))
-            If koma <> DUMMY_ID And 1 <= koma Then
-                If 15 <= koma Then
-                    koma = koma - 14
-                End If
-                tb(koma - 1) += 1
-            End If
+            Dim koma = Piece(tegomab(i)).omote
+            tb(koma - 1) += 1
         Next
 
-        For i = 1 To 8 Step 1
+        For i = 1 To tw.Length Step 1
             GetHandWhite(i).Text = GetKomaName(i) + Str(tw(i - 1))
             If tw(i - 1) > 0 Then
                 GetHandWhite(i).Visible = True
@@ -2055,7 +2059,7 @@
                 GetHandWhite(i).Visible = False
             End If
         Next
-        For i = 1 To 8 Step 1
+        For i = 1 To tb.Length Step 1
             GetHandBlack(i).Text = GetKomaName(i) + Str(tb(i - 1))
             If tb(i - 1) > 0 Then
                 GetHandBlack(i).Visible = True
@@ -2243,6 +2247,9 @@ SET_BOARD:
     Private Sub KomaOki(ByVal hand As Integer, ByVal locate As Integer, ByVal id As Integer)
         'board(locate) = t
         SetBoard(hand, locate, id)
+        If id = DUMMY_ID Then
+            Exit Sub
+        End If
         Dim p As PieceID = Piece(id)
         Dim t As Integer = hand
         If 15 <= t Then
