@@ -2,7 +2,8 @@
     Const WHITE As Integer = 1
     Const BLACK As Integer = -1
     Const USE_AB As Boolean = True
-    Const YOMI_DEPTH As Integer = 3
+    Const USE_JYOSEKI As Boolean = False
+    Const YOMI_DEPTH As Integer = 1
     Const HAND_RIMIT As Integer = 1
     Const HAND_READ As Boolean = True
     Const NARAZU_READ As Boolean = False
@@ -15,7 +16,6 @@
     Const BLANK As Integer = 255
     Const BRANCH_WIDTH As Integer = 600
     Const NORMAL_SEARCH = 0
-    Const MONTE_SEARCH = 1
     Const SEARCH_TYPE = NORMAL_SEARCH
 
     Private CheckBit As Integer = 0
@@ -23,27 +23,24 @@
         Public komaID As Integer
         Public org_pos As Integer
         Public dst_pos As Integer
-        Public src_komaid As Integer
-        Public dst_komaid As Integer
         Public hand As Integer = BLANK
         Public classup As Boolean = True
         Public eval As Integer = 0
         Public best_eval As Integer = 0
         Public read_depth As Integer = 0
+        Public dst_komaid As Integer = 0
+        Public src_kind As Integer = 0
+        Public dst_kind As Integer = 0
         Sub New()
 
         End Sub
         Sub New(ByVal id As Byte,
                 ByVal i As Integer,
                 ByVal dist As Integer,
-                ByVal s As Integer,
-                ByVal d As Integer,
                 ByVal h As Integer)
             komaID = id
             org_pos = i
             dst_pos = dist
-            src_komaid = s
-            dst_komaid = d
             hand = h
             classup = True
         End Sub
@@ -51,15 +48,11 @@
         Sub New(ByVal id As Byte,
                 ByVal i As Integer,
                 ByVal dist As Integer,
-                ByVal s As Integer,
-                ByVal d As Integer,
                 ByVal h As Integer,
                 ByVal c As Boolean)
             komaID = id
             org_pos = i
             dst_pos = dist
-            src_komaid = s
-            dst_komaid = d
             hand = h
             classup = c
         End Sub
@@ -73,8 +66,6 @@
             _RetString = ""
             _RetString += org_pos.ToString() + ","
             _RetString += dst_pos.ToString() + ","
-            _RetString += src_komaid.ToString() + ","
-            _RetString += dst_komaid.ToString() + ","
             _RetString += hand.ToString() + ","
             _RetString += classup.ToString() + ","
             _RetString += eval.ToString() + ","
@@ -87,10 +78,8 @@
             If a.Length >= 7 Then
                 org_pos = a(0)
                 dst_pos = a(1)
-                src_komaid = a(2)
-                dst_komaid = a(3)
-                hand = a(4)
-                classup = a(5)
+                hand = a(2)
+                classup = a(3)
             Else
                 Return False
             End If
@@ -586,8 +575,30 @@
     Const ST_BLACK_MOVE As Integer = 4
     Dim undo As Integer
     Dim range As Array
-    Dim tegomaw As Array
-    Dim tegomab As Array
+    Dim tegomaw As List(Of Integer)
+    Dim tegomab As List(Of Integer)
+    Private Function GetTegoma(ByVal i As Integer, ByVal wb As Integer) As Integer
+        If wb = WHITE Then
+            For i = 0 To tegomaw.Count - 1
+                Dim p As PieceID = Piece(tegomaw(i))
+                Dim ret = p.kind
+                'If ret >= 15 Then
+                'ret -= 14
+                'End If
+                Return ret
+            Next
+        Else
+            For i = 0 To tegomab.Count - 1
+                Dim p As PieceID = Piece(tegomab(i))
+                Dim ret = p.kind
+                If ret <= 8 Then
+                    ret += 14
+                End If
+                Return ret
+            Next
+        End If
+        Return -1
+    End Function
     Private Function KomaIdx(ByVal i As Integer, ByVal wb As Integer) As Integer
         Static ARW As Array = {1, 2, 3, 4, 5, 6, 7, 8}
         Static ARB As Array = {15, 16, 17, 18, 19, 20, 21, 22}
@@ -693,8 +704,6 @@
                     1, 1, 1, 1, 1, 1, 1, 1, 1,
                     0, 6, 0, 0, 0, 0, 0, 7, 0,
                     2, 3, 4, 5, 8, 5, 4, 3, 2}
-        Public _tegomaw = {0, 0, 0, 0, 0, 0, 0, 0}
-        Public _tegomab = {0, 0, 0, 0, 0, 0, 0, 0}
         Public _retstring As String
 
         Public Function GetBoardString(ByVal bd As Array) As String
@@ -703,12 +712,12 @@
             For i = 0 To 80
                 _retstring += _board(i).ToString() + ","
             Next
-            For i = 0 To 7
-                _retstring += _tegomaw(i).ToString() + ","
-            Next
-            For i = 0 To 7
-                _retstring += _tegomab(i).ToString() + ","
-            Next
+            'For i = 0 To 7
+            '_retstring += _tegomaw(i).ToString() + ","
+            'Next
+            'For i = 0 To 7
+            '_retstring += _tegomab(i).ToString() + ","
+            'Next
             Return _retstring
         End Function
     End Class
@@ -741,8 +750,8 @@
         komaname = {"", "歩", "香", "桂", "銀", "金", "飛", "角", "王", "と", "杏", "圭", "全", "龍", "馬"}
         all = _b._all
         board = _b._board
-        tegomaw = _b._tegomaw
-        tegomab = _b._tegomab
+        tegomaw = New List(Of Integer)
+        tegomab = New List(Of Integer)
         Dim id = 0
         For i = 0 To 80 Step 1
             Dim k = board(i)
@@ -1005,8 +1014,9 @@
         End If
     End Sub
     Dim InitGenerate As Boolean = True
-    Dim PosID = 0
-    Private Function UnitRange(ByVal mmid As Integer, ByVal id As Byte, ByVal locate As Integer) As List(Of Integer)
+    Private Function UnitRange(ByVal mmid As Integer, ByVal locate As Integer) As List(Of Integer)
+        UnitRange = New List(Of Integer)
+        Dim id As Integer = FindID(locate)
         Dim unit As Integer
         locate = locate
         unit = board(locate)
@@ -1060,15 +1070,17 @@
             Node.InsertRange(NodeIdx, KomaIDNode(id))
             NodeIdx += KomaIDNode(id).Count
         End If
-        If 0 < unit And unit <= 26 And unit <> 2 And unit <> 6 And unit <> 7 And unit <> 13 And unit <> 14 And unit <> 16 And unit <> 20 And unit <> 21 Then
-            Dim dist = KikiBlocked.GetFirst()
-            While dist <> -1
-                Dim result = KomaBlocked(dist).Find(Function(n) n = id)
-                If result < 1 Then
-                    KomaBlocked(dist).Add(id)
-                End If
-                dist = KikiBlocked.GetNext()
-            End While
+        If False Then
+            If 0 < unit And unit <= 26 And unit <> 2 And unit <> 6 And unit <> 7 And unit <> 13 And unit <> 14 And unit <> 16 And unit <> 20 And unit <> 21 Then
+                Dim dist = KikiBlocked.GetFirst()
+                While dist <> -1
+                    Dim result = KomaBlocked(dist).Find(Function(n) n = id)
+                    If result < 1 Then
+                        KomaBlocked(dist).Add(id)
+                    End If
+                    dist = KikiBlocked.GetNext()
+                End While
+            End If
         End If
     End Function
     Private Function RangeCheck(ByVal locate As Integer) As Boolean
@@ -1133,9 +1145,9 @@
     Private Sub AddValue(ByVal id As Byte, ByVal locate As Integer, ByRef l As List(Of Integer), ByVal dist As Integer, ByVal pos As Integer)
         l.Add(dist)
         If GenerationFlag = True Then
-            KomaIDNode(id).Add(New MoveData(id, locate, dist, board(locate), board(dist), BLANK))
+            KomaIDNode(id).Add(New MoveData(id, locate, dist, BLANK))
             If NARAZU_READ And (16 <= board(locate)) And (board(locate) <= 18) And ((locate >= 54) Or (dist >= 54)) Then
-                KomaIDNode(id).Add(New MoveData(id, locate, dist, board(locate), board(dist), BLANK, False))
+                KomaIDNode(id).Add(New MoveData(id, locate, dist, BLANK, False))
             End If
         End If
     End Sub
@@ -1580,8 +1592,14 @@
             End If
         Next
         For i = 0 To 7 Step 1
-            WBuf.komatoku += tegomaw(i) * KomaScore(KomaIdx(i, WHITE)) * 1.05
-            BBuf.komatoku += tegomab(i) * KomaScore(KomaIdx(i, BLACK)) * 1.05
+            'WBuf.komatoku += tegomaw(i) * KomaScore(KomaIdx(i, WHITE)) * 1.05
+            'BBuf.komatoku += tegomab(i) * KomaScore(KomaIdx(i, BLACK)) * 1.05
+        Next
+        For i = 0 To tegomaw.Count - 1
+            WBuf.komatoku += KomaScore(GetTegoma(i, WHITE)) * 1.05
+        Next
+        For i = 0 To tegomab.Count - 1
+            WBuf.komatoku += KomaScore(GetTegoma(i, BLACK)) * 1.05
         Next
         Hyouka += WBuf.komatoku
         Hyouka += WBuf.komaichi
@@ -1591,14 +1609,6 @@
         Hyouka -= BBuf.komakiki
         Hyouka = Hyouka / 2
         Return Hyouka
-    End Function
-    Private Function MontecarloNum() As Integer
-        If SEARCH_TYPE = NORMAL_SEARCH Then
-            Return 1
-        Else
-            Static SEARCH_RATE_VALUE As Integer = 2
-            Return (VBMath.Rnd() * SEARCH_RATE_VALUE + 1)
-        End If
     End Function
     Private Function IsKillerMove(ByVal wb As Integer, ByVal dst As Integer) As Boolean
         Return IsWB(-wb, dst)
@@ -1614,14 +1624,9 @@
         End If
         Dim last As Integer = GenerateMoves(i, first, wb, depth)
         For i = first To last - 1 Step 1
-            If (SEARCH_TYPE = MONTE_SEARCH And
-                IsKillerMove(-wb, Node(i).dst_komaid) = False And
-                MontecarloNum() > 1) Then
-                Continue For
-            End If
             MakeMove(Node(i), False, ModosiIdx)
             Dim a = -alphabeta(i, last, -wb, depth - 1, -beta, -alpha)
-            UnmakeMove(Node(i), ModosiIdx)
+            UnmakeMove(ModosiIdx)
             If (a > alpha) Then
                 alpha = a
                 If depth = YOMI_DEPTH Then
@@ -1642,7 +1647,6 @@
     End Function
     Private Function GenerateMoves(ByVal MakeMovedID As Integer, ByVal first As Integer, ByVal wb As Integer,
                                         ByVal depth As Integer) As Integer
-        PosID = 0
         Dim idx As Integer = first
         If KOMAKIKI_READ Then
             KomaKikiInit()
@@ -1666,18 +1670,17 @@
                 GenerationFlag = True
                 NodeIdx = idx
                 If MakeMovedID <> -1 Then
-                    UnitRange(Node(MakeMovedID).komaID, PosID, pos)
+                    UnitRange(Node(MakeMovedID).komaID, pos)
                 Else
-                    UnitRange(-1, PosID, pos)
+                    UnitRange(-1, pos)
                 End If
-                PosID = PosID + 1
                 GenerationFlag = False
                 idx += (NodeIdx - idx)
             End If
             pos = bb.GetNext()
         End While
         InitGenerate = False
-        If HAND_READ And (depth > HAND_RIMIT) Then
+        If False And HAND_READ And (depth > HAND_RIMIT) Then
             For i = 0 To 6 '手駒の玉は読まない
                 If wb = WHITE And tegomaw(i) > 0 Then
                     range = HandRange(wb, i).ToArray
@@ -1706,17 +1709,20 @@
         'Dim starttime As Long = Now.Hour * 3600 + Now.Minute * 60 + Now.Second
         nodemax = 214748364
         nodemin = -214748364
-        Dim MakeBuff As MoveData = New MoveData
         SuspendLayout()
         Dim ret As Integer = 0
         best.org_pos = BLANK
         Dim s As String = _b.GetBoardString(board)
-        If _JyosekiDictionary.ContainsKey(s) Then
-            best.SetMoveDataFromString(_JyosekiDictionary(s))
+        If USE_JYOSEKI Then
+            If _JyosekiDictionary.ContainsKey(s) Then
+                best.SetMoveDataFromString(_JyosekiDictionary(s))
+            End If
         Else
             ret = alphabeta(-1, 0, wb, YOMI_DEPTH, nodemin, nodemax)
             Dim s2 As String = best.GetMoveDataString()
-            _JyosekiDictionary.Add(s, s2)
+            If False Then
+                _JyosekiDictionary.Add(s, s2)
+            End If
         End If
         If RETURN_LOG Then
             ListBox1.Items.Add(ret)
@@ -1753,7 +1759,7 @@
         r = False
         If state = ST_FREE Then
             undo = locate
-            range = UnitRange(-1, 40, locate).ToArray
+            range = UnitRange(-1, locate).ToArray
             For i = 0 To range.Length - 1 Step 1
                 If range(i) <> BLANK Then
                     r = True
@@ -1785,8 +1791,6 @@
             d.komaID = FindID(undo)
             d.org_pos = undo
             d.dst_pos = locate
-            d.src_komaid = board(undo)
-            d.dst_komaid = board(locate)
             MakeMove(d, True, ModosiIdx)
             DispAll()
             AddKihu(locate)
@@ -1804,8 +1808,6 @@
             d.komaID = FindID(undo)
             d.org_pos = undo
             d.dst_pos = locate
-            d.src_komaid = board(undo)
-            d.dst_komaid = board(locate)
             MakeMove(d, True, ModosiIdx)
             DispAll()
             AddKihu(locate)
@@ -1817,10 +1819,6 @@
             d.komaID = FindIDPop(pop - 1, WHITE)
             d.org_pos = undo
             d.dst_pos = locate
-            If undo <> 255 Then
-                d.src_komaid = board(undo)
-            End If
-            d.dst_komaid = board(locate)
             MakeMove(d, True, 0)
             DispAll()
             AddKihu(locate)
@@ -1838,10 +1836,6 @@
             d.komaID = FindIDPop(pop - 15, BLACK)
             d.org_pos = undo
             d.dst_pos = locate
-            If undo <> 255 Then
-                d.src_komaid = board(undo)
-            End If
-            d.dst_komaid = board(locate)
             MakeMove(d, True, ModosiIdx)
             DispAll()
             AddKihu(locate)
@@ -2004,16 +1998,18 @@
     End Function
     Private Sub DispHand()
         Dim i As Integer
-        For i = 1 To tegomaw.Length Step 1
-            GetHandWhite(i).Text = GetKomaName(i) + Str(tegomaw(i - 1))
+        For i = 1 To tegomaw.Count Step 1
+            'GetHandWhite(i).Text = GetKomaName(i) + Str(tegomaw(i - 1))
+            GetHandWhite(i).Text = GetTegoma(i - 1, WHITE).ToString
             If tegomaw(i - 1) > 0 Then
                 GetHandWhite(i).Visible = True
             Else
                 GetHandWhite(i).Visible = False
             End If
         Next
-        For i = 1 To tegomab.Length Step 1
-            GetHandBlack(i).Text = GetKomaName(i) + Str(tegomab(i - 1))
+        For i = 1 To tegomab.Count Step 1
+            'GetHandBlack(i).Text = GetKomaName(i) + Str(tegomab(i - 1))
+            GetHandBlack(i).Text = GetKomaName(GetTegoma(i - 1, BLACK))
             If tegomab(i - 1) > 0 Then
                 GetHandBlack(i).Visible = True
             Else
@@ -2065,6 +2061,13 @@
     Dim ModosiIdx As Integer = 0
     Dim DummyIdx As Integer = 0
     Private Sub MakeMove(ByVal d As MoveData, ByVal mov As Boolean, ByRef MIdx As Integer)
+        If BLANK <> d.org_pos Then
+            d.src_kind = board(d.org_pos)
+        End If
+        d.dst_kind = board(d.dst_pos)
+        If d.dst_kind > 0 Then
+            d.dst_komaid = FindID(d.dst_pos)
+        End If
         modosi(MIdx) = d
         MIdx = MIdx + 1
         If d.hand <> BLANK Then
@@ -2081,7 +2084,7 @@
             CheckBit += 1
         End If
         'board(d.dst_pos) = board(d.org_pos)
-        SetBoard(d.dst_pos, board(d.org_pos), d.komaID)
+        SetBoard(d.dst_pos, d.src_kind, d.komaID)
         'board(d.org_pos) = 0
         SetBoard(d.org_pos, 0, d.komaID)
         If d.classup Then
@@ -2094,9 +2097,9 @@ LOG_WRITE:
             AddYomi(d.dst_pos)
         End If
     End Sub
-    Private Sub UnmakeMove(ByVal d As MoveData, ByRef MIdx As Integer)
+    Private Sub UnmakeMove(ByRef MIdx As Integer)
         MIdx = MIdx - 1
-        modosi(MIdx) = d
+        Dim d As MoveData = modosi(MIdx)
         If d.hand <> BLANK Then
             KomaModosi(d.dst_pos)
             'board(d.r2) = 0
@@ -2104,8 +2107,10 @@ LOG_WRITE:
             Exit Sub
         End If
         'board(d.r) = d.src
-        SetBoard(d.org_pos, d.src_komaid, d.komaID)
-        KomaKaeshi(d.dst_pos, d.dst_komaid, d.komaID)
+        SetBoard(d.org_pos, d.src_kind, d.komaID)
+        If d.dst_komaid <> -1 Then
+            KomaKaeshi(d.dst_pos, d.dst_kind, d.dst_komaid)
+        End If
     End Sub
     Private Function Question() As Boolean
         Question = True
@@ -2169,12 +2174,14 @@ LOG_WRITE:
         Dim b = board(locate)
         Dim wb = WHITE
         If 15 <= t Then
-            t = Ura_Omote(t)
-            tegomaw(t) = tegomaw(t) + 1
+            't = Ura_Omote(t)
+            'tegomaw(t) = tegomaw(t) + 1
+            tegomaw.Add(id)
         ElseIf 1 <= t And t <= 14 Then
             wb = BLACK
-            t = Ura_Omote(t)
-            tegomab(t) = tegomab(t) + 1
+            't = Ura_Omote(t)
+            'tegomab(t) = tegomab(t) + 1
+            tegomab.Add(id)
         End If
         If id <> -1 Then
             Dim p As PieceID = Piece(id)
@@ -2191,14 +2198,19 @@ LOG_WRITE:
             Exit Sub
         End If
         Dim id = FindID(locate)
+        If id = -1 Then
+            Exit Sub
+        End If
         Dim wb = BLACK
         If 15 <= t Then
-            t = Ura_Omote(t)
-            tegomab(t) = tegomab(t) + 1
+            't = Ura_Omote(t)
+            'tegomab(t) = tegomab(t) + 1
+            tegomab.Add(id)
         ElseIf 1 <= t And t <= 14 Then
             wb = WHITE
-            t = Ura_Omote(t)
-            tegomaw(t) = tegomaw(t) + 1
+            't = Ura_Omote(t)
+            'tegomaw(t) = tegomaw(t) + 1
+            tegomaw.Add(id)
         End If
         If id <> -1 Then
             Dim p As PieceID = Piece(id)
@@ -2214,10 +2226,12 @@ LOG_WRITE:
         Dim p As PieceID = Piece(id)
         If 15 <= t Then
             t = Ura_Omote(t)
-            tegomab(t) = tegomab(t) - 1
+            'tegomab(t) = tegomab(t) - 1
+            tegomab.Remove(id)
         ElseIf 1 <= t And t <= 14 Then
             t = Ura_Omote(t)
-            tegomaw(t) = tegomaw(t) - 1
+            'tegomaw(t) = tegomaw(t) - 1
+            tegomaw.Remove(id)
         End If
         p.kind = t
         Piece(id) = p
@@ -2228,12 +2242,16 @@ LOG_WRITE:
         Dim p As PieceID = Piece(id)
         If 15 <= t Then
             t = Ura_Omote(t)
-            tegomaw(t) = tegomaw(t) - 1
+            'tegomaw(t) = tegomaw(t) - 1
+            tegomaw.Remove(id)
         ElseIf 1 <= t And t <= 14 Then
             t = Ura_Omote(t)
-            tegomab(t) = tegomab(t) - 1
+            'tegomab(t) = tegomab(t) - 1
+            tegomab.Remove(id)
         End If
         p.kind = t
+        p.captured = -1 * p.captured
+        p.owner = -1 * p.owner
         Piece(id) = p
     End Sub
     Private Sub AddKihu(ByVal locate As Integer)
@@ -2317,7 +2335,7 @@ LOG_WRITE:
         For i = 0 To 80 Step 1
             If i = undo Then
             ElseIf prev(i) = prev(undo) Then
-                Range = UnitRange(-1, 40, i).ToArray
+                Range = UnitRange(-1, i).ToArray
                 For j = 0 To Range.Length - 1 Step 1
                     If Range(j) = locate Then
                         Kouho(ki) = i
@@ -2986,7 +3004,7 @@ LOG_WRITE:
     End Sub
 
     Private Sub Button82_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button82.Click
-        UnmakeMove(modosi(ModosiIdx), ModosiIdx)
+        UnmakeMove(ModosiIdx)
         DispAll()
     End Sub
 
@@ -3032,6 +3050,7 @@ LOG_WRITE:
     End Sub
     Private Sub DispPiece()
         Dim s1 As String
+        Dim s2 As String
         For i = 0 To Piece.Count - 1
             Dim p = Piece(i)
             s1 += p.id.ToString + "," + p.kind.ToString + "," + p.place.ToString + "," + p.owner.ToString + "," + p.captured.ToString + " "
@@ -3039,8 +3058,17 @@ LOG_WRITE:
                 s1 += vbCrLf
             End If
         Next
+        s1 += vbCrLf
+        s1 += vbCrLf + "W"
+        For i = 0 To tegomaw.Count - 1
+            s2 += tegomaw(i).ToString + ","
+        Next
+        s2 += vbCrLf + "B"
+        For i = 0 To tegomab.Count - 1
+            s2 += tegomab(i).ToString + ","
+        Next
         RichTextBox1.Clear()
-        RichTextBox1.Text = s1
+        RichTextBox1.Text = s1 + s2
     End Sub
     Private Sub Button83_Click(sender As Object, e As EventArgs) Handles Button83.Click
         DispBitBoard()
