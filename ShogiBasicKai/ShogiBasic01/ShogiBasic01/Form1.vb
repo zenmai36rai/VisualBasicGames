@@ -739,7 +739,7 @@
     End Function
     Class ShogiBoard
         Public _all = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80}
-        Public _board = {16, 17, 18, 19, 22, 19, 18, 17, 16,
+        Public _old_board = {16, 17, 18, 19, 22, 19, 18, 17, 16,
                     0, 21, 0, 0, 0, 0, 0, 20, 0,
                     15, 15, 15, 15, 15, 15, 15, 15, 15,
                     0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -748,6 +748,7 @@
                     1, 1, 1, 1, 1, 1, 1, 1, 1,
                     0, 6, 0, 0, 0, 0, 0, 7, 0,
                     2, 3, 4, 5, 8, 5, 4, 3, 2}
+        Public _board(9, 9) As Integer
         Public _retstring As String
         Public _id = {0, 1, 2, 3, 4, 5, 6, 7, 8,
             128, 9, 128, 128, 128, 128, 128, 10, 128,
@@ -760,11 +761,11 @@
             31, 32, 33, 34, 35, 36, 37, 38, 39}
 
         Public Function GetBoardString(ByVal bd As Array) As String
-            _board = bd
+            _old_board = bd
             _retstring = ""
-            For i = 0 To 80
-                _retstring += _board(i).ToString() + ","
-            Next
+            'For i = 0 To 80
+            '_retstring += _board(i).ToString() + ","
+            'Next
             'For i = 0 To 7
             '_retstring += _tegomaw(i).ToString() + ","
             'Next
@@ -799,7 +800,7 @@
 
         komaname = {"", "歩", "香", "桂", "銀", "金", "飛", "角", "王", "と", "杏", "圭", "全", "龍", "馬"}
         all = _b._all
-        board = _b._board
+        board = _b._old_board
         tegomaw = New List(Of Integer)
         tegomab = New List(Of Integer)
         Dim id = 0
@@ -822,6 +823,9 @@
                     pi.owner = BLACK
                 End If
                 Piece.Add(pi)
+                Dim x = i Mod 9
+                Dim y = i / 9
+                _b._board(x, y) = id
                 id += 1
             End If
         Next
