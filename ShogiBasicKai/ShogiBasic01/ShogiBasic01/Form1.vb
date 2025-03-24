@@ -647,17 +647,13 @@
         End If
         If 1 <= koma And koma <= 14 Then
             board(dist) = koma
-            If id <> -1 Then
-                Piece(id).place = dist
-            End If
+            Piece(id).place = dist
             bb_white.AddBoard(dist)
             bb_black.RemoveBoard(dist)
         End If
         If 15 <= koma Then
             board(dist) = koma
-            If id <> -1 Then
-                Piece(id).place = dist
-            End If
+            Piece(id).place = dist
             bb_black.AddBoard(dist)
             bb_white.RemoveBoard(dist)
         End If
@@ -1588,10 +1584,10 @@
             'BBuf.komatoku += tegomab(i) * KomaScore(KomaIdx(i, BLACK)) * 1.05
         Next
         For i = 0 To tegomaw.Count - 1
-            WBuf.komatoku += KomaScore(GetTegoma(tegomaw(i), WHITE)) * 1.05
+            WBuf.komatoku += KomaScore(GetTegoma(i, WHITE)) * 1.05
         Next
         For i = 0 To tegomab.Count - 1
-            WBuf.komatoku += KomaScore(GetTegoma(tegomab(i), BLACK)) * 1.05
+            WBuf.komatoku += KomaScore(GetTegoma(i, BLACK)) * 1.05
         Next
         Hyouka += WBuf.komatoku
         Hyouka += WBuf.komaichi
@@ -1904,9 +1900,9 @@
     Private Function TakeHand(ByVal koma As Integer) As Array
         Dim b As Button
         If koma <= 14 Then
-            pop = GetTegoma(koma, WHITE)
+            pop = GetTegoma(koma - 1, WHITE)
         Else
-            pop = GetTegoma(koma, BLACK)
+            pop = GetTegoma(koma - 1, BLACK)
         End If
         range = all.Clone()
         For i = 0 To 80 Step 1
@@ -1992,7 +1988,7 @@
         Dim i As Integer
         For i = 1 To tegomaw.Count Step 1
             'GetHandWhite(i).Text = GetKomaName(i) + Str(tegomaw(i - 1))
-            GetHandWhite(i).Text = GetKomaName(GetTegoma(tegomaw(i - 1), WHITE))
+            GetHandWhite(i).Text = GetKomaName(GetTegoma(i - 1, WHITE))
             If tegomaw(i - 1) > 0 Then
                 GetHandWhite(i).Visible = True
             Else
@@ -2001,7 +1997,7 @@
         Next
         For i = 1 To tegomab.Count Step 1
             'GetHandBlack(i).Text = GetKomaName(i) + Str(tegomab(i - 1))
-            GetHandBlack(i).Text = GetKomaName(GetTegoma(tegomab(i - 1), BLACK))
+            GetHandBlack(i).Text = GetKomaName(GetTegoma(i - 1, BLACK))
             If tegomab(i - 1) > 0 Then
                 GetHandBlack(i).Visible = True
             Else
@@ -2071,7 +2067,7 @@
             narimem = board(d.org_pos)
         End If
         If d.classup Then
-            ClassUp(d.org_pos)
+            ClassUp(d.org_pos, d.komaID)
         Else
             CheckBit += 1
         End If
@@ -2080,7 +2076,7 @@
         'board(d.org_pos) = 0
         SetBoard(d.org_pos, 0, d.komaID)
         If d.classup Then
-            ClassUp(d.dst_pos)
+            ClassUp(d.dst_pos, d.dst_komaid)
         Else
             CheckBit += 1
         End If
@@ -2113,7 +2109,7 @@ LOG_WRITE:
             Question = False
         End If
     End Function
-    Private Sub ClassUp(ByVal locate As Integer)
+    Private Sub ClassUp(ByVal locate As Integer, ByVal id As Integer)
         Dim unit As Integer
         unit = board(locate)
         If IsWhite(locate) And 0 <= locate And locate <= 26 Then
@@ -2122,33 +2118,33 @@ LOG_WRITE:
             End If
             Select Case unit
                 Case 1
-                    board(locate) = 9
+                    SetBoard(locate, 9, id)
                 Case 2
-                    board(locate) = 10
+                    SetBoard(locate, 10, id)
                 Case 3
-                    board(locate) = 11
+                    SetBoard(locate, 11, id)
                 Case 4
-                    board(locate) = 12
+                    SetBoard(locate, 12, id)
                 Case 6
-                    board(locate) = 13
+                    SetBoard(locate, 13, id)
                 Case 7
-                    board(locate) = 14
+                    SetBoard(locate, 14, id)
             End Select
         End If
         If IsBlack(locate) And 54 <= locate And locate <= 80 Then
             Select Case unit
                 Case 15
-                    board(locate) = 23
+                    SetBoard(locate, 23, id)
                 Case 16
-                    board(locate) = 24
+                    SetBoard(locate, 24, id)
                 Case 17
-                    board(locate) = 25
+                    SetBoard(locate, 25, id)
                 Case 18
-                    board(locate) = 26
+                    SetBoard(locate, 26, id)
                 Case 20
-                    board(locate) = 27
+                    SetBoard(locate, 27, id)
                 Case 21
-                    board(locate) = 28
+                    SetBoard(locate, 28, id)
             End Select
         End If
     End Sub
