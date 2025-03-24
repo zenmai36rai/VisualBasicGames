@@ -1083,10 +1083,10 @@
             End While
         End If
     End Function
-    Private Function RangeCheck(ByVal locate As Integer) As Boolean
+    Private Function RangeCheck(ByRef r As Array, ByVal locate As Integer) As Boolean
         Dim i As Integer
-        For i = 0 To range.Length - 1 Step 1
-            If range(i) = locate Then
+        For i = 0 To r.Length - 1 Step 1
+            If r(i) = locate Then
                 RangeCheck = True
                 Exit Function
             End If
@@ -1757,9 +1757,9 @@
         r = False
         If state = ST_FREE Then
             undo = locate
-            range = UnitRange(locate).ToArray
-            For i = 0 To range.Length - 1 Step 1
-                If range(i) <> BLANK Then
+            Range = UnitRange(locate).ToArray
+            For i = 0 To Range.Length - 1 Step 1
+                If Range(i) <> BLANK Then
                     r = True
                 End If
             Next
@@ -1783,7 +1783,7 @@
                     b.BackColor = Color.YellowGreen
                 End If
             Next
-        ElseIf state = ST_WHITE_CHOOSE And RangeCheck(locate) Then
+        ElseIf state = ST_WHITE_CHOOSE And RangeCheck(Range, locate) Then
             'MoveChara(locate)
             d.hand = BLANK
             d.komaID = FindID(undo)
@@ -1801,7 +1801,7 @@
         ElseIf (state = ST_WHITE_CHOOSE Or state = ST_BLACK_CHOOSE) And undo = locate Then
             DispAll()
             state = 0
-        ElseIf state = ST_BLACK_CHOOSE And RangeCheck(locate) Then
+        ElseIf state = ST_BLACK_CHOOSE And RangeCheck(Range, locate) Then
             'MoveChara(locate)
             d.hand = BLANK
             d.komaID = FindID(undo)
@@ -1812,7 +1812,7 @@
             DispAll()
             AddKihu(locate)
             state = ST_FREE
-        ElseIf state = ST_WHITE_MOVE And RangeCheck(locate) Then
+        ElseIf state = ST_WHITE_MOVE And RangeCheck(Range, locate) Then
             'board(locate) = pop
             'tegomaw(pop - 1) = tegomaw(pop - 1) - 1
             d.hand = pop
@@ -1830,7 +1830,7 @@
             Me.Cursor = Cursors.WaitCursor
             RobotMove(-1)
             Me.Cursor = Cursors.Default
-        ElseIf state = ST_BLACK_MOVE And RangeCheck(locate) Then
+        ElseIf state = ST_BLACK_MOVE And RangeCheck(Range, locate) Then
             'board(locate) = pop
             'tegomab(pop - 15) = tegomab(pop - 15) - 1
             d.hand = pop
