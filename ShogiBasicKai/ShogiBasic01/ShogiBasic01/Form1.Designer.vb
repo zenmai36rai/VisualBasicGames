@@ -140,6 +140,7 @@ Partial Class Form1
         Me.Button84 = New System.Windows.Forms.Button()
         Me.Button85 = New System.Windows.Forms.Button()
         Me.Button86 = New System.Windows.Forms.Button()
+        Me.Button87 = New System.Windows.Forms.Button()
         Me.Panel1.SuspendLayout()
         Me.Panel3.SuspendLayout()
         Me.Panel2.SuspendLayout()
@@ -1443,9 +1444,10 @@ Partial Class Form1
         '
         Me.RichTextBox1.Location = New System.Drawing.Point(629, 12)
         Me.RichTextBox1.Name = "RichTextBox1"
-        Me.RichTextBox1.Size = New System.Drawing.Size(174, 349)
+        Me.RichTextBox1.Size = New System.Drawing.Size(266, 349)
         Me.RichTextBox1.TabIndex = 107
         Me.RichTextBox1.Text = ""
+        Me.RichTextBox1.WordWrap = False
         '
         'Button83
         '
@@ -1483,12 +1485,22 @@ Partial Class Form1
         Me.Button86.Text = "load"
         Me.Button86.UseVisualStyleBackColor = True
         '
+        'Button87
+        '
+        Me.Button87.Location = New System.Drawing.Point(811, 367)
+        Me.Button87.Name = "Button87"
+        Me.Button87.Size = New System.Drawing.Size(84, 38)
+        Me.Button87.TabIndex = 112
+        Me.Button87.Text = "Button87"
+        Me.Button87.UseVisualStyleBackColor = True
+        '
         'Form1
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 12.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.BackColor = System.Drawing.Color.DarkGreen
-        Me.ClientSize = New System.Drawing.Size(820, 416)
+        Me.ClientSize = New System.Drawing.Size(917, 416)
+        Me.Controls.Add(Me.Button87)
         Me.Controls.Add(Me.Button86)
         Me.Controls.Add(Me.Button85)
         Me.Controls.Add(Me.Button84)
@@ -1636,4 +1648,5 @@ Partial Class Form1
     Friend WithEvents Button86 As Button
     Friend WithEvents ContextMenuStrip1 As ContextMenuStrip
     Friend WithEvents クリップボードにコピーToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents Button87 As Button
 End Class

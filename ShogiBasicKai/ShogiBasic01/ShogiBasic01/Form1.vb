@@ -572,19 +572,19 @@
     Dim tegomaw As List(Of Integer)
     Dim tegomab As List(Of Integer)
     Private Function GetTegoma(ByVal it As Integer, ByVal wb As Integer) As Integer
-        If wb = WHITE And it < tegomaw.Count Then
+        If wb = WHITE And DUMMY_ID <> tegomaw(it) Then
             Dim p As PieceID = Piece(tegomaw(it))
             If p.id <> tegomaw(it) Then
                 Return DUMMY_ID
             End If
-            Dim ret = p.kind
+            Dim ret = p.omote
             Return ret
-        ElseIf wb = BLACK And it < tegomab.Count Then
+        ElseIf wb = BLACK And DUMMY_ID <> tegomab(it) Then
             Dim p As PieceID = Piece(tegomab(it))
             If p.id <> tegomab(it) Then
                 Return DUMMY_ID
             End If
-            Dim ret = p.kind
+            Dim ret = p.omote
             Return ret
         End If
         Return DUMMY_ID
@@ -707,6 +707,20 @@
         Public captured As Integer = 0
     End Class
     Dim Piece As List(Of PieceID)
+    Private Function FromKind(ByVal k As Integer)
+        Dim kind = k
+        If kind >= 15 Then
+            kind -= 14
+        End If
+        kind = ClassDown(kind)
+        For i = 0 To Piece.Count - 1
+            If Piece(i).omote = kind Then
+                Return Piece(i).id
+            End If
+        Next
+        Return DUMMY_ID
+    End Function
+
     Private Function FindID(ByVal pos As Integer)
         For i = 0 To Piece.Count - 1
             If Piece(i).place = pos Then
@@ -735,6 +749,15 @@
                     0, 6, 0, 0, 0, 0, 0, 7, 0,
                     2, 3, 4, 5, 8, 5, 4, 3, 2}
         Public _retstring As String
+        Public _id = {0, 1, 2, 3, 4, 5, 6, 7, 8,
+            128, 9, 128, 128, 128, 128, 128, 10, 128,
+            11, 12, 13, 14, 15, 16, 17, 18, 19,
+            128, 128, 128, 128, 128, 128, 128, 128, 128,
+            128, 128, 128, 128, 128, 128, 128, 128, 128,
+            128, 128, 128, 128, 128, 128, 128, 128, 128,
+            20, 21, 22, 23, 24, 25, 26, 27, 28,
+            128, 29, 128, 128, 128, 128, 128, 30, 128,
+            31, 32, 33, 34, 35, 36, 37, 38, 39}
 
         Public Function GetBoardString(ByVal bd As Array) As String
             _board = bd
@@ -1047,7 +1070,7 @@
     End Sub
     Dim InitGenerate As Boolean = True
     Private Function UnitRange(ByVal locate As Integer) As List(Of Integer)
-        Dim id As Integer = FindID(locate)
+        Dim id As Integer = FromKind(board(locate))
         Dim unit As Integer
         locate = locate
         unit = board(locate)
@@ -1627,11 +1650,11 @@
             'WBuf.komatoku += tegomaw(i) * KomaScore(KomaIdx(i, WHITE)) * 1.05
             'BBuf.komatoku += tegomab(i) * KomaScore(KomaIdx(i, BLACK)) * 1.05
         Next
-        For i = 0 To tegomaw.Count - 1
-            WBuf.komatoku += KomaScore(ClassDown(GetTegoma(i, WHITE))) * 1.05
+        For i = 0 To tegomaw.Count - 1 Step 1
+            WBuf.komatoku += KomaScore(Piece(tegomaw(i)).omote - 1) * 1.05
         Next
-        For i = 0 To tegomab.Count - 1
-            BBuf.komatoku += KomaScore(ClassDown(GetTegoma(i, BLACK))) * 1.05
+        For i = 0 To tegomab.Count - 1 Step 1
+            BBuf.komatoku += KomaScore(Piece(tegomab(i)).omote - 1) * 1.05
         Next
         Hyouka += WBuf.komatoku
         Hyouka += WBuf.komaichi
@@ -1820,7 +1843,7 @@
         ElseIf state = ST_WHITE_CHOOSE And RangeCheck(Range, locate) Then
             'MoveChara(locate)
             d.hand = BLANK
-            d.komaID = FindID(undo)
+            d.komaID = FromKind(board(undo))
             d.org_pos = undo
             d.dst_pos = locate
             d.teban = WHITE
@@ -1830,7 +1853,7 @@
             state = ST_FREE
             Me.Refresh()
             Me.Cursor = Cursors.WaitCursor
-            RobotMove(-1)
+            'RobotMove(-1)
             Me.Cursor = Cursors.Default
         ElseIf (state = ST_WHITE_CHOOSE Or state = ST_BLACK_CHOOSE) And undo = locate Then
             DispAll()
@@ -1838,7 +1861,7 @@
         ElseIf state = ST_BLACK_CHOOSE And RangeCheck(Range, locate) Then
             'MoveChara(locate)
             d.hand = BLANK
-            d.komaID = FindID(undo)
+            d.komaID = FromKind(board(undo))
             d.org_pos = undo
             d.dst_pos = locate
             d.teban = BLACK
@@ -1862,7 +1885,7 @@
             state = ST_FREE
             Me.Refresh()
             Me.Cursor = Cursors.WaitCursor
-            RobotMove(-1)
+            'RobotMove(-1)
             Me.Cursor = Cursors.Default
         ElseIf state = ST_BLACK_MOVE And RangeCheck(Range, locate) Then
             'board(locate) = pop
@@ -2159,11 +2182,11 @@ LOG_WRITE:
             Question = False
         End If
     End Function
-    Private Sub ClassUp(ByVal org As Integer, ByVal locate As Integer, ByVal id As Integer)
+    Private Sub ClassUp(ByVal from As Integer, ByVal dst As Integer, ByVal id As Integer)
         Dim unit As Integer
-        unit = board(org)
+        unit = board(from)
         Dim unit_up As Integer = unit
-        If IsWhite(org) And ((0 <= locate And locate <= 26) Or (0 <= org And org <= 26)) Then
+        If IsWhite(from) And ((0 <= from And from <= 26) Or (0 <= dst And dst <= 26)) Then
             If Question() = False Then
                 GoTo SET_BOARD
             End If
@@ -2174,7 +2197,7 @@ LOG_WRITE:
                     unit_up = unit + 7
             End Select
         End If
-        If IsBlack(org) And ((54 <= locate And locate <= 80) Or (54 <= org And org <= 80)) Then
+        If IsBlack(from) And ((54 <= from And from <= 80) Or (54 <= dst And dst <= 80)) Then
             Select Case unit
                 Case 15, 16, 17, 18
                     unit_up = unit + 8
@@ -2188,7 +2211,7 @@ LOG_WRITE:
             Piece(id).kind = unit
         End If
 SET_BOARD:
-        SetBoard(org, locate, id)
+        SetBoard(from, dst, id)
     End Sub
     Private Function ClassDown(ByVal kind As Integer) As Integer
         Dim unit As Integer = kind
@@ -2219,12 +2242,16 @@ SET_BOARD:
         If 15 <= t Then
             t = Ura_Omote(t)
             'tegomaw(t) = tegomaw(t) + 1
-            tegomaw.Add(id)
+            If 0 <= id And id < 40 Then
+                tegomaw.Add(id)
+            End If
         ElseIf 1 <= t And t <= 14 Then
             wb = BLACK
             t = Ura_Omote(t)
             'tegomab(t) = tegomab(t) + 1
-            tegomab.Add(id)
+            If 0 <= id And id < 40 Then
+                tegomab.Add(id)
+            End If
         End If
         If id <> DUMMY_ID Then
             Piece(id).captured = wb
@@ -2235,9 +2262,13 @@ SET_BOARD:
     End Function
     Private Sub KomaModosi(ByVal id, ByVal teban)
         If teban = WHITE Then
-            tegomab.Add(id)
+            If 0 <= id And id < 40 Then
+                tegomab.Remove(id)
+            End If
         Else
-            tegomaw.Add(id)
+            If 0 <= id And id < 40 Then
+                tegomaw.Remove(id)
+            End If
         End If
         If id <> DUMMY_ID Then
             Piece(id).captured = teban
@@ -2270,11 +2301,11 @@ SET_BOARD:
         If 15 <= t Then
             't = Ura_Omote(t)
             'tegomaw(t) = tegomaw(t) - 1
-            tegomaw.Remove(id)
+            tegomab.Remove(id)
         ElseIf 1 <= t And t <= 14 Then
             't = Ura_Omote(t)
             'tegomab(t) = tegomab(t) - 1
-            tegomab.Remove(id)
+            tegomaw.Remove(id)
         End If
     End Sub
     Private Sub AddKihu(ByVal locate As Integer)
@@ -3076,13 +3107,12 @@ SET_BOARD:
         Dim s2 As String
         For i = 0 To Piece.Count - 1
             Dim p = Piece(i)
-            s1 += p.id.ToString + "," + p.kind.ToString + "," + p.place.ToString + "," + p.owner.ToString + "," + p.captured.ToString + " "
+            s1 += p.id.ToString.PadLeft(2) + ":" + p.omote.ToString.PadLeft(2) + "," + p.kind.ToString.PadLeft(2) + "," + p.place.ToString.PadLeft(2) + "," + p.owner.ToString.PadLeft(2) + "," + p.captured.ToString.PadLeft(2) + " "
             If i Mod 2 = 1 Then
                 s1 += vbCrLf
             End If
         Next
-        s1 += vbCrLf
-        s1 += vbCrLf + "W"
+        s1 += "W"
         For i = 0 To tegomaw.Count - 1
             s2 += tegomaw(i).ToString + ","
         Next
@@ -3151,6 +3181,26 @@ SET_BOARD:
         Next
         Clipboard.SetText(Clip)
 
+    End Sub
+
+    Private Sub Button87_Click(sender As Object, e As EventArgs) Handles Button87.Click
+        Dim s As String
+        For i = 0 To 80
+            Dim flag = False
+            For id = 0 To 39
+                If i = Piece(id).place Then
+                    s += Piece(id).place.ToString.PadLeft(2)
+                    flag = True
+                End If
+            Next
+            If flag = False Then
+                s += "DU"
+            End If
+            If i Mod 9 = 8 Then
+                s += vbCrLf
+            End If
+        Next
+        RichTextBox1.Text = s
     End Sub
 End Class
 ' 2015 - 2025 Written By Kyosuke Miyazawa ShogiBasic
