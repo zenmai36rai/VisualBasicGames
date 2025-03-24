@@ -3,7 +3,7 @@
     Const BLACK As Integer = -1
     Const USE_AB As Boolean = True
     Const USE_JYOSEKI As Boolean = False
-    Const YOMI_DEPTH As Integer = 1
+    Const YOMI_DEPTH As Integer = 3
     Const HAND_RIMIT As Integer = 1
     Const HAND_READ As Boolean = True
     Const NARAZU_READ As Boolean = False
@@ -690,7 +690,9 @@
             bb_black.AddBoard(dist)
             bb_white.RemoveBoard(dist)
         End If
-        Piece(id).place = dist
+        If id <> DUMMY_ID Then
+            Piece(id).place = dist
+        End If
         If from <> BLANK Then
             board(from) = 0
             bb_white.RemoveBoard(from)
@@ -1857,7 +1859,7 @@
             state = ST_FREE
             Me.Refresh()
             Me.Cursor = Cursors.WaitCursor
-            'RobotMove(-1)
+            RobotMove(-1)
             Me.Cursor = Cursors.Default
         ElseIf (state = ST_WHITE_CHOOSE Or state = ST_BLACK_CHOOSE) And undo = locate Then
             DispAll()
@@ -1889,7 +1891,7 @@
             state = ST_FREE
             Me.Refresh()
             Me.Cursor = Cursors.WaitCursor
-            'RobotMove(-1)
+            RobotMove(-1)
             Me.Cursor = Cursors.Default
         ElseIf state = ST_BLACK_MOVE And RangeCheck(Range, locate) Then
             'board(locate) = pop
@@ -2172,7 +2174,7 @@ LOG_WRITE:
             Exit Sub
         End If
         'board(d.r) = d.src
-        SetBoardKind(d.dst_pos, d.org_pos, d.komaID, d.src_kind)
+        SetBoardKind(d.dst_pos, d.org_pos, DUMMY_ID, d.src_kind)
         If d.capture <> BLANK And d.capture <> DUMMY_ID Then
             KomaKaeshi(BLANK, d.dst_pos, d.capture, d.dst_kind)
         End If
@@ -2248,6 +2250,7 @@ SET_BOARD:
             'tegomaw(t) = tegomaw(t) + 1
             If 0 <= id And id < 40 Then
                 tegomaw.Add(id)
+                Console.WriteLine("先手が " & (id.ToString) & " を追加: ")
             End If
         ElseIf 1 <= t And t <= 14 Then
             wb = BLACK
@@ -2255,6 +2258,7 @@ SET_BOARD:
             'tegomab(t) = tegomab(t) + 1
             If 0 <= id And id < 40 Then
                 tegomab.Add(id)
+                Console.WriteLine("後手が " & (id.ToString) & " を追加: ")
             End If
         End If
         If id <> DUMMY_ID Then
@@ -2305,11 +2309,13 @@ SET_BOARD:
         If 15 <= t Then
             't = Ura_Omote(t)
             'tegomaw(t) = tegomaw(t) - 1
-            tegomab.Remove(id)
+            tegomaw.Remove(id)
+            Console.WriteLine("先手が " & (id.ToString) & " を削除: ")
         ElseIf 1 <= t And t <= 14 Then
             't = Ura_Omote(t)
             'tegomab(t) = tegomab(t) - 1
-            tegomaw.Remove(id)
+            tegomab.Remove(id)
+            Console.WriteLine("後手が " & (id.ToString) & " を削除: ")
         End If
     End Sub
     Private Sub AddKihu(ByVal locate As Integer)
