@@ -29,7 +29,6 @@
         Public eval As Integer = 0
         Public best_eval As Integer = 0
         Public read_depth As Integer = 0
-        Public dst_komaid As Integer = 0
         Public src_kind As Integer = 0
         Public dst_kind As Integer = 0
         Public teban As Integer = 0
@@ -88,7 +87,7 @@
     Dim NodeIdx As Integer
     Dim best As MoveData = New MoveData
     Dim BestScore As Integer = 0
-    Dim modosi(1024) As MoveData
+    Dim modosi As Stack(Of MoveData)
     Dim KomaIDNode(40) As List(Of MoveData)
     Dim PosRange(40) As List(Of Integer)
     Dim TegomaRange(40) As List(Of MoveData)
@@ -751,15 +750,12 @@
         For n = 0 To 81 - 1 Step 1
             KomaBlocked(n) = New List(Of Integer)
         Next
-        For n = 0 To YOMI_DEPTH
-            modosi(n) = New MoveData
-        Next
         For n = 0 To 40 - 1
             For m = 0 To 81 - 1
                 TegomaRange(n).Add(New MoveData(n, m))
             Next
         Next
-
+        modosi = New Stack(Of MoveData)
 
         komaname = {"", "歩", "香", "桂", "銀", "金", "飛", "角", "王", "と", "杏", "圭", "全", "龍", "馬"}
         all = _b._all
@@ -1638,9 +1634,9 @@
         End If
         Dim last As Integer = GenerateMoves(first, wb, depth)
         For i = first To last - 1 Step 1
-            MakeMove(Node(i), False, ModosiIdx)
+            MakeMove(Node(i), False)
             Dim a = -alphabeta(last, -wb, depth - 1, -beta, -alpha)
-            UnmakeMove(ModosiIdx)
+            UnmakeMove()
             If (a > alpha) Then
                 alpha = a
                 If depth = YOMI_DEPTH Then
@@ -1804,7 +1800,7 @@
             d.org_pos = undo
             d.dst_pos = locate
             d.teban = WHITE
-            MakeMove(d, True, ModosiIdx)
+            MakeMove(d, True)
             DispAll()
             AddKihu(locate)
             state = ST_FREE
@@ -1822,7 +1818,7 @@
             d.org_pos = undo
             d.dst_pos = locate
             d.teban = BLACK
-            MakeMove(d, True, ModosiIdx)
+            MakeMove(d, True)
             DispAll()
             AddKihu(locate)
             state = ST_FREE
@@ -1834,7 +1830,7 @@
             d.org_pos = undo
             d.dst_pos = locate
             d.teban = WHITE
-            MakeMove(d, True, 0)
+            MakeMove(d, True)
             DispAll()
             AddKihu(locate)
             undo = BLANK
@@ -1852,7 +1848,7 @@
             d.org_pos = undo
             d.dst_pos = locate
             d.teban = BLACK
-            MakeMove(d, True, ModosiIdx)
+            MakeMove(d, True)
             DispAll()
             AddKihu(locate)
             undo = BLANK
@@ -2098,14 +2094,11 @@
     End Sub
     Dim ModosiIdx As Integer = 0
     Dim DummyIdx As Integer = 0
-    Private Sub MakeMove(ByRef d As MoveData, ByVal mov As Boolean, ByRef MIdx As Integer)
+    Private Sub MakeMove(ByRef d As MoveData, ByVal mov As Boolean)
         If BLANK <> d.org_pos Then
             d.src_kind = board(d.org_pos)
         End If
         d.dst_kind = board(d.dst_pos)
-        If d.dst_kind > 0 Then
-            d.dst_komaid = FindID(d.dst_pos)
-        End If
         If d.hand <> BLANK Then
             Dim id = GetTegomaIDFromKind(d.hand, d.teban)
             KomaOki(d.dst_pos, d.hand, id)
@@ -2133,12 +2126,10 @@ LOG_WRITE:
         If DEBUG_LOG Then
             AddYomi(d.dst_pos)
         End If
-        modosi(MIdx) = d
-        MIdx = MIdx + 1
+        modosi.Push(d)
     End Sub
-    Private Sub UnmakeMove(ByRef MIdx As Integer)
-        MIdx = MIdx - 1
-        Dim d As MoveData = modosi(MIdx)
+    Private Sub UnmakeMove()
+        Dim d As MoveData = modosi.Pop
         If d.hand <> BLANK Then
             KomaModosi(d.dst_pos)
             'board(d.r2) = 0
@@ -2147,9 +2138,7 @@ LOG_WRITE:
         End If
         'board(d.r) = d.src
         SetBoard(d.org_pos, d.src_kind, d.komaID)
-        If d.dst_komaid <> DUMMY_ID Then
-            KomaKaeshi(d.dst_pos, d.dst_kind, d.capture)
-        End If
+        KomaKaeshi(d.dst_pos, d.dst_kind, d.capture)
     End Sub
     Private Function Question() As Boolean
         Question = True
@@ -3038,7 +3027,7 @@ LOG_WRITE:
     End Sub
 
     Private Sub Button82_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button82.Click
-        UnmakeMove(ModosiIdx)
+        UnmakeMove()
         DispAll()
     End Sub
 
