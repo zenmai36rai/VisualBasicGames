@@ -31,31 +31,23 @@
         Public dst_komaid As Integer = 0
         Public src_kind As Integer = 0
         Public dst_kind As Integer = 0
+        Public teban As Integer = 0
         Sub New()
 
         End Sub
         Sub New(ByVal id As Byte,
                 ByVal i As Integer,
                 ByVal dist As Integer,
-                ByVal h As Integer)
+                ByVal h As Integer,
+                ByVal t As Integer)
             komaID = id
             org_pos = i
             dst_pos = dist
             hand = h
+            teban = t
             classup = True
         End Sub
 
-        Sub New(ByVal id As Byte,
-                ByVal i As Integer,
-                ByVal dist As Integer,
-                ByVal h As Integer,
-                ByVal c As Boolean)
-            komaID = id
-            org_pos = i
-            dst_pos = dist
-            hand = h
-            classup = c
-        End Sub
         Sub New(ByVal i As Integer, ByVal j As Integer)
             hand = i
             dst_pos = j
@@ -86,6 +78,7 @@
             Return True
         End Function
     End Class
+    Dim NOW_TEBAN As Integer = 0
     Dim KikiBlocked As BitBoard
     Dim KomaBlocked(81) As List(Of Integer)
     Dim GenerationFlag As Boolean = False
@@ -589,24 +582,27 @@
         End If
         Return -1
     End Function
-    Private Function GetTegomaIDFromKind(ByVal k As Integer) As Integer
+    Private Function GetTegomaIDFromKind(ByVal k As Integer, ByVal wb As Integer) As Integer
         Dim tw = {0, 0, 0, 0, 0, 0, 0, 0}
         Dim tb = {0, 0, 0, 0, 0, 0, 0, 0}
         Dim i As Integer
-        For i = 0 To tegomaw.Count - 1 Step 1
-            Dim koma = GetTegoma(i, WHITE)
-            If koma = k Then
-                Dim p As PieceID = Piece(tegomaw(i))
-                Return p.id
-            End If
-        Next
-        For i = 0 To tegomab.Count - 1 Step 1
-            Dim koma = GetTegoma(i, BLACK)
-            If koma = k Then
-                Dim p As PieceID = Piece(tegomab(i))
-                Return p.id
-            End If
-        Next
+        If wb = WHITE Then
+            For i = 0 To tegomaw.Count - 1 Step 1
+                Dim koma = GetTegoma(i, WHITE)
+                If koma = k Or koma + 14 = k Then
+                    Dim p As PieceID = Piece(tegomaw(i))
+                    Return p.id
+                End If
+            Next
+        Else
+            For i = 0 To tegomab.Count - 1 Step 1
+                Dim koma = GetTegoma(i, BLACK)
+                If koma = k Or koma + 14 = k Then
+                    Dim p As PieceID = Piece(tegomab(i))
+                    Return p.id
+                End If
+            Next
+        End If
         Return -1
     End Function
     Private Function KomaIdx(ByVal i As Integer, ByVal wb As Integer) As Integer
@@ -1118,12 +1114,12 @@
             End If
         End If
     End Sub
-    Private Sub AddRange(ByVal id As Byte, ByVal locate As Integer, ByVal dx As Integer, ByVal dy As Integer, ByRef list As List(Of Integer), ByVal pos As Integer)
+    Private Sub AddRange(ByVal id As Byte, ByVal locate As Integer, ByVal dx As Integer, ByVal dy As Integer, ByRef list As List(Of Integer), ByVal pos As Integer, ByVal wb As Integer)
         Dim dist As Integer
         If CheckBoardRange(dx, dy) = True Then
             dist = dx + dy * 9
             If JigomaCheck(locate, dist) Then
-                AddValue(id, locate, list, dist, pos)
+                AddValue(id, locate, list, dist, pos, wb)
             End If
         End If
     End Sub
@@ -1147,13 +1143,13 @@
         End If
         Return JigomaCheck
     End Function
-    Private Sub AddValue(ByVal id As Byte, ByVal locate As Integer, ByRef l As List(Of Integer), ByVal dist As Integer, ByVal pos As Integer)
+    Private Sub AddValue(ByVal id As Byte, ByVal locate As Integer, ByRef l As List(Of Integer), ByVal dist As Integer, ByVal pos As Integer, ByVal wb As Integer)
         l.Add(dist)
         If GenerationFlag = True Then
-            KomaIDNode(id).Add(New MoveData(id, locate, dist, BLANK))
-            If NARAZU_READ And (16 <= board(locate)) And (board(locate) <= 18) And ((locate >= 54) Or (dist >= 54)) Then
-                KomaIDNode(id).Add(New MoveData(id, locate, dist, BLANK, False))
-            End If
+            KomaIDNode(id).Add(New MoveData(id, locate, dist, BLANK, wb))
+            'If NARAZU_READ And (16 <= board(locate)) And (board(locate) <= 18) And ((locate >= 54) Or (dist >= 54)) Then
+            'KomaIDNode(id).Add(New MoveData(id, locate, dist, BLANK, wb, False))
+            'End If
         End If
     End Sub
 
@@ -1168,7 +1164,7 @@
         HuRange = New List(Of Integer)
         Dim dist As Integer = bb_kiki.GetHuRange(locate, wb, GetWB_BB(wb), KikiBlocked)
         If dist <> BLANK Then
-            AddValue(id, locate, HuRange, dist, 0)
+            AddValue(id, locate, HuRange, dist, 0, wb)
         End If
         bb_kiki.GetHuKiki(locate, wb, bb_white, bb_black, komakiki_w, komakiki_b)
     End Function
@@ -1181,7 +1177,7 @@
         End If
         Dim idx = 0
         While dist <> BLANK
-            AddValue(id, locate, KyoRange, dist, idx)
+            AddValue(id, locate, KyoRange, dist, idx, wb)
             dist = bb.GetNext()
             If dist = -1 Then
                 dist = BLANK
@@ -1216,7 +1212,7 @@
                     AddKomakiki(dx, dy)
                     Exit For
                 End If
-                AddValue(id, locate, HisyaRange, dist, i)
+                AddValue(id, locate, HisyaRange, dist, i, wb)
                 If AB(wb, locate, dist) Then
                     KomaBlocked(dist).Add(id)
                     Exit For
@@ -1234,7 +1230,7 @@
                     AddKomakiki(dx, dy)
                     Exit For
                 End If
-                AddValue(id, locate, HisyaRange, dist, i + 7)
+                AddValue(id, locate, HisyaRange, dist, i + 7, wb)
                 If AB(wb, locate, dist) Then
                     KomaBlocked(dist).Add(id)
                     Exit For
@@ -1252,7 +1248,7 @@
                     AddKomakiki(dx, dy)
                     Exit For
                 End If
-                AddValue(id, locate, HisyaRange, dist, i + 15)
+                AddValue(id, locate, HisyaRange, dist, i + 15, wb)
                 If AB(wb, locate, dist) Then
                     KomaBlocked(dist).Add(id)
                     Exit For
@@ -1270,7 +1266,7 @@
                     AddKomakiki(dx, dy)
                     Exit For
                 End If
-                AddValue(id, locate, HisyaRange, dist, i + 23)
+                AddValue(id, locate, HisyaRange, dist, i + 23, wb)
                 If AB(wb, locate, dist) Then
                     KomaBlocked(dist).Add(id)
                     Exit For
@@ -1282,16 +1278,16 @@
         If c = True Then
             dx = x - 1
             dy = y - 1
-            AddRange(id, locate, dx, dy, HisyaRange, 32)
+            AddRange(id, locate, dx, dy, HisyaRange, 32, wb)
             dx = x + 1
             dy = y + 1
-            AddRange(id, locate, dx, dy, HisyaRange, 33)
+            AddRange(id, locate, dx, dy, HisyaRange, 33, wb)
             dx = x - 1
             dy = y + 1
-            AddRange(id, locate, dx, dy, HisyaRange, 34)
+            AddRange(id, locate, dx, dy, HisyaRange, 34, wb)
             dx = x + 1
             dy = y - 1
-            AddRange(id, locate, dx, dy, HisyaRange, 35)
+            AddRange(id, locate, dx, dy, HisyaRange, 35, wb)
         End If
     End Function
     Private Function KakuRange(ByVal id As Byte, ByVal locate As Integer, ByVal wb As Integer, ByVal c As Boolean) As List(Of Integer)
@@ -1314,11 +1310,11 @@
                     Exit For
                 End If
                 If AB(wb, locate, dist) Then
-                    AddValue(id, locate, KakuRange, dist, i)
+                    AddValue(id, locate, KakuRange, dist, i, wb)
                     KomaBlocked(dist).Add(id)
                     Exit For
                 Else
-                    AddValue(id, locate, KakuRange, dist, i)
+                    AddValue(id, locate, KakuRange, dist, i, wb)
                 End If
             Else
                 Exit For
@@ -1334,11 +1330,11 @@
                     Exit For
                 End If
                 If AB(wb, locate, dist) Then
-                    AddValue(id, locate, KakuRange, dist, i + 7)
+                    AddValue(id, locate, KakuRange, dist, i + 7, wb)
                     KomaBlocked(dist).Add(id)
                     Exit For
                 Else
-                    AddValue(id, locate, KakuRange, dist, i + 7)
+                    AddValue(id, locate, KakuRange, dist, i + 7, wb)
                 End If
             Else
                 Exit For
@@ -1354,11 +1350,11 @@
                     Exit For
                 End If
                 If AB(wb, locate, dist) Then
-                    AddValue(id, locate, KakuRange, dist, i + 15)
+                    AddValue(id, locate, KakuRange, dist, i + 15, wb)
                     KomaBlocked(dist).Add(id)
                     Exit For
                 Else
-                    AddValue(id, locate, KakuRange, dist, i + 15)
+                    AddValue(id, locate, KakuRange, dist, i + 15, wb)
                 End If
             Else
                 Exit For
@@ -1374,11 +1370,11 @@
                     Exit For
                 End If
                 If AB(wb, locate, dist) Then
-                    AddValue(id, locate, KakuRange, dist, i + 23)
+                    AddValue(id, locate, KakuRange, dist, i + 23, wb)
                     KomaBlocked(dist).Add(id)
                     Exit For
                 Else
-                    AddValue(id, locate, KakuRange, dist, i + 23)
+                    AddValue(id, locate, KakuRange, dist, i + 23, wb)
                 End If
             Else
                 Exit For
@@ -1387,16 +1383,16 @@
         If c = True Then
             dx = x
             dy = y - 1
-            AddRange(id, locate, dx, dy, KakuRange, 32)
+            AddRange(id, locate, dx, dy, KakuRange, 32, wb)
             dx = x
             dy = y + 1
-            AddRange(id, locate, dx, dy, KakuRange, 33)
+            AddRange(id, locate, dx, dy, KakuRange, 33, wb)
             dx = x - 1
             dy = y
-            AddRange(id, locate, dx, dy, KakuRange, 34)
+            AddRange(id, locate, dx, dy, KakuRange, 34, wb)
             dx = x + 1
             dy = y
-            AddRange(id, locate, dx, dy, KakuRange, 35)
+            AddRange(id, locate, dx, dy, KakuRange, 35, wb)
         End If
     End Function
     Private Function KeimaRange(ByVal id As Byte, ByVal locate As Integer, ByVal wb As Integer) As List(Of Integer)
@@ -1408,7 +1404,7 @@
         End If
         Dim idx = 0
         While dist <> BLANK
-            AddValue(id, locate, KeimaRange, dist, idx)
+            AddValue(id, locate, KeimaRange, dist, idx, wb)
             dist = bb.GetNext()
             If dist = -1 Then
                 dist = BLANK
@@ -1426,7 +1422,7 @@
         End If
         Dim idx = 0
         While dist <> BLANK
-            AddValue(id, locate, GinRange, dist, idx)
+            AddValue(id, locate, GinRange, dist, idx, wb)
             dist = bb.GetNext()
             If dist = -1 Then
                 dist = BLANK
@@ -1444,7 +1440,7 @@
         End If
         Dim idx = 0
         While dist <> BLANK
-            AddValue(id, locate, KinRange, dist, idx)
+            AddValue(id, locate, KinRange, dist, idx, wb)
             dist = bb.GetNext()
             If dist = -1 Then
                 dist = BLANK
@@ -1462,7 +1458,7 @@
         End If
         Dim idx = 0
         While dist <> BLANK
-            AddValue(id, locate, OuRange, dist, idx)
+            AddValue(id, locate, OuRange, dist, idx, wb)
             dist = bb.GetNext()
             If dist = -1 Then
                 dist = BLANK
@@ -1687,12 +1683,14 @@
                     range = HandRange(wb, i).ToArray
                     For j = 0 To range.Length - 1 Step 1
                         Node(idx) = TegomaRange(i)(range(j))
+                        Node(idx).teban = wb
                         idx += 1
                     Next
                 ElseIf tegomab(i) > 0 Then
                     range = HandRange(wb, i).ToArray
                     For j = 0 To range.Length - 1 Step 1
                         Node(idx) = TegomaRange(i + 15)(range(j))
+                        Node(idx).teban = wb
                         idx += 1
                     Next
                 End If
@@ -1792,13 +1790,14 @@
             d.komaID = FindID(undo)
             d.org_pos = undo
             d.dst_pos = locate
+            d.teban = WHITE
             MakeMove(d, True, ModosiIdx)
             DispAll()
             AddKihu(locate)
             state = ST_FREE
             Me.Refresh()
             Me.Cursor = Cursors.WaitCursor
-            RobotMove(-1)
+            'RobotMove(-1)
             Me.Cursor = Cursors.Default
         ElseIf (state = ST_WHITE_CHOOSE Or state = ST_BLACK_CHOOSE) And undo = locate Then
             DispAll()
@@ -1809,6 +1808,7 @@
             d.komaID = FindID(undo)
             d.org_pos = undo
             d.dst_pos = locate
+            d.teban = BLACK
             MakeMove(d, True, ModosiIdx)
             DispAll()
             AddKihu(locate)
@@ -1817,9 +1817,10 @@
             'board(locate) = pop
             'tegomaw(pop - 1) = tegomaw(pop - 1) - 1
             d.hand = pop
-            d.komaID = GetTegomaIDFromKind(pop)
+            d.komaID = GetTegomaIDFromKind(pop, WHITE)
             d.org_pos = undo
             d.dst_pos = locate
+            d.teban = WHITE
             MakeMove(d, True, 0)
             DispAll()
             AddKihu(locate)
@@ -1828,15 +1829,16 @@
             state = ST_FREE
             Me.Refresh()
             Me.Cursor = Cursors.WaitCursor
-            RobotMove(-1)
+            'RobotMove(-1)
             Me.Cursor = Cursors.Default
         ElseIf state = ST_BLACK_MOVE And RangeCheck(locate) Then
             'board(locate) = pop
             'tegomab(pop - 15) = tegomab(pop - 15) - 1
             d.hand = pop
-            d.komaID = GetTegomaIDFromKind(pop)
+            d.komaID = GetTegomaIDFromKind(pop, BLACK)
             d.org_pos = undo
             d.dst_pos = locate
+            d.teban = BLACK
             MakeMove(d, True, ModosiIdx)
             DispAll()
             AddKihu(locate)
@@ -2092,7 +2094,8 @@
         modosi(MIdx) = d
         MIdx = MIdx + 1
         If d.hand <> BLANK Then
-            KomaOki(d.dst_pos, d.hand, d.komaID)
+            Dim id = GetTegomaIDFromKind(d.hand, d.teban)
+            KomaOki(d.dst_pos, d.hand, id)
             GoTo LOG_WRITE
         End If
         KomaTori(d.dst_pos)
