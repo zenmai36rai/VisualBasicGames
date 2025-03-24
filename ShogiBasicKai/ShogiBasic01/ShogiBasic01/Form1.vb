@@ -2326,7 +2326,6 @@ LOG_WRITE:
         GetKanji = k(num)
     End Function
     Private Function GetSoeji(ByVal locate As Integer) As String
-        Return ""
         Dim prev As Array
         Dim Range As Array
         Dim Kouho As Array
