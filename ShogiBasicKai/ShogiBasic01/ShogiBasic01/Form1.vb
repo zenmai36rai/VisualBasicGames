@@ -1777,7 +1777,7 @@
             state = ST_FREE
             Me.Refresh()
             Me.Cursor = Cursors.WaitCursor
-            RobotMove(-1)
+            'RobotMove(-1)
             Me.Cursor = Cursors.Default
         ElseIf (state = ST_WHITE_CHOOSE Or state = ST_BLACK_CHOOSE) And undo = locate Then
             DispAll()
@@ -1982,20 +1982,34 @@
         TakeHand = range.Clone
     End Function
     Private Sub DispHand()
+        Dim tw = {0, 0, 0, 0, 0, 0, 0, 0}
+        Dim tb = {0, 0, 0, 0, 0, 0, 0, 0}
         Dim i As Integer
-        For i = 1 To tegomaw.Count Step 1
-            'GetHandWhite(i).Text = GetKomaName(i) + Str(tegomaw(i - 1))
-            GetHandWhite(i).Text = GetKomaName(GetTegoma(i - 1, WHITE))
-            If tegomaw(i - 1) > 0 Then
+        For i = 0 To tegomaw.Count - 1 Step 1
+            Dim koma = GetTegoma(i, WHITE)
+            If koma <> -1 Then
+                tw(koma - 1) += 1
+            End If
+        Next
+        For i = 0 To tegomab.Count - 1 Step 1
+            Dim koma = GetTegoma(i, BLACK)
+            If koma <> -1 Then
+                tb(koma - 1) += 1
+            End If
+        Next
+
+
+        For i = 1 To 8 Step 1
+            GetHandWhite(i).Text = GetKomaName(i) + Str(tw(i - 1))
+            If tw(i - 1) > 0 Then
                 GetHandWhite(i).Visible = True
             Else
                 GetHandWhite(i).Visible = False
             End If
         Next
-        For i = 1 To tegomab.Count Step 1
-            'GetHandBlack(i).Text = GetKomaName(i) + Str(tegomab(i - 1))
-            GetHandBlack(i).Text = GetKomaName(GetTegoma(i - 1, BLACK))
-            If tegomab(i - 1) > 0 Then
+        For i = 1 To 8 Step 1
+            GetHandBlack(i).Text = GetKomaName(i) + Str(tb(i - 1))
+            If tb(i - 1) > 0 Then
                 GetHandBlack(i).Visible = True
             Else
                 GetHandBlack(i).Visible = False
@@ -2235,7 +2249,7 @@ LOG_WRITE:
             tegomab.Remove(id)
         End If
         p.kind = t
-        p.captured = -1 * p.captured
+        p.captured = 0
         p.owner = -1 * p.owner
         Piece(id) = p
     End Sub
