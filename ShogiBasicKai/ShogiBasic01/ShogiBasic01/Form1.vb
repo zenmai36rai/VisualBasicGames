@@ -2281,7 +2281,7 @@ SET_BOARD:
     End Sub
     Private Sub KomaOki(ByVal hand As Integer, ByVal locate As Integer, ByVal id As Integer)
         'board(locate) = t
-        SetBoard(hand, locate, id)
+        SetBoardKind(BLANK, locate, id, hand)
         If id = DUMMY_ID Then
             Exit Sub
         End If
@@ -3128,6 +3128,7 @@ SET_BOARD:
         RichTextBox1.Text = s1 + s2
     End Sub
     Private Sub Button83_Click(sender As Object, e As EventArgs) Handles Button83.Click
+        KomaOki(1, 19, 11)
         DispBitBoard()
     End Sub
 
