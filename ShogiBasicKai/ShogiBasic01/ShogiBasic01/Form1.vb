@@ -589,6 +589,26 @@
         End If
         Return -1
     End Function
+    Private Function GetTegomaIDFromKind(ByVal k As Integer) As Integer
+        Dim tw = {0, 0, 0, 0, 0, 0, 0, 0}
+        Dim tb = {0, 0, 0, 0, 0, 0, 0, 0}
+        Dim i As Integer
+        For i = 0 To tegomaw.Count - 1 Step 1
+            Dim koma = GetTegoma(i, WHITE)
+            If koma = k Then
+                Dim p As PieceID = Piece(tegomaw(i))
+                Return p.id
+            End If
+        Next
+        For i = 0 To tegomab.Count - 1 Step 1
+            Dim koma = GetTegoma(i, BLACK)
+            If koma = k Then
+                Dim p As PieceID = Piece(tegomab(i))
+                Return p.id
+            End If
+        Next
+        Return -1
+    End Function
     Private Function KomaIdx(ByVal i As Integer, ByVal wb As Integer) As Integer
         Static ARW As Array = {1, 2, 3, 4, 5, 6, 7, 8}
         Static ARB As Array = {15, 16, 17, 18, 19, 20, 21, 22}
@@ -599,6 +619,7 @@
         End If
     End Function
     Dim pop As Integer
+    Dim pop_id As Integer
     Dim all As Array
     Dim komaundo As Integer
     Dim kihumem As Integer
@@ -1000,7 +1021,7 @@
         End If
     End Sub
     Dim InitGenerate As Boolean = True
-    Private Function UnitRange(ByVal mmid As Integer, ByVal locate As Integer) As List(Of Integer)
+    Private Function UnitRange(ByVal locate As Integer) As List(Of Integer)
         UnitRange = New List(Of Integer)
         Dim id As Integer = FindID(locate)
         Dim unit As Integer
@@ -1653,7 +1674,7 @@
                 undo = pos
                 GenerationFlag = True
                 NodeIdx = idx
-                UnitRange(-1, pos)
+                UnitRange(pos)
                 GenerationFlag = False
                 idx += (NodeIdx - idx)
             End If
@@ -1739,7 +1760,7 @@
         r = False
         If state = ST_FREE Then
             undo = locate
-            range = UnitRange(-1, locate).ToArray
+            range = UnitRange(locate).ToArray
             For i = 0 To range.Length - 1 Step 1
                 If range(i) <> BLANK Then
                     r = True
@@ -1777,7 +1798,7 @@
             state = ST_FREE
             Me.Refresh()
             Me.Cursor = Cursors.WaitCursor
-            'RobotMove(-1)
+            RobotMove(-1)
             Me.Cursor = Cursors.Default
         ElseIf (state = ST_WHITE_CHOOSE Or state = ST_BLACK_CHOOSE) And undo = locate Then
             DispAll()
@@ -1796,7 +1817,7 @@
             'board(locate) = pop
             'tegomaw(pop - 1) = tegomaw(pop - 1) - 1
             d.hand = pop
-            d.komaID = FindIDPop(pop - 1, WHITE)
+            d.komaID = GetTegomaIDFromKind(pop)
             d.org_pos = undo
             d.dst_pos = locate
             MakeMove(d, True, 0)
@@ -1807,13 +1828,13 @@
             state = ST_FREE
             Me.Refresh()
             Me.Cursor = Cursors.WaitCursor
-            'RobotMove(-1)
+            RobotMove(-1)
             Me.Cursor = Cursors.Default
         ElseIf state = ST_BLACK_MOVE And RangeCheck(locate) Then
             'board(locate) = pop
             'tegomab(pop - 15) = tegomab(pop - 15) - 1
             d.hand = pop
-            d.komaID = FindIDPop(pop - 15, BLACK)
+            d.komaID = GetTegomaIDFromKind(pop)
             d.org_pos = undo
             d.dst_pos = locate
             MakeMove(d, True, ModosiIdx)
@@ -1896,11 +1917,12 @@
     End Function
     Private Function TakeHand(ByVal koma As Integer) As Array
         Dim b As Button
-        If koma <= 14 Then
-            pop = GetTegoma(koma - 1, WHITE)
-        Else
-            pop = GetTegoma(koma - 1, BLACK)
-        End If
+        pop = koma
+        'If koma <= 14 Then
+        'pop_id = GetTegomaId(koma - 1, WHITE)
+        'Else
+        'pop_id = GetTegomaId(koma - 1, BLACK)
+        'End If
         range = all.Clone()
         For i = 0 To 80 Step 1
             If board(i) <> 0 Then
@@ -2303,6 +2325,7 @@ LOG_WRITE:
         GetKanji = k(num)
     End Function
     Private Function GetSoeji(ByVal locate As Integer) As String
+        Return ""
         Dim prev As Array
         Dim Range As Array
         Dim Kouho As Array
@@ -2334,7 +2357,7 @@ LOG_WRITE:
         For i = 0 To 80 Step 1
             If i = undo Then
             ElseIf prev(i) = prev(undo) Then
-                Range = UnitRange(-1, i).ToArray
+                Range = UnitRange(i).ToArray
                 For j = 0 To Range.Length - 1 Step 1
                     If Range(j) = locate Then
                         Kouho(ki) = i
