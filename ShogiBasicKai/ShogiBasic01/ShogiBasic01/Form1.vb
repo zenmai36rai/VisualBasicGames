@@ -33,6 +33,7 @@
         Public src_kind As Integer = 0
         Public dst_kind As Integer = 0
         Public teban As Integer = 0
+        Public capture As Integer = BLANK
         Sub New()
 
         End Sub
@@ -1809,7 +1810,7 @@
             state = ST_FREE
             Me.Refresh()
             Me.Cursor = Cursors.WaitCursor
-            'RobotMove(-1)
+            RobotMove(-1)
             Me.Cursor = Cursors.Default
         ElseIf (state = ST_WHITE_CHOOSE Or state = ST_BLACK_CHOOSE) And undo = locate Then
             DispAll()
@@ -1841,7 +1842,7 @@
             state = ST_FREE
             Me.Refresh()
             Me.Cursor = Cursors.WaitCursor
-            'RobotMove(-1)
+            RobotMove(-1)
             Me.Cursor = Cursors.Default
         ElseIf state = ST_BLACK_MOVE And RangeCheck(Range, locate) Then
             'board(locate) = pop
@@ -2097,7 +2098,7 @@
     End Sub
     Dim ModosiIdx As Integer = 0
     Dim DummyIdx As Integer = 0
-    Private Sub MakeMove(ByVal d As MoveData, ByVal mov As Boolean, ByRef MIdx As Integer)
+    Private Sub MakeMove(ByRef d As MoveData, ByVal mov As Boolean, ByRef MIdx As Integer)
         If BLANK <> d.org_pos Then
             d.src_kind = board(d.org_pos)
         End If
@@ -2105,14 +2106,12 @@
         If d.dst_kind > 0 Then
             d.dst_komaid = FindID(d.dst_pos)
         End If
-        modosi(MIdx) = d
-        MIdx = MIdx + 1
         If d.hand <> BLANK Then
             Dim id = GetTegomaIDFromKind(d.hand, d.teban)
             KomaOki(d.dst_pos, d.hand, id)
             GoTo LOG_WRITE
         End If
-        KomaTori(d.dst_pos)
+        d.capture = KomaTori(d.dst_pos)
         If mov Then
             narimem = board(d.org_pos)
         End If
@@ -2134,6 +2133,8 @@ LOG_WRITE:
         If DEBUG_LOG Then
             AddYomi(d.dst_pos)
         End If
+        modosi(MIdx) = d
+        MIdx = MIdx + 1
     End Sub
     Private Sub UnmakeMove(ByRef MIdx As Integer)
         MIdx = MIdx - 1
@@ -2147,7 +2148,7 @@ LOG_WRITE:
         'board(d.r) = d.src
         SetBoard(d.org_pos, d.src_kind, d.komaID)
         If d.dst_komaid <> DUMMY_ID Then
-            KomaKaeshi(d.dst_pos, d.dst_kind, d.dst_komaid)
+            KomaKaeshi(d.dst_pos, d.dst_kind, d.capture)
         End If
     End Sub
     Private Function Question() As Boolean
@@ -2205,11 +2206,11 @@ LOG_WRITE:
         Static table As Array = {0, 1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 6, 7, 1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 6, 7}
         Return table(t)
     End Function
-    Private Sub KomaTori(ByVal locate)
+    Private Function KomaTori(ByVal locate) As Integer
         Dim t As Integer
         t = board(locate)
         If t = 0 Then
-            Exit Sub
+            Return DUMMY_ID
         End If
         Dim id = FindID(locate)
         Dim b = board(locate)
@@ -2229,7 +2230,8 @@ LOG_WRITE:
             Piece(id).owner = wb
             Piece(id).kind = t
         End If
-    End Sub
+        Return id
+    End Function
     Private Sub KomaModosi(ByVal locate)
         Dim t As Integer
         t = board(locate)
@@ -2274,19 +2276,16 @@ LOG_WRITE:
     End Sub
     Private Sub KomaKaeshi(ByVal locate, ByVal t, ByVal id)
         'board(locate) = t
-        SetBoard(locate, t, id)
+        SetBoard(locate, t, DUMMY_ID)
         If 15 <= t Then
-            t = Ura_Omote(t)
+            't = Ura_Omote(t)
             'tegomaw(t) = tegomaw(t) - 1
             tegomaw.Remove(id)
         ElseIf 1 <= t And t <= 14 Then
-            t = Ura_Omote(t)
+            't = Ura_Omote(t)
             'tegomab(t) = tegomab(t) - 1
             tegomab.Remove(id)
         End If
-        Piece(id).kind = t
-        Piece(id).captured = 0
-        Piece(id).owner = -1 * Piece(id).owner
     End Sub
     Private Sub AddKihu(ByVal locate As Integer)
         Dim x As Integer

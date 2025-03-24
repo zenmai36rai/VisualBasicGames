@@ -1438,7 +1438,6 @@ Partial Class Form1
         Me.Button82.TabIndex = 106
         Me.Button82.Text = "戻"
         Me.Button82.UseVisualStyleBackColor = True
-        Me.Button82.Visible = False
         '
         'RichTextBox1
         '
