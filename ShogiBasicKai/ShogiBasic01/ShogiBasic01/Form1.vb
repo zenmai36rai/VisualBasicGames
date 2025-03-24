@@ -582,18 +582,12 @@
             For i = 0 To tegomaw.Count - 1
                 Dim p As PieceID = Piece(tegomaw(i))
                 Dim ret = p.kind
-                'If ret >= 15 Then
-                'ret -= 14
-                'End If
                 Return ret
             Next
         Else
             For i = 0 To tegomab.Count - 1
                 Dim p As PieceID = Piece(tegomab(i))
                 Dim ret = p.kind
-                If ret <= 8 Then
-                    ret += 14
-                End If
                 Return ret
             Next
         End If
@@ -2000,7 +1994,7 @@
         Dim i As Integer
         For i = 1 To tegomaw.Count Step 1
             'GetHandWhite(i).Text = GetKomaName(i) + Str(tegomaw(i - 1))
-            GetHandWhite(i).Text = GetTegoma(i - 1, WHITE).ToString
+            GetHandWhite(i).Text = GetKomaName(GetTegoma(tegomaw(i - 1), WHITE))
             If tegomaw(i - 1) > 0 Then
                 GetHandWhite(i).Visible = True
             Else
@@ -2009,7 +2003,7 @@
         Next
         For i = 1 To tegomab.Count Step 1
             'GetHandBlack(i).Text = GetKomaName(i) + Str(tegomab(i - 1))
-            GetHandBlack(i).Text = GetKomaName(GetTegoma(i - 1, BLACK))
+            GetHandBlack(i).Text = GetKomaName(GetTegoma(tegomab(i - 1), BLACK))
             If tegomab(i - 1) > 0 Then
                 GetHandBlack(i).Visible = True
             Else
@@ -2162,7 +2156,7 @@ LOG_WRITE:
     End Sub
     Private Function Ura_Omote(ByVal t As Integer) As Integer
         Static table As Array = {0, 1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 6, 7, 1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 6, 7}
-        Return table(t) - 1
+        Return table(t)
     End Function
     Private Sub KomaTori(ByVal locate)
         Dim t As Integer
@@ -2174,12 +2168,12 @@ LOG_WRITE:
         Dim b = board(locate)
         Dim wb = WHITE
         If 15 <= t Then
-            't = Ura_Omote(t)
+            t = Ura_Omote(t)
             'tegomaw(t) = tegomaw(t) + 1
             tegomaw.Add(id)
         ElseIf 1 <= t And t <= 14 Then
             wb = BLACK
-            't = Ura_Omote(t)
+            t = Ura_Omote(t)
             'tegomab(t) = tegomab(t) + 1
             tegomab.Add(id)
         End If
@@ -2203,12 +2197,12 @@ LOG_WRITE:
         End If
         Dim wb = BLACK
         If 15 <= t Then
-            't = Ura_Omote(t)
+            t = Ura_Omote(t)
             'tegomab(t) = tegomab(t) + 1
             tegomab.Add(id)
         ElseIf 1 <= t And t <= 14 Then
             wb = WHITE
-            't = Ura_Omote(t)
+            t = Ura_Omote(t)
             'tegomaw(t) = tegomaw(t) + 1
             tegomaw.Add(id)
         End If
