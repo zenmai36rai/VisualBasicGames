@@ -581,7 +581,7 @@
             Return ret
         ElseIf wb = BLACK And it < tegomab.Count Then
             Dim p As PieceID = Piece(tegomab(it))
-            If p.id <> tegomaw(it) Then
+            If p.id <> tegomab(it) Then
                 Return DUMMY_ID
             End If
             Dim ret = p.kind
@@ -1830,7 +1830,7 @@
             state = ST_FREE
             Me.Refresh()
             Me.Cursor = Cursors.WaitCursor
-            'RobotMove(-1)
+            RobotMove(-1)
             Me.Cursor = Cursors.Default
         ElseIf (state = ST_WHITE_CHOOSE Or state = ST_BLACK_CHOOSE) And undo = locate Then
             DispAll()
@@ -1862,7 +1862,7 @@
             state = ST_FREE
             Me.Refresh()
             Me.Cursor = Cursors.WaitCursor
-            'RobotMove(-1)
+            RobotMove(-1)
             Me.Cursor = Cursors.Default
         ElseIf state = ST_BLACK_MOVE And RangeCheck(Range, locate) Then
             'board(locate) = pop
