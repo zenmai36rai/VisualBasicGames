@@ -1588,10 +1588,10 @@
             'BBuf.komatoku += tegomab(i) * KomaScore(KomaIdx(i, BLACK)) * 1.05
         Next
         For i = 0 To tegomaw.Count - 1
-            WBuf.komatoku += KomaScore(GetTegoma(i, WHITE)) * 1.05
+            WBuf.komatoku += KomaScore(GetTegoma(tegomaw(i), WHITE)) * 1.05
         Next
         For i = 0 To tegomab.Count - 1
-            WBuf.komatoku += KomaScore(GetTegoma(i, BLACK)) * 1.05
+            WBuf.komatoku += KomaScore(GetTegoma(tegomab(i), BLACK)) * 1.05
         Next
         Hyouka += WBuf.komatoku
         Hyouka += WBuf.komaichi
@@ -1605,7 +1605,7 @@
     Private Function IsKillerMove(ByVal wb As Integer, ByVal dst As Integer) As Boolean
         Return IsWB(-wb, dst)
     End Function
-    Private Function alphabeta(ByVal i As Integer, ByVal first As Integer, ByVal wb As Integer, ByVal depth As Integer,
+    Private Function alphabeta(ByVal first As Integer, ByVal wb As Integer, ByVal depth As Integer,
                                 ByVal alpha As Integer, ByVal beta As Integer) As Integer
         Dim h As Integer = Hyouka() * wb
         If depth = 0 Then
@@ -1614,10 +1614,10 @@
         If Math.Abs(h) >= FINISH_SCORE Then
             Return h
         End If
-        Dim last As Integer = GenerateMoves(i, first, wb, depth)
+        Dim last As Integer = GenerateMoves(first, wb, depth)
         For i = first To last - 1 Step 1
             MakeMove(Node(i), False, ModosiIdx)
-            Dim a = -alphabeta(i, last, -wb, depth - 1, -beta, -alpha)
+            Dim a = -alphabeta(last, -wb, depth - 1, -beta, -alpha)
             UnmakeMove(ModosiIdx)
             If (a > alpha) Then
                 alpha = a
@@ -1637,7 +1637,7 @@
         Next
         Return alpha
     End Function
-    Private Function GenerateMoves(ByVal MakeMovedID As Integer, ByVal first As Integer, ByVal wb As Integer,
+    Private Function GenerateMoves(ByVal first As Integer, ByVal wb As Integer,
                                         ByVal depth As Integer) As Integer
         Dim idx As Integer = first
         If KOMAKIKI_READ Then
@@ -1706,7 +1706,7 @@
                 best.SetMoveDataFromString(_JyosekiDictionary(s))
             End If
         Else
-            ret = alphabeta(-1, 0, wb, YOMI_DEPTH, nodemin, nodemax)
+            ret = alphabeta(0, wb, YOMI_DEPTH, nodemin, nodemax)
             Dim s2 As String = best.GetMoveDataString()
             If False Then
                 _JyosekiDictionary.Add(s, s2)
