@@ -1833,7 +1833,8 @@
         TextBox4.Text = -Hyouka().ToString
     End Sub
     Private Function HandRange(ByVal wb As Integer, ByVal idx As Integer) As List(Of Integer)
-        Dim koma = KomaIdx(idx, wb)
+        'Dim koma = KomaIdx(idx, wb)
+        Dim koma = GetTegoma(idx, wb)
         range = all.Clone()
         For i = 0 To 80 Step 1
             If board(i) <> 0 Then
