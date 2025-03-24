@@ -577,22 +577,15 @@
     Dim range As Array
     Dim tegomaw As List(Of Integer)
     Dim tegomab As List(Of Integer)
-    Private Function GetTegoma(ByVal i As Integer, ByVal wb As Integer) As Integer
+    Private Function GetTegoma(ByVal it As Integer, ByVal wb As Integer) As Integer
         If wb = WHITE Then
-            For i = 0 To tegomaw.Count - 1
-                Dim p As PieceID = Piece(tegomaw(i))
-                Dim ret = p.kind
-                If ret < 1 Or 8 < ret Then
-                    Dim dbg = ret
-                End If
-                Return ret
-            Next
+            Dim p As PieceID = Piece(tegomaw(it))
+            Dim ret = p.kind
+            Return ret
         Else
-            For i = 0 To tegomab.Count - 1
-                Dim p As PieceID = Piece(tegomab(i))
-                Dim ret = p.kind
-                Return ret
-            Next
+            Dim p As PieceID = Piece(tegomab(it))
+            Dim ret = p.kind
+            Return ret
         End If
         Return -1
     End Function
