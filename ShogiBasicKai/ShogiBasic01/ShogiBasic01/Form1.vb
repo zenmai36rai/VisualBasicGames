@@ -1809,7 +1809,7 @@
             state = ST_FREE
             Me.Refresh()
             Me.Cursor = Cursors.WaitCursor
-            RobotMove(-1)
+            'RobotMove(-1)
             Me.Cursor = Cursors.Default
         ElseIf (state = ST_WHITE_CHOOSE Or state = ST_BLACK_CHOOSE) And undo = locate Then
             DispAll()
@@ -1841,7 +1841,7 @@
             state = ST_FREE
             Me.Refresh()
             Me.Cursor = Cursors.WaitCursor
-            RobotMove(-1)
+            'RobotMove(-1)
             Me.Cursor = Cursors.Default
         ElseIf state = ST_BLACK_MOVE And RangeCheck(Range, locate) Then
             'board(locate) = pop
@@ -2225,11 +2225,9 @@ LOG_WRITE:
             tegomab.Add(id)
         End If
         If id <> DUMMY_ID Then
-            Dim p As PieceID = Piece(id)
-            p.captured = wb
-            p.owner = wb
-            p.kind = t
-            Piece(id) = p
+            Piece(id).captured = wb
+            Piece(id).owner = wb
+            Piece(id).kind = t
         End If
     End Sub
     Private Sub KomaModosi(ByVal locate)
@@ -2254,11 +2252,9 @@ LOG_WRITE:
             tegomaw.Add(id)
         End If
         If id <> DUMMY_ID Then
-            Dim p As PieceID = Piece(id)
-            p.captured = wb
-            p.owner = wb
-            p.kind = t
-            Piece(id) = p
+            Piece(id).captured = wb
+            Piece(id).owner = wb
+            Piece(id).kind = t
         End If
     End Sub
     Private Sub KomaOki(ByVal locate, ByVal t, ByVal id)
@@ -2274,13 +2270,11 @@ LOG_WRITE:
             'tegomaw(t) = tegomaw(t) - 1
             tegomaw.Remove(id)
         End If
-        p.kind = t
-        Piece(id) = p
+        Piece(id).kind = t
     End Sub
     Private Sub KomaKaeshi(ByVal locate, ByVal t, ByVal id)
         'board(locate) = t
         SetBoard(locate, t, id)
-        Dim p As PieceID = Piece(id)
         If 15 <= t Then
             t = Ura_Omote(t)
             'tegomaw(t) = tegomaw(t) - 1
@@ -2290,10 +2284,9 @@ LOG_WRITE:
             'tegomab(t) = tegomab(t) - 1
             tegomab.Remove(id)
         End If
-        p.kind = t
-        p.captured = 0
-        p.owner = -1 * p.owner
-        Piece(id) = p
+        Piece(id).kind = t
+        Piece(id).captured = 0
+        Piece(id).owner = -1 * Piece(id).owner
     End Sub
     Private Sub AddKihu(ByVal locate As Integer)
         Dim x As Integer
