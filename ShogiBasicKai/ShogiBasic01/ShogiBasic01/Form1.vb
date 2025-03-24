@@ -1903,7 +1903,11 @@
     End Function
     Private Function TakeHand(ByVal koma As Integer) As Array
         Dim b As Button
-        pop = koma
+        If koma <= 14 Then
+            pop = GetTegoma(koma, WHITE)
+        Else
+            pop = GetTegoma(koma, BLACK)
+        End If
         range = all.Clone()
         For i = 0 To 80 Step 1
             If board(i) <> 0 Then
