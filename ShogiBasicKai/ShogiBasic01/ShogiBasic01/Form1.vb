@@ -1018,7 +1018,6 @@
     End Sub
     Dim InitGenerate As Boolean = True
     Private Function UnitRange(ByVal locate As Integer) As List(Of Integer)
-        UnitRange = New List(Of Integer)
         Dim id As Integer = FindID(locate)
         Dim unit As Integer
         locate = locate
@@ -1797,7 +1796,7 @@
             state = ST_FREE
             Me.Refresh()
             Me.Cursor = Cursors.WaitCursor
-            'RobotMove(-1)
+            RobotMove(-1)
             Me.Cursor = Cursors.Default
         ElseIf (state = ST_WHITE_CHOOSE Or state = ST_BLACK_CHOOSE) And undo = locate Then
             DispAll()
@@ -1829,7 +1828,7 @@
             state = ST_FREE
             Me.Refresh()
             Me.Cursor = Cursors.WaitCursor
-            'RobotMove(-1)
+            RobotMove(-1)
             Me.Cursor = Cursors.Default
         ElseIf state = ST_BLACK_MOVE And RangeCheck(locate) Then
             'board(locate) = pop
@@ -2017,11 +2016,13 @@
         Next
         For i = 0 To tegomab.Count - 1 Step 1
             Dim koma = GetTegoma(i, BLACK)
+            If 15 <= koma Then
+                koma = koma - 14
+            End If
             If koma <> -1 Then
                 tb(koma - 1) += 1
             End If
         Next
-
 
         For i = 1 To 8 Step 1
             GetHandWhite(i).Text = GetKomaName(i) + Str(tw(i - 1))
