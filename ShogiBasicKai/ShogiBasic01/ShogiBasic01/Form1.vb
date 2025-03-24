@@ -3,7 +3,7 @@
     Const BLACK As Integer = -1
     Const USE_AB As Boolean = True
     Const USE_JYOSEKI As Boolean = False
-    Const YOMI_DEPTH As Integer = 1
+    Const YOMI_DEPTH As Integer = 3
     Const HAND_RIMIT As Integer = 1
     Const HAND_READ As Boolean = True
     Const NARAZU_READ As Boolean = False
