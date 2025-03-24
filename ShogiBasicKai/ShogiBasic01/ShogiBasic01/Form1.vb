@@ -1064,17 +1064,15 @@
             Node.InsertRange(NodeIdx, KomaIDNode(id))
             NodeIdx += KomaIDNode(id).Count
         End If
-        If False Then
-            If 0 < unit And unit <= 26 And unit <> 2 And unit <> 6 And unit <> 7 And unit <> 13 And unit <> 14 And unit <> 16 And unit <> 20 And unit <> 21 Then
-                Dim dist = KikiBlocked.GetFirst()
-                While dist <> -1
-                    Dim result = KomaBlocked(dist).Find(Function(n) n = id)
-                    If result < 1 Then
-                        KomaBlocked(dist).Add(id)
-                    End If
-                    dist = KikiBlocked.GetNext()
-                End While
-            End If
+        If 0 < unit And unit <= 26 And unit <> 2 And unit <> 6 And unit <> 7 And unit <> 13 And unit <> 14 And unit <> 16 And unit <> 20 And unit <> 21 Then
+            Dim dist = KikiBlocked.GetFirst()
+            While dist <> -1
+                Dim result = KomaBlocked(dist).Find(Function(n) n = id)
+                If result < 1 Then
+                    KomaBlocked(dist).Add(id)
+                End If
+                dist = KikiBlocked.GetNext()
+            End While
         End If
     End Function
     Private Function RangeCheck(ByVal locate As Integer) As Boolean
@@ -1663,11 +1661,7 @@
                 undo = pos
                 GenerationFlag = True
                 NodeIdx = idx
-                If MakeMovedID <> -1 Then
-                    UnitRange(Node(MakeMovedID).komaID, pos)
-                Else
-                    UnitRange(-1, pos)
-                End If
+                UnitRange(-1, pos)
                 GenerationFlag = False
                 idx += (NodeIdx - idx)
             End If
@@ -1821,7 +1815,7 @@
             state = ST_FREE
             Me.Refresh()
             Me.Cursor = Cursors.WaitCursor
-            RobotMove(-1)
+            'RobotMove(-1)
             Me.Cursor = Cursors.Default
         ElseIf state = ST_BLACK_MOVE And RangeCheck(locate) Then
             'board(locate) = pop
