@@ -2180,6 +2180,8 @@ LOG_WRITE:
         End If
         If unit <> unit_up Then
             Piece(id).kind = unit_up
+        Else
+            Piece(id).kind = unit
         End If
 SET_BOARD:
         SetBoard(org, locate, id)
