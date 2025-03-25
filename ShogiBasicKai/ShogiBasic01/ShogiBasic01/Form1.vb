@@ -746,7 +746,7 @@
         If 0 < take Then
             dst_id = FindID(dist)
             If id = DUMMY_ID Then
-                id = FromKind(take)
+                id = FromKind(take, dist)
             End If
         End If
         If koma = 0 Then
@@ -832,18 +832,24 @@
         Public captured As Integer = 0
     End Class
     Dim Piece As List(Of PieceID)
-    Private Function FromKind(ByVal k As Integer)
+    Private Function FromKind(ByVal k As Integer, ByVal pos As Integer)
+        Dim ret = DUMMY_ID
         Dim kind = k
         If kind >= 15 Then
             kind -= 14
         End If
         kind = ClassDown(kind)
+        Dim max = 80
         For i = 0 To Piece.Count - 1
             If Piece(i).omote = kind Then
-                Return Piece(i).id
+                Dim dist = Math.Abs(Piece(i).place - pos)
+                If (dist < max) Then
+                    max = dist
+                    ret = Piece(i).id
+                End If
             End If
         Next
-        Return DUMMY_ID
+        Return ret
     End Function
 
     Private Function FindID(ByVal pos As Integer)
@@ -1200,7 +1206,7 @@
     Private Function UnitRange(ByVal locate As Integer) As List(Of Integer)
         Dim id As Integer = FindID(locate)
         If id = DUMMY_ID Then
-            id = FromKind(board(locate))
+            id = FromKind(board(locate), locate)
         End If
         Dim unit As Integer
         locate = locate
@@ -1977,7 +1983,7 @@
             d.hand = BLANK
             id = FindID(undo)
             If id = DUMMY_ID Then
-                id = FromKind(board(undo))
+                id = FromKind(board(undo), undo)
             End If
             d.komaID = id
             d.org_pos = undo
@@ -1999,7 +2005,7 @@
             d.hand = BLANK
             id = FindID(undo)
             If id = DUMMY_ID Then
-                id = FromKind(board(undo))
+                id = FromKind(board(undo), undo)
             End If
             d.komaID = id
             d.org_pos = undo
@@ -2384,7 +2390,7 @@ SET_BOARD:
         End If
         Dim id = FindID(locate)
         If id = DUMMY_ID Then
-            id = FromKind(board(locate))
+            id = FromKind(board(locate), locate)
         End If
         Dim wb = WHITE
         If 15 <= t Then
