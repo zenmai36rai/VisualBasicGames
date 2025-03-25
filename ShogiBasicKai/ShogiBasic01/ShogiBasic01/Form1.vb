@@ -2164,6 +2164,7 @@ LOG_WRITE:
             AddYomi(d.dst_pos)
         End If
         modosi.Push(d)
+        DispSum("MakeMove")
     End Sub
     Private Sub UnmakeMove()
         Dim d As MoveData = modosi.Pop
@@ -2178,6 +2179,7 @@ LOG_WRITE:
         If d.capture <> BLANK And d.capture <> DUMMY_ID Then
             KomaKaeshi(BLANK, d.dst_pos, d.capture, d.dst_kind)
         End If
+        DispSum("UnmakeMove")
     End Sub
     Private Function Question() As Boolean
         Question = True
@@ -2317,6 +2319,22 @@ SET_BOARD:
             tegomab.Remove(id)
             Console.WriteLine("後手が " & (id.ToString) & " を削除: ")
         End If
+    End Sub
+
+    Private Sub DispSum(ByVal s As String)
+        Dim n = 0
+        For i = 0 To 80
+            If board(i) <> 0 Then
+                n += 1
+            End If
+        Next
+        Dim w = tegomaw.Count
+        Dim b = tegomab.Count
+        Dim sum = n + w + b
+        If sum <> 40 Then
+            Console.WriteLine(s & "sumError! sum:" & sum.ToString & ",n:" & n.ToString & ",w:" & w.ToString & ",b:" & b.ToString)
+        End If
+
     End Sub
     Private Sub AddKihu(ByVal locate As Integer)
         Dim x As Integer
