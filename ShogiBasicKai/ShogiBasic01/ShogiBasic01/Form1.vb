@@ -1876,7 +1876,7 @@
             state = ST_FREE
             Me.Refresh()
             Me.Cursor = Cursors.WaitCursor
-            RobotMove(-1)
+            'RobotMove(-1)
             Me.Cursor = Cursors.Default
         ElseIf (state = ST_WHITE_CHOOSE Or state = ST_BLACK_CHOOSE) And undo = locate Then
             DispAll()
@@ -2175,7 +2175,7 @@
         End If
         DispSum("MakeMove: BeforeMove")
         d.capture = ClassUp(d.org_pos, d.dst_pos, d.komaID)
-        Dim s As String = "MakeMove: AfterClassUp, src:" + d.org_pos.ToString + ",dst:" + d.dst_pos.ToString + ",id:" + d.komaID.ToString
+        Dim s As String = "AfterClassUp, src:" + d.org_pos.ToString + ",dst:" + d.dst_pos.ToString + ",id:" + d.komaID.ToString
         DispSum(s)
 LOG_WRITE:
         If DEBUG_LOG Then
@@ -3113,19 +3113,26 @@ SET_BOARD:
 
     End Sub
     Private Sub DispBitBoard()
-        Dim s As String
+        Dim s1, s2, s3, s4 As String
         Dim mask As Int64 = &B111111111
         For i = 0 To 6 Step 1
             Dim m As Int64 = mask
             Dim d As Int64 = (bb_black.b1 >> (i * 9)) And m
             For j = 0 To 8 Step 1
                 Dim b As Int64 = (d >> j) And 1
-                s += Convert.ToString(b, 2)
+                s1 += Convert.ToString(b, 2)
             Next
-            s += vbCrLf
+            s1 += vbCrLf
         Next
-        Dim s2 As String = Convert.ToString(bb_black.b2, 2) + vbCrLf
-        Dim s3 As String
+        For i = 0 To 1 Step 1
+            Dim m As Int64 = mask
+            Dim d As Int64 = (bb_black.b2 >> (i * 9)) And m
+            For j = 0 To 8 Step 1
+                Dim b As Int64 = (d >> j) And 1
+                s2 += Convert.ToString(b, 2)
+            Next
+            s2 += vbCrLf
+        Next
         For i = 0 To 6 Step 1
             Dim m As Int64 = mask
             Dim d As Int64 = (bb_white.b1 >> (i * 9)) And m
@@ -3135,9 +3142,17 @@ SET_BOARD:
             Next
             s3 += vbCrLf
         Next
-        Dim s4 As String = Convert.ToString(bb_white.b2, 2)
+        For i = 0 To 1 Step 1
+            Dim m As Int64 = mask
+            Dim d As Int64 = (bb_white.b2 >> (i * 9)) And m
+            For j = 0 To 8 Step 1
+                Dim b As Int64 = (d >> j) And 1
+                s4 += Convert.ToString(b, 2)
+            Next
+            s4 += vbCrLf
+        Next
         RichTextBox1.Clear()
-        RichTextBox1.Text = s + vbCrLf + s2 + vbCrLf + s3 + vbCrLf + s4
+        RichTextBox1.Text = s1 + s2 + vbCrLf + s3 + s4
     End Sub
     Private Sub DispEval()
         Dim s1 As String = "先手駒得:" + Convert.ToString(WTop.komatoku)
