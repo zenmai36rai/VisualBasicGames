@@ -4,7 +4,7 @@
     Const BLACK As Integer = -1
     Const USE_AB As Boolean = True
     Const USE_JYOSEKI As Boolean = False
-    Const YOMI_DEPTH As Integer = 1
+    Const YOMI_DEPTH As Integer = 3
     Const HAND_RIMIT As Integer = 1
     Const HAND_READ As Boolean = True
     Const NARAZU_READ As Boolean = False
@@ -728,6 +728,9 @@
     End Sub
 
     Private Function SetBoard(ByVal from As Integer, ByVal dist As Integer, ByVal id As Integer) As Integer
+        If from = BLANK Then
+            Console.WriteLine("SetBoard: From Hand")
+        End If
         Dim koma = board(from)
         If id <> DUMMY_ID Then
             Dim c_up = Piece(id).kind
@@ -880,6 +883,15 @@
                     1, 1, 1, 1, 1, 1, 1, 1, 1,
                     0, 6, 0, 0, 0, 0, 0, 7, 0,
                     2, 3, 4, 5, 8, 5, 4, 3, 2}
+        Public _new_board = {1, 2, 3, 4, 5, 6, 7, 8, 9,
+                    0, 10, 0, 0, 0, 0, 0, 11, 0,
+                    12, 13, 14, 15, 16, 17, 18, 19, 20,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0,
+                    21, 22, 23, 24, 25, 26, 27, 28, 29,
+                    0, 30, 0, 0, 0, 0, 0, 31, 0,
+                    32, 33, 34, 35, 36, 37, 38, 39, 40}
         Public _board(9, 9) As Integer
         Public _retstring As String
         Public _id = {0, 1, 2, 3, 4, 5, 6, 7, 8,
