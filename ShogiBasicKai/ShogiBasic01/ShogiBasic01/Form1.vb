@@ -3,7 +3,7 @@
     Const BLACK As Integer = -1
     Const USE_AB As Boolean = True
     Const USE_JYOSEKI As Boolean = False
-    Const YOMI_DEPTH As Integer = 1
+    Const YOMI_DEPTH As Integer = 3
     Const HAND_RIMIT As Integer = 1
     Const HAND_READ As Boolean = True
     Const NARAZU_READ As Boolean = False
@@ -665,7 +665,7 @@
         Dim dst_id = FindID(dist)
         If 1 <= koma And koma <= 14 Then
             If take > 0 And dst_id <> DUMMY_ID Then
-                tegomaw.Add(dst_id)
+                AddTegomaW(dst_id)
             End If
             board(dist) = koma
             bb_white.AddBoard(dist)
@@ -673,7 +673,7 @@
         End If
         If 15 <= koma Then
             If take > 0 And dst_id <> DUMMY_ID Then
-                tegomab.Add(dst_id)
+                AddTegomaB(dst_id)
             End If
             board(dist) = koma
             bb_black.AddBoard(dist)
@@ -2268,7 +2268,7 @@ SET_BOARD:
             t = Ura_Omote(t)
             'tegomaw(t) = tegomaw(t) + 1
             If 0 <= id And id < 40 Then
-                tegomaw.Add(id)
+                AddTegomaW(id)
                 Console.WriteLine("先手が " & (id.ToString) & " を追加: ")
             End If
         ElseIf 1 <= t And t <= 14 Then
@@ -2276,7 +2276,7 @@ SET_BOARD:
             t = Ura_Omote(t)
             'tegomab(t) = tegomab(t) + 1
             If 0 <= id And id < 40 Then
-                tegomab.Add(id)
+                AddTegomaB(id)
                 Console.WriteLine("後手が " & (id.ToString) & " を追加: ")
             End If
         End If
@@ -2290,11 +2290,11 @@ SET_BOARD:
     Private Sub KomaModosi(ByVal id, ByVal teban)
         If teban = WHITE Then
             If 0 <= id And id < 40 Then
-                tegomab.Remove(id)
+                RemoveTegomaB(id)
             End If
         Else
             If 0 <= id And id < 40 Then
-                tegomaw.Remove(id)
+                RemoveTegomaW(id)
             End If
         End If
         If id <> DUMMY_ID Then
@@ -2313,11 +2313,11 @@ SET_BOARD:
         If 15 <= t Then
             't = Ura_Omote(t)
             'tegomab(t) = tegomab(t) - 1
-            tegomab.Remove(id)
+            RemoveTegomaB(id)
         ElseIf 1 <= t And t <= 14 Then
             't = Ura_Omote(t)
             'tegomaw(t) = tegomaw(t) - 1
-            tegomaw.Remove(id)
+            RemoveTegomaW(id)
         End If
         Piece(id).kind = t
     End Sub
@@ -2328,12 +2328,12 @@ SET_BOARD:
         If 15 <= t Then
             't = Ura_Omote(t)
             'tegomaw(t) = tegomaw(t) - 1
-            tegomaw.Remove(id)
+            RemoveTegomaW(id)
             Console.WriteLine("先手が " & (id.ToString) & " を削除: ")
         ElseIf 1 <= t And t <= 14 Then
             't = Ura_Omote(t)
             'tegomab(t) = tegomab(t) - 1
-            tegomab.Remove(id)
+            RemoveTegomaB(id)
             Console.WriteLine("後手が " & (id.ToString) & " を削除: ")
         End If
     End Sub
@@ -3275,5 +3275,34 @@ SET_BOARD:
         Next
         RichTextBox1.Text = s
     End Sub
+    Private Sub AddTegomaW(ByVal id)
+        If tegomaw.Find(Function(n) n = id) Then
+            Console.WriteLine("DuplicateID AddTegomaW !")
+        Else
+            tegomaw.Add(id)
+        End If
+        Dim s As String = "AddTegomaW:id=" + id.ToString
+        DispSum(s)
+    End Sub
+    Private Sub AddTegomaB(ByVal id)
+        If tegomab.Find(Function(n) n = id) Then
+            Console.WriteLine("DuplicateID AddTegomaB !")
+        Else
+            tegomab.Add(id)
+        End If
+        Dim s As String = "AddTegomaB:id=" + id.ToString
+        DispSum(s)
+    End Sub
+    Private Sub RemoveTegomaW(ByVal id)
+        tegomaw.Remove(id)
+        Dim s As String = "RemoveTegomaW:id=" + id.ToString
+        DispSum(s)
+    End Sub
+    Private Sub RemoveTegomaB(ByVal id)
+        tegomab.Remove(id)
+        Dim s As String = "RemoveTegomaB:id=" + id.ToString
+        DispSum(s)
+    End Sub
+
 End Class
 ' 2015 - 2025 Written By Kyosuke Miyazawa ShogiBasic
