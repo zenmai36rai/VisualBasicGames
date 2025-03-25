@@ -4,7 +4,7 @@
     Const BLACK As Integer = -1
     Const USE_AB As Boolean = True
     Const USE_JYOSEKI As Boolean = False
-    Const YOMI_DEPTH As Integer = 3
+    Const YOMI_DEPTH As Integer = 1
     Const HAND_RIMIT As Integer = 1
     Const HAND_READ As Boolean = True
     Const NARAZU_READ As Boolean = False
@@ -657,6 +657,13 @@
     Dim WTop As EvalBuff = New EvalBuff()
     Dim BTop As EvalBuff = New EvalBuff()
 
+    Dim allPieces As New List(Of Integer) From {
+        1, 1, 1, 1, 1, 1, 1, 1, 1, ' 先手の歩9枚
+        2, 3, 4, 5, 8, 5, 4, 3, 2, ' 先手の香桂銀金王金銀桂香
+        15, 15, 15, 15, 15, 15, 15, 15, 15, ' 後手の歩9枚
+        16, 17, 18, 19, 22, 19, 18, 17, 16 ' 後手の香桂銀金王金銀桂香
+    }
+
     Private Function GetLostID(ByVal take As Integer, ByVal pos As Integer) As Integer
         For i = 0 To Piece.Count - 1
             Dim p As PieceID = Piece(i)
@@ -664,8 +671,61 @@
                 Return Piece(i).id
             End If
         Next
+        For n = 0 To 80
+            For i = 0 To Piece.Count - 1
+                Dim p As PieceID = Piece(i)
+                If 0 <= p.place And p.place <= 80 Then
+                    If p.kind <> board(p.place) Then
+
+                    End If
+                End If
+            Next
+        Next
+
         Return DUMMY_ID
     End Function
+    Function GetCurrentPieces() As List(Of Integer)
+        Dim current As New List(Of Integer)
+        ' 盤面の駒
+        For i = 0 To 80
+            If board(i) <> 0 Then current.Add(board(i))
+        Next
+        ' 先手の手駒
+        current.AddRange(tegomaw)
+
+        ' 後手の手駒
+        current.AddRange(tegomab)
+
+        Return current
+    End Function
+    Sub IdentifyMissingOrExtra()
+        Dim total = CalculateSum()
+        If total <> 40 Then
+            Dim currentPieces = GetCurrentPieces()
+            Console.WriteLine("異常: SUM = " & total)
+
+            If total < 40 Then
+                ' 失くした駒を特定
+                For Each id In allPieces
+                    If Not currentPieces.Contains(id) Then
+                        Console.WriteLine("失くした駒ID: " & id)
+                        Exit For ' 1つ特定したら終了（仮定）
+                    End If
+                Next
+            ElseIf total > 40 Then
+                ' 増えた駒を特定
+                Dim tempList As New List(Of Integer)(allPieces)
+                For Each id In currentPieces
+                    If tempList.Contains(id) Then
+                        tempList.Remove(id) ' 一致したら削除
+                    Else
+                        Console.WriteLine("増えた駒ID: " & id)
+                        ' 重複チェック用にリストに残す
+                    End If
+                Next
+            End If
+        End If
+    End Sub
 
     Private Function SetBoard(ByVal from As Integer, ByVal dist As Integer, ByVal id As Integer) As Integer
         Dim koma = board(from)
@@ -682,7 +742,10 @@
             Console.WriteLine("DummyID at SetBoard !")
         End If
         Dim take = board(dist)
-        Dim dst_id = FindID(dist)
+        Dim dst_id = DUMMY_ID
+        If 0 < take Then
+            FindID(dist)
+        End If
         If koma = 0 Then
             Console.WriteLine("ZERO Move at SetBoard !")
         ElseIf take = 0 Then
@@ -786,6 +849,7 @@
                 Return Piece(i).id
             End If
         Next
+        Console.WriteLine("FindID Missing position = " & pos.ToString)
         Return DUMMY_ID
     End Function
     Private Function FindIDPop(ByVal pop As Integer, ByVal wb As Integer)
@@ -1131,7 +1195,7 @@
     End Sub
     Dim InitGenerate As Boolean = True
     Private Function UnitRange(ByVal locate As Integer) As List(Of Integer)
-        Dim id As Integer = FromKind(board(locate))
+        Dim id As Integer = FindID(locate)
         Dim unit As Integer
         locate = locate
         unit = board(locate)
@@ -1904,7 +1968,7 @@
         ElseIf state = ST_WHITE_CHOOSE And RangeCheck(range, locate) Then
             'MoveChara(locate)
             d.hand = BLANK
-            d.komaID = FromKind(board(undo))
+            d.komaID = FindID(undo)
             d.org_pos = undo
             d.dst_pos = locate
             d.teban = WHITE
@@ -1914,7 +1978,7 @@
             state = ST_FREE
             Me.Refresh()
             Me.Cursor = Cursors.WaitCursor
-            RobotMove(-1)
+            'RobotMove(-1)
             Me.Cursor = Cursors.Default
         ElseIf (state = ST_WHITE_CHOOSE Or state = ST_BLACK_CHOOSE) And undo = locate Then
             DispAll()
@@ -1922,7 +1986,7 @@
         ElseIf state = ST_BLACK_CHOOSE And RangeCheck(range, locate) Then
             'MoveChara(locate)
             d.hand = BLANK
-            d.komaID = FromKind(board(undo))
+            d.komaID = FindID(undo)
             d.org_pos = undo
             d.dst_pos = locate
             d.teban = BLACK
@@ -1946,7 +2010,7 @@
             state = ST_FREE
             Me.Refresh()
             Me.Cursor = Cursors.WaitCursor
-            RobotMove(-1)
+            'RobotMove(-1)
             Me.Cursor = Cursors.Default
         ElseIf state = ST_BLACK_MOVE And RangeCheck(range, locate) Then
             'board(locate) = pop
@@ -2221,6 +2285,7 @@ LOG_WRITE:
         End If
         modosi.Push(d)
         DispSum("MakeMove: End")
+        IdentifyMissingOrExtra()
     End Sub
     Private Sub UnmakeMove()
         Dim d As MoveData = modosi.Pop
@@ -2324,6 +2389,7 @@ SET_BOARD:
             Piece(id).captured = wb
             Piece(id).owner = wb
             Piece(id).kind = t
+            Piece(id).place = BLANK
         End If
         Return id
     End Function
@@ -2381,6 +2447,18 @@ SET_BOARD:
         End If
     End Sub
 
+    Private Function CalculateSum() As Integer
+        Dim n = 0
+        For i = 0 To 80
+            If board(i) <> 0 Then
+                n += 1
+            End If
+        Next
+        Dim w = tegomaw.Count
+        Dim b = tegomab.Count
+        Dim sum = n + w + b
+        Return sum
+    End Function
     Private Sub DispSum(ByVal s As String)
         Dim n = 0
         For i = 0 To 80
