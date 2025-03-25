@@ -1,5 +1,6 @@
 ﻿Public Class Form1
     Const DEBUG As Boolean = True
+    Const ROBOT_MOVE As Boolean = False
     Const WHITE As Integer = 1
     Const BLACK As Integer = -1
     Const USE_AB As Boolean = True
@@ -1904,6 +1905,9 @@
         Return idx
     End Function
     Private Sub RobotMove(ByVal wb As Integer)
+        If ROBOT_MOVE = False Then
+            Exit Sub
+        End If
         Dim c As Integer
         Dim org_pos As Integer
         Dim dst_pos As Integer
