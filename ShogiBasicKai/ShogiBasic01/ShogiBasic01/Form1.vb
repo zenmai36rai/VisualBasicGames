@@ -1942,6 +1942,7 @@
         Dim c As Integer
         Dim r As Integer
         Dim d As MoveData = New MoveData
+        Dim id As Integer
         r = False
         If state = ST_FREE Then
             undo = locate
@@ -1974,7 +1975,11 @@
         ElseIf state = ST_WHITE_CHOOSE And RangeCheck(range, locate) Then
             'MoveChara(locate)
             d.hand = BLANK
-            d.komaID = FindID(undo)
+            id = FindID(undo)
+            If id = DUMMY_ID Then
+                id = FromKind(board(undo))
+            End If
+            d.komaID = id
             d.org_pos = undo
             d.dst_pos = locate
             d.teban = WHITE
@@ -1984,7 +1989,7 @@
             state = ST_FREE
             Me.Refresh()
             Me.Cursor = Cursors.WaitCursor
-            'RobotMove(-1)
+            RobotMove(-1)
             Me.Cursor = Cursors.Default
         ElseIf (state = ST_WHITE_CHOOSE Or state = ST_BLACK_CHOOSE) And undo = locate Then
             DispAll()
@@ -1992,7 +1997,11 @@
         ElseIf state = ST_BLACK_CHOOSE And RangeCheck(range, locate) Then
             'MoveChara(locate)
             d.hand = BLANK
-            d.komaID = FindID(undo)
+            id = FindID(undo)
+            If id = DUMMY_ID Then
+                id = FromKind(board(undo))
+            End If
+            d.komaID = id
             d.org_pos = undo
             d.dst_pos = locate
             d.teban = BLACK
@@ -2016,7 +2025,7 @@
             state = ST_FREE
             Me.Refresh()
             Me.Cursor = Cursors.WaitCursor
-            'RobotMove(-1)
+            RobotMove(-1)
             Me.Cursor = Cursors.Default
         ElseIf state = ST_BLACK_MOVE And RangeCheck(range, locate) Then
             'board(locate) = pop
