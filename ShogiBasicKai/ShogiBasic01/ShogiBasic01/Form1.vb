@@ -1,4 +1,5 @@
 ﻿Public Class Form1
+    Const DEBUG As Boolean = True
     Const WHITE As Integer = 1
     Const BLACK As Integer = -1
     Const USE_AB As Boolean = True
@@ -656,16 +657,49 @@
     Dim WTop As EvalBuff = New EvalBuff()
     Dim BTop As EvalBuff = New EvalBuff()
 
+    Private Function GetLostID(ByVal take As Integer, ByVal pos As Integer) As Integer
+        For i = 0 To Piece.Count - 1
+            Dim p As PieceID = Piece(i)
+            If p.kind = take And p.place = pos Then
+                Return Piece(i).id
+            End If
+        Next
+        Return DUMMY_ID
+    End Function
+
     Private Function SetBoard(ByVal from As Integer, ByVal dist As Integer, ByVal id As Integer) As Integer
         Dim koma = board(from)
         If id <> DUMMY_ID Then
-            koma = Piece(id).kind
+            Dim c_up = Piece(id).kind
+            If 1 <= koma And koma <= 14 And 1 <= c_up And c_up <= 14 Then
+                koma = c_up
+            ElseIf 15 <= koma And koma <= 28 And 15 <= c_up And c_up <= 28 Then
+                koma = c_up
+            Else
+                Console.WriteLine("Cross Koma Move at SetBoard !")
+            End If
+        Else
+            Console.WriteLine("DummyID at SetBoard !")
         End If
         Dim take = board(dist)
         Dim dst_id = FindID(dist)
+        If koma = 0 Then
+            Console.WriteLine("ZERO Move at SetBoard !")
+        ElseIf take = 0 Then
+            Console.WriteLine("ZERO Take at SetBoard !")
+        ElseIf 1 <= koma And koma <= 14 And 1 <= take And take <= 14 Then
+            Console.WriteLine("BOTH WHITE Move at SetBoard !")
+        ElseIf 15 <= koma And koma <= 28 And 15 <= take And take <= 28 Then
+            Console.WriteLine("BOTH BLACK Move at SetBoard !")
+        End If
         If 1 <= koma And koma <= 14 Then
             If take > 0 And dst_id <> DUMMY_ID Then
                 AddTegomaW(dst_id)
+                Piece(dst_id).place = BLANK
+                Piece(dst_id).captured = WHITE
+            ElseIf take > 0 Then
+                Console.WriteLine("Failed Take at SetBoard !")
+                'AddTegomaW()
             End If
             board(dist) = koma
             bb_white.AddBoard(dist)
@@ -674,6 +708,11 @@
         If 15 <= koma Then
             If take > 0 And dst_id <> DUMMY_ID Then
                 AddTegomaB(dst_id)
+                Piece(dst_id).place = BLANK
+                Piece(dst_id).captured = BLACK
+            ElseIf take > 0 Then
+                Console.WriteLine("Failed Take at SetBoard !")
+                'AddTegomaW()
             End If
             board(dist) = koma
             bb_black.AddBoard(dist)
@@ -681,10 +720,11 @@
         End If
         Piece(id).place = dist
         If from <> BLANK Then
-            'Console.WriteLine("SetBoard: from rewrite")
             board(from) = 0
             bb_white.RemoveBoard(from)
             bb_black.RemoveBoard(from)
+        Else
+            Console.WriteLine("SetBoard: from BLANK")
         End If
         Return dst_id
     End Function
@@ -1861,7 +1901,7 @@
                     b.BackColor = Color.YellowGreen
                 End If
             Next
-        ElseIf state = ST_WHITE_CHOOSE And RangeCheck(Range, locate) Then
+        ElseIf state = ST_WHITE_CHOOSE And RangeCheck(range, locate) Then
             'MoveChara(locate)
             d.hand = BLANK
             d.komaID = FromKind(board(undo))
@@ -1879,7 +1919,7 @@
         ElseIf (state = ST_WHITE_CHOOSE Or state = ST_BLACK_CHOOSE) And undo = locate Then
             DispAll()
             state = 0
-        ElseIf state = ST_BLACK_CHOOSE And RangeCheck(Range, locate) Then
+        ElseIf state = ST_BLACK_CHOOSE And RangeCheck(range, locate) Then
             'MoveChara(locate)
             d.hand = BLANK
             d.komaID = FromKind(board(undo))
@@ -1890,7 +1930,7 @@
             DispAll()
             AddKihu(locate)
             state = ST_FREE
-        ElseIf state = ST_WHITE_MOVE And RangeCheck(Range, locate) Then
+        ElseIf state = ST_WHITE_MOVE And RangeCheck(range, locate) Then
             'board(locate) = pop
             'tegomaw(pop - 1) = tegomaw(pop - 1) - 1
             d.hand = pop
@@ -1908,7 +1948,7 @@
             Me.Cursor = Cursors.WaitCursor
             RobotMove(-1)
             Me.Cursor = Cursors.Default
-        ElseIf state = ST_BLACK_MOVE And RangeCheck(Range, locate) Then
+        ElseIf state = ST_BLACK_MOVE And RangeCheck(range, locate) Then
             'board(locate) = pop
             'tegomab(pop - 15) = tegomab(pop - 15) - 1
             d.hand = pop
@@ -2173,7 +2213,7 @@
         End If
         DispSum("MakeMove: BeforeMove")
         d.capture = ClassUp(d.org_pos, d.dst_pos, d.komaID)
-        Dim s As String = "AfterClassUp, src:" + d.org_pos.ToString + ",dst:" + d.dst_pos.ToString + ",id:" + d.komaID.ToString
+        Dim s As String = "AfterClassUp:capture = " + d.capture.ToString + ",src:" + d.org_pos.ToString + ",dst:" + d.dst_pos.ToString + ",id:" + d.komaID.ToString + ",kind:" + d.src_kind.ToString
         DispSum(s)
 LOG_WRITE:
         If DEBUG_LOG Then
@@ -2320,6 +2360,9 @@ SET_BOARD:
             RemoveTegomaW(id)
         End If
         Piece(id).kind = t
+        Piece(id).place = locate
+        Piece(id).captured = 0
+
     End Sub
     Private Sub KomaKaeshi(ByVal org, ByVal locate, ByVal id, ByVal kind)
         'board(locate) = t
