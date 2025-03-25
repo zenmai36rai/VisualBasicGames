@@ -105,8 +105,8 @@
                                         71, 70, 69, 68, 67, 66, 65, 64, 63,
                                         80, 79, 78, 77, 76, 75, 74, 73, 72}
     Class BitBoard
-        Public b1 As Int64
-        Public b2 As Int64
+        Public b1 As Int64 = 0
+        Public b2 As Int64 = 0
         Public n1 As Int64 = 0
         Public n2 As Int64 = 0
         Private bit As Int64 = 1
@@ -842,13 +842,11 @@
                     pi.owner = BLACK
                 End If
                 Piece.Add(pi)
-                Dim x = i Mod 9
-                Dim y = i / 9
-                _b._board(x, y) = id
                 id += 1
             End If
         Next
-        Dim s As String = _b.GetBoardString(board)
+
+        'Dim s As String = _b.GetBoardString(board)
         For i = 0 To 80 Step 1
             Dim k = board(i)
             If k <> 0 Then
@@ -1876,7 +1874,7 @@
             state = ST_FREE
             Me.Refresh()
             Me.Cursor = Cursors.WaitCursor
-            'RobotMove(-1)
+            RobotMove(-1)
             Me.Cursor = Cursors.Default
         ElseIf (state = ST_WHITE_CHOOSE Or state = ST_BLACK_CHOOSE) And undo = locate Then
             DispAll()
@@ -3113,7 +3111,10 @@ SET_BOARD:
 
     End Sub
     Private Sub DispBitBoard()
-        Dim s1, s2, s3, s4 As String
+        Dim s1 As String = ""
+        Dim s2 As String = ""
+        Dim s3 As String = ""
+        Dim s4 As String = ""
         Dim mask As Int64 = &B111111111
         For i = 0 To 6 Step 1
             Dim m As Int64 = mask
@@ -3151,8 +3152,18 @@ SET_BOARD:
             Next
             s4 += vbCrLf
         Next
+        Dim s5 As String = "" + vbCrLf + vbCrLf
+        Dim n = 0
+        For i = 0 To 8
+            For j = 0 To 8
+                s5 += board(n).ToString + ","
+                n += 1
+            Next
+            s5 += vbCrLf
+        Next
+
         RichTextBox1.Clear()
-        RichTextBox1.Text = s1 + s2 + vbCrLf + s3 + s4
+        RichTextBox1.Text = s1 + s2 + vbCrLf + s3 + s4 + s5
     End Sub
     Private Sub DispEval()
         Dim s1 As String = "先手駒得:" + Convert.ToString(WTop.komatoku)
@@ -3186,7 +3197,6 @@ SET_BOARD:
         RichTextBox1.Text = s1 + s2
     End Sub
     Private Sub Button83_Click(sender As Object, e As EventArgs) Handles Button83.Click
-        KomaOki(1, 19, 11)
         DispBitBoard()
     End Sub
 
