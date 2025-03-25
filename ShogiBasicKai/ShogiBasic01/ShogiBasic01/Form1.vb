@@ -744,7 +744,7 @@
         Dim take = board(dist)
         Dim dst_id = DUMMY_ID
         If 0 < take Then
-            FindID(dist)
+            dst_id = FindID(dist)
         End If
         If koma = 0 Then
             Console.WriteLine("ZERO Move at SetBoard !")
