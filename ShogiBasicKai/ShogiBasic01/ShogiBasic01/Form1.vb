@@ -660,7 +660,6 @@
         Dim koma = board(from)
         Dim take = board(dist)
         Dim dst_id = FindID(dist)
-
         If 1 <= koma And koma <= 14 Then
             If take > 0 And dst_id <> DUMMY_ID Then
                 tegomaw.Add(dst_id)
@@ -674,11 +673,12 @@
                 tegomab.Add(dst_id)
             End If
             board(dist) = koma
-                bb_black.AddBoard(dist)
-                bb_white.RemoveBoard(dist)
-            End If
-            Piece(id).place = dist
+            bb_black.AddBoard(dist)
+            bb_white.RemoveBoard(dist)
+        End If
+        Piece(id).place = dist
         If from <> BLANK Then
+            'Console.WriteLine("SetBoard: from rewrite")
             board(from) = 0
             bb_white.RemoveBoard(from)
             bb_black.RemoveBoard(from)
@@ -687,6 +687,13 @@
     End Function
     Private Function SetBoardKind(ByVal from As Integer, ByVal dist As Integer, ByVal id As Integer, ByVal kind As Integer) As Integer
         Dim koma = kind
+        Dim back = -1
+        If from <> 255 Then
+            back = board(from)
+        End If
+        If back <> -1 And back <> koma Then
+            Console.WriteLine("SetBoardKind Diff from koma")
+        End If
         If 1 <= koma And koma <= 14 Then
             board(dist) = koma
             bb_white.AddBoard(dist)
@@ -2148,6 +2155,7 @@
     Dim ModosiIdx As Integer = 0
     Dim DummyIdx As Integer = 0
     Private Sub MakeMove(ByRef d As MoveData, ByVal mov As Boolean)
+        DispSum("MakeMove: Start")
         If BLANK <> d.org_pos Then
             d.src_kind = board(d.org_pos)
         End If
@@ -2155,23 +2163,27 @@
         If d.hand <> BLANK Then
             Dim id = GetTegomaIDFromKind(d.hand, d.teban)
             KomaOki(d.hand, d.dst_pos, id)
+            DispSum("MakeMove: AfterDrop")
             GoTo LOG_WRITE
         End If
         'd.capture = KomaTori(d.dst_pos)
         If mov Then
             narimem = board(d.org_pos)
         End If
+        DispSum("MakeMove: BeforeMove")
         If d.classup Then
             d.capture = ClassUp(d.org_pos, d.dst_pos, d.komaID)
+            DispSum("MakeMove: AfterClassUp")
         Else
             d.capture = SetBoard(d.org_pos, d.dst_pos, d.komaID)
+            DispSum("MakeMove: AfterSetBoard")
         End If
 LOG_WRITE:
         If DEBUG_LOG Then
             AddYomi(d.dst_pos)
         End If
         modosi.Push(d)
-        DispSum("MakeMove")
+        DispSum("MakeMove: End")
     End Sub
     Private Sub UnmakeMove()
         Dim d As MoveData = modosi.Pop
