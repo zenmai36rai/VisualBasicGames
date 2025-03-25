@@ -657,26 +657,33 @@
     Dim BTop As EvalBuff = New EvalBuff()
 
     Private Function SetBoard(ByVal from As Integer, ByVal dist As Integer, ByVal id As Integer) As Integer
-        If id <> DUMMY_ID Then
-            Dim koma = Piece(id).kind
-            If 1 <= koma And koma <= 14 Then
-                board(dist) = koma
-                bb_white.AddBoard(dist)
-                bb_black.RemoveBoard(dist)
+        Dim koma = board(from)
+        Dim take = board(dist)
+        Dim dst_id = FindID(dist)
+
+        If 1 <= koma And koma <= 14 Then
+            If take > 0 And dst_id <> DUMMY_ID Then
+                tegomaw.Add(dst_id)
             End If
-            If 15 <= koma Then
-                board(dist) = koma
+            board(dist) = koma
+            bb_white.AddBoard(dist)
+            bb_black.RemoveBoard(dist)
+        End If
+        If 15 <= koma Then
+            If take > 0 And dst_id <> DUMMY_ID Then
+                tegomab.Add(dst_id)
+            End If
+            board(dist) = koma
                 bb_black.AddBoard(dist)
                 bb_white.RemoveBoard(dist)
             End If
             Piece(id).place = dist
-        End If
         If from <> BLANK Then
             board(from) = 0
             bb_white.RemoveBoard(from)
             bb_black.RemoveBoard(from)
         End If
-        Return 0
+        Return dst_id
     End Function
     Private Function SetBoardKind(ByVal from As Integer, ByVal dist As Integer, ByVal id As Integer, ByVal kind As Integer) As Integer
         Dim koma = kind
@@ -2150,14 +2157,14 @@
             KomaOki(d.hand, d.dst_pos, id)
             GoTo LOG_WRITE
         End If
-        d.capture = KomaTori(d.dst_pos)
+        'd.capture = KomaTori(d.dst_pos)
         If mov Then
             narimem = board(d.org_pos)
         End If
         If d.classup Then
-            ClassUp(d.org_pos, d.dst_pos, d.komaID)
+            d.capture = ClassUp(d.org_pos, d.dst_pos, d.komaID)
         Else
-            SetBoard(d.org_pos, d.dst_pos, d.komaID)
+            d.capture = SetBoard(d.org_pos, d.dst_pos, d.komaID)
         End If
 LOG_WRITE:
         If DEBUG_LOG Then
@@ -2190,7 +2197,7 @@ LOG_WRITE:
             Question = False
         End If
     End Function
-    Private Sub ClassUp(ByVal from As Integer, ByVal dst As Integer, ByVal id As Integer)
+    Private Function ClassUp(ByVal from As Integer, ByVal dst As Integer, ByVal id As Integer) As Integer
         Dim unit As Integer
         unit = board(from)
         Dim unit_up As Integer = unit
@@ -2219,8 +2226,8 @@ LOG_WRITE:
             Piece(id).kind = unit
         End If
 SET_BOARD:
-        SetBoard(from, dst, id)
-    End Sub
+        Return SetBoard(from, dst, id)
+    End Function
     Private Function ClassDown(ByVal kind As Integer) As Integer
         Dim unit As Integer = kind
         Select Case unit
