@@ -3,7 +3,7 @@
     Const BLACK As Integer = -1
     Const USE_AB As Boolean = True
     Const USE_JYOSEKI As Boolean = False
-    Const YOMI_DEPTH As Integer = 3
+    Const YOMI_DEPTH As Integer = 1
     Const HAND_RIMIT As Integer = 1
     Const HAND_READ As Boolean = True
     Const NARAZU_READ As Boolean = False
@@ -658,6 +658,9 @@
 
     Private Function SetBoard(ByVal from As Integer, ByVal dist As Integer, ByVal id As Integer) As Integer
         Dim koma = board(from)
+        If id <> DUMMY_ID Then
+            koma = Piece(id).kind
+        End If
         Dim take = board(dist)
         Dim dst_id = FindID(dist)
         If 1 <= koma And koma <= 14 Then
@@ -2171,13 +2174,9 @@
             narimem = board(d.org_pos)
         End If
         DispSum("MakeMove: BeforeMove")
-        If d.classup Then
-            d.capture = ClassUp(d.org_pos, d.dst_pos, d.komaID)
-            DispSum("MakeMove: AfterClassUp")
-        Else
-            d.capture = SetBoard(d.org_pos, d.dst_pos, d.komaID)
-            DispSum("MakeMove: AfterSetBoard")
-        End If
+        d.capture = ClassUp(d.org_pos, d.dst_pos, d.komaID)
+        Dim s As String = "MakeMove: AfterClassUp, src:" + d.org_pos.ToString + ",dst:" + d.dst_pos.ToString + ",id:" + d.komaID.ToString
+        DispSum(s)
 LOG_WRITE:
         If DEBUG_LOG Then
             AddYomi(d.dst_pos)
@@ -2232,12 +2231,13 @@ LOG_WRITE:
                     unit_up = unit + 7
             End Select
         End If
+SET_BOARD:
         If unit <> unit_up Then
             Piece(id).kind = unit_up
         Else
             Piece(id).kind = unit
         End If
-SET_BOARD:
+        DispSum("ClassUp:SetBoard:Before")
         Return SetBoard(from, dst, id)
     End Function
     Private Function ClassDown(ByVal kind As Integer) As Integer
