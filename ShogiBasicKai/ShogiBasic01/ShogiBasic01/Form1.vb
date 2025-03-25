@@ -745,6 +745,9 @@
         Dim dst_id = DUMMY_ID
         If 0 < take Then
             dst_id = FindID(dist)
+            If id = DUMMY_ID Then
+                id = FromKind(take)
+            End If
         End If
         If koma = 0 Then
             Console.WriteLine("ZERO Move at SetBoard !")
@@ -1196,6 +1199,9 @@
     Dim InitGenerate As Boolean = True
     Private Function UnitRange(ByVal locate As Integer) As List(Of Integer)
         Dim id As Integer = FindID(locate)
+        If id = DUMMY_ID Then
+            id = FromKind(board(locate))
+        End If
         Dim unit As Integer
         locate = locate
         unit = board(locate)
@@ -2368,6 +2374,9 @@ SET_BOARD:
             Return DUMMY_ID
         End If
         Dim id = FindID(locate)
+        If id = DUMMY_ID Then
+            id = FromKind(board(locate))
+        End If
         Dim wb = WHITE
         If 15 <= t Then
             t = Ura_Omote(t)
