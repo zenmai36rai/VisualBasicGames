@@ -2310,7 +2310,7 @@
         d.dst_kind = board(d.dst_pos)
         If d.hand <> BLANK Then
             Dim id = GetTegomaIDFromKind(d.hand, d.teban)
-            KomaOki(d.hand, d.dst_pos, id)
+            DropHand(d.hand, d.dst_pos, id)
             DispSum("MakeMove: AfterDrop")
             GoTo LOG_WRITE
         End If
@@ -2333,7 +2333,7 @@ LOG_WRITE:
     Private Sub UnmakeMove()
         Dim d As MoveData = modosi.Pop
         If d.hand <> BLANK Then
-            KomaModosi(d.komaID, d.teban)
+            ReverseDrop(d.komaID, d.teban)
             'board(d.r2) = 0
             SetBoard(BLANK, d.dst_pos, d.komaID)
             Exit Sub
@@ -2341,7 +2341,7 @@ LOG_WRITE:
         'board(d.r) = d.src
         ClassDown(d.dst_pos, d.org_pos, d.komaID, d.src_kind)
         If d.capture <> BLANK And d.capture <> DUMMY_ID Then
-            KomaKaeshi(BLANK, d.dst_pos, d.capture, d.dst_kind)
+            ReverseCapture(BLANK, d.dst_pos, d.capture, d.dst_kind, d.teban)
         End If
         DispSum("UnmakeMove")
     End Sub
@@ -2452,7 +2452,7 @@ SET_BOARD:
         End If
         Return id
     End Function
-    Private Sub KomaModosi(ByVal id, ByVal teban)
+    Private Sub ReverseDrop(ByVal id, ByVal teban)
         If teban = WHITE Then
             If 0 <= id And id < 40 Then
                 RemoveTegomaB(id)
@@ -2467,7 +2467,7 @@ SET_BOARD:
             Piece(id).owner = teban
         End If
     End Sub
-    Private Sub KomaOki(ByVal hand As Integer, ByVal locate As Integer, ByVal id As Integer)
+    Private Sub DropHand(ByVal hand As Integer, ByVal locate As Integer, ByVal id As Integer)
         'board(locate) = t
         SetBoardKind(BLANK, locate, id, hand)
         If id = DUMMY_ID Then
@@ -2489,21 +2489,15 @@ SET_BOARD:
         Piece(id).captured = 0
 
     End Sub
-    Private Sub KomaKaeshi(ByVal org, ByVal locate, ByVal id, ByVal kind)
+    Private Sub ReverseCapture(ByVal org, ByVal locate, ByVal id, ByVal kind, ByVal teban)
         'board(locate) = t
         SetBoardKind(org, locate, id, kind)
-        Dim t = Piece(id).kind
-        If 15 <= t Then
-            't = Ura_Omote(t)
-            'tegomaw(t) = tegomaw(t) - 1
+        If teban = WHITE Then
             RemoveTegomaW(id)
-            Console.WriteLine("先手が " & (id.ToString) & " を削除: ")
-        ElseIf 1 <= t And t <= 14 Then
-            't = Ura_Omote(t)
-            'tegomab(t) = tegomab(t) - 1
+        Else
             RemoveTegomaB(id)
-            Console.WriteLine("後手が " & (id.ToString) & " を削除: ")
         End If
+        Exit Sub
     End Sub
 
     Private Function CalculateSum() As Integer
