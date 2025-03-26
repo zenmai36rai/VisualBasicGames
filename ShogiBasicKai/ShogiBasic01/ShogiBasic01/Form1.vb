@@ -729,10 +729,13 @@
     End Sub
 
     Private Function SetBoard(ByVal from As Integer, ByVal dist As Integer, ByVal id As Integer) As Integer
+        Dim koma = BLANK
         If from = BLANK Then
             Console.WriteLine("SetBoard: From Hand")
+            koma = Piece(id).kind
+        Else
+            koma = board(from)
         End If
-        Dim koma = board(from)
         If id <> DUMMY_ID Then
             Dim c_up = Piece(id).kind
             If 1 <= koma And koma <= 14 And 1 <= c_up And c_up <= 14 Then
@@ -2333,7 +2336,7 @@ LOG_WRITE:
             Exit Sub
         End If
         'board(d.r) = d.src
-        SetBoardKind(d.dst_pos, d.org_pos, DUMMY_ID, d.src_kind)
+        ClassDown(d.dst_pos, d.org_pos, d.komaID, d.src_kind)
         If d.capture <> BLANK And d.capture <> DUMMY_ID Then
             KomaKaeshi(BLANK, d.dst_pos, d.capture, d.dst_kind)
         End If
@@ -2380,6 +2383,19 @@ SET_BOARD:
         DispSum("ClassUp:SetBoard:Before")
         Return SetBoard(from, dst, id)
     End Function
+    Private Function ClassDown(ByVal from As Integer, ByVal dst As Integer, ByVal id As Integer, ByVal kind As Integer) As Integer
+        Dim unit_up As Integer
+        unit_up = board(from)
+        Dim unit As Integer = kind
+        If unit <> unit_up Then
+            Piece(id).kind = unit
+        Else
+            Piece(id).kind = unit_up
+        End If
+        DispSum("ClassDown:SetBoard:Before")
+        Return SetBoard(from, dst, id)
+    End Function
+
     Private Function ClassDown(ByVal kind As Integer) As Integer
         Dim unit As Integer = kind
         Select Case unit
