@@ -684,66 +684,71 @@
         deltaW.Init()
         deltaB.Init()
 
+        ' 移動する駒（移動先の駒は成り後の可能性あり）
+        Dim originalPiece As Integer = move.src_kind ' MoveDataに移動前の駒を仮定
+        Dim movingPiece As Integer = board(move._to)  ' 移動後の駒（成り済み）
+
+
         ' 移動元の評価を引く
-        If IsWB(WHITE, move.from) Then
-            deltaW.komatoku -= KomaScore(board(move.from))
-            deltaW.komaichi -= koma_position_score(board(move.from), move.from)
-            deltaW.komakiki -= score_table(komakiki_w(move.from), 1, king_pos, move.from)
-            deltaB.komakiki -= score_table(komakiki_b(move.from), 1, enem_pos, move.from)
-        ElseIf IsWB(BLACK, move.from) Then
-            deltaB.komatoku -= KomaScore(board(move.from))
-            deltaB.komaichi -= koma_position_score(board(move.from), move.from)
-            deltaW.komakiki -= score_table(komakiki_w(move.from), 1, king_pos, move.from)
-            deltaB.komakiki -= score_table(komakiki_b(move.from), 0, king_pos, move.from)
+        If IsWB(WHITE, move._to) Then
+            deltaW.komatoku -= KomaScore(originalPiece) * 100
+            deltaW.komaichi -= koma_position_score(originalPiece, move.from) * 100
+            deltaW.komakiki -= score_table(komakiki_w(move.from), 1, king_pos, move.from) * 100
+            deltaB.komakiki -= score_table(komakiki_b(move.from), 1, enem_pos, move.from) * 100
+        Else
+            deltaB.komatoku -= KomaScore(originalPiece) * 100
+            deltaB.komaichi -= koma_position_score(originalPiece, move.from) * 100
+            deltaW.komakiki -= score_table(komakiki_w(move.from), 1, king_pos, move.from) * 100
+            deltaB.komakiki -= score_table(komakiki_b(move.from), 0, king_pos, move.from) * 100
         End If
 
-        ' 移動先の評価を足す
+        ' 移動先の評価を足す（成り考慮）
         If IsWB(WHITE, move._to) Then
-            deltaW.komatoku += KomaScore(board(move._to))
-            deltaW.komaichi += koma_position_score(board(move._to), move._to)
-            deltaW.komakiki += score_table(komakiki_w(move._to), 1, king_pos, move._to)
-            deltaB.komakiki += score_table(komakiki_b(move._to), 1, enem_pos, move._to)
-        ElseIf IsWB(BLACK, move._to) Then
-            deltaB.komatoku += KomaScore(board(move._to))
-            deltaB.komaichi += koma_position_score(board(move._to), move._to)
-            deltaW.komakiki += score_table(komakiki_w(move._to), 1, king_pos, move._to)
-            deltaB.komakiki += score_table(komakiki_b(move._to), 0, king_pos, move._to)
+            deltaW.komatoku += KomaScore(movingPiece) * 100 ' 成駒のスコア
+            deltaW.komaichi += koma_position_score(movingPiece, move._to) * 100
+            deltaW.komakiki += score_table(komakiki_w(move._to), 1, king_pos, move._to) * 100
+            deltaB.komakiki += score_table(komakiki_b(move._to), 1, enem_pos, move._to) * 100
+        Else
+            deltaB.komatoku += KomaScore(movingPiece) * 100
+            deltaB.komaichi += koma_position_score(movingPiece, move._to) * 100
+            deltaW.komakiki += score_table(komakiki_w(move._to), 1, king_pos, move._to) * 100
+            deltaB.komakiki += score_table(komakiki_b(move._to), 0, king_pos, move._to) * 100
         End If
 
         ' 捕獲があれば持ち駒として加算
         If move.capture <> DUMMY_ID Then
-            If IsWB(WHITE, move._to) Then
-                deltaW.komatoku += KomaScore(Piece(move.capture).omote) * 1.05
-            ElseIf IsWB(BLACK, move._to) Then
-                deltaB.komatoku += KomaScore(Piece(move.capture).omote) * 1.05
+            If move.teban = WHITE Then
+                deltaW.komatoku += KomaScore(Piece(move.capture).omote) * 105
+                deltaB.komatoku -= KomaScore(Piece(move.capture).omote) * 105
+            Else
+                deltaW.komatoku -= KomaScore(Piece(move.capture).omote) * 105
+                deltaB.komatoku += KomaScore(Piece(move.capture).omote) * 105
             End If
         End If
 
-        ' 全体の評価を更新
+        ' グローバル評価値を更新
         currentEval += (deltaW.komatoku + deltaW.komaichi + deltaW.komakiki)
         currentEval -= (deltaB.komatoku + deltaB.komaichi + deltaB.komakiki)
-        currentEval = currentEval / 2
 
-        ' グローバルなバッファを更新
-        WBufGlobal.komatoku += deltaW.komatoku
-        WBufGlobal.komaichi += deltaW.komaichi
-        WBufGlobal.komakiki += deltaW.komakiki
-        BBufGlobal.komatoku += deltaB.komatoku
-        BBufGlobal.komaichi += deltaB.komaichi
-        BBufGlobal.komakiki += deltaB.komakiki
+        ' グローバルバッファを更新
+        'WBufGlobal.komatoku += deltaW.komatoku
+        'WBufGlobal.komaichi += deltaW.komaichi
+        'WBufGlobal.komakiki += deltaW.komakiki
+        'BBufGlobal.komatoku += deltaB.komatoku
+        'BBufGlobal.komaichi += deltaB.komaichi
+        'BBufGlobal.komakiki += deltaB.komakiki
     End Sub
 
     Private Sub UnmakeEval(ByVal deltaW As Buffer, ByVal deltaB As Buffer)
         currentEval -= (deltaW.komatoku + deltaW.komaichi + deltaW.komakiki)
         currentEval += (deltaB.komatoku + deltaB.komaichi + deltaB.komakiki)
-        currentEval = currentEval / 2
 
-        WBufGlobal.komatoku -= deltaW.komatoku
-        WBufGlobal.komaichi -= deltaW.komaichi
-        WBufGlobal.komakiki -= deltaW.komakiki
-        BBufGlobal.komatoku -= deltaB.komatoku
-        BBufGlobal.komaichi -= deltaB.komaichi
-        BBufGlobal.komakiki -= deltaB.komakiki
+        'WBufGlobal.komatoku -= deltaW.komatoku
+        'WBufGlobal.komaichi -= deltaW.komaichi
+        'WBufGlobal.komakiki -= deltaW.komakiki
+        'BBufGlobal.komatoku -= deltaB.komatoku
+        'BBufGlobal.komaichi -= deltaB.komaichi
+        'BBufGlobal.komakiki -= deltaB.komakiki
     End Sub
 
     Dim WBuf As EvalBuff = New EvalBuff() 'WhiteBuff
@@ -1872,20 +1877,20 @@
         End If
         For i = 0 To 80 Step 1
             If board(i) = 0 Then
-                WBuf.komakiki += score_table(komakiki_w(i), 2, king_pos, i)
-                BBuf.komakiki += score_table(komakiki_b(i), 2, enem_pos, i)
+                WBuf.komakiki += score_table(komakiki_w(i), 2, king_pos, i) * 100
+                BBuf.komakiki += score_table(komakiki_b(i), 2, enem_pos, i) * 100
                 Continue For
             End If
             If IsWB(WHITE, i) Then
-                WBuf.komatoku += KomaScore(board(i))
-                WBuf.komaichi += koma_position_score(board(i), i)
-                'WBuf.komakiki += score_table(komakiki_w(i), 0, enem_pos, i)
-                BBuf.komakiki += score_table(komakiki_b(i), 1, enem_pos, i)
+                WBuf.komatoku += KomaScore(board(i)) * 100
+                WBuf.komaichi += koma_position_score(board(i), i) * 100
+                ''WBuf.komakiki += score_table(komakiki_w(i), 0, enem_pos, i)
+                BBuf.komakiki += score_table(komakiki_b(i), 1, enem_pos, i) * 100
             End If
             If IsWB(BLACK, i) Then
-                BBuf.komatoku += KomaScore(board(i))
-                BBuf.komaichi += koma_position_score(board(i), i)
-                WBuf.komakiki += score_table(komakiki_w(i), 1, king_pos, i)
+                BBuf.komatoku += KomaScore(board(i)) * 100
+                BBuf.komaichi += koma_position_score(board(i), i) * 100
+                WBuf.komakiki += score_table(komakiki_w(i), 1, king_pos, i) * 100
                 'BBuf.komakiki += score_table(komakiki_b(i), 0, king_pos, i)
             End If
         Next
@@ -1894,10 +1899,10 @@
             'BBuf.komatoku += tegomab(i) * KomaScore(KomaIdx(i, BLACK)) * 1.05
         Next
         For i = 0 To tegomaw.Count - 1 Step 1
-            WBuf.komatoku += KomaScore(Piece(tegomaw(i)).omote - 1) * 1.05
+            WBuf.komatoku += KomaScore(Piece(tegomaw(i)).omote) * 105
         Next
         For i = 0 To tegomab.Count - 1 Step 1
-            BBuf.komatoku += KomaScore(Piece(tegomab(i)).omote - 1) * 1.05
+            BBuf.komatoku += KomaScore(Piece(tegomab(i)).omote) * 105
         Next
         Hyouka += WBuf.komatoku
         Hyouka += WBuf.komaichi
@@ -1906,14 +1911,15 @@
         Hyouka -= BBuf.komaichi
         Hyouka -= BBuf.komakiki
         Hyouka = Hyouka / 2
-        Return Hyouka
+        Return Hyouka / 100
     End Function
     Private Function IsKillerMove(ByVal wb As Integer, ByVal dst As Integer) As Boolean
         Return IsWB(-wb, dst)
     End Function
     Private Function alphabeta(ByVal first As Integer, ByVal wb As Integer, ByVal depth As Integer,
                                 ByVal alpha As Integer, ByVal beta As Integer) As Integer
-        Dim h As Integer = Hyouka() * wb
+        'Dim h As Integer = Hyouka() * wb
+        Dim h As Integer = (currentEval / 200) * wb
         If depth = 0 Then
             Return h
         End If
@@ -2430,8 +2436,11 @@ LOG_WRITE:
         DispEvalDifference("MakeMoveEval:")
     End Sub
     Private Sub DispEvalDifference(ByVal s As String)
-        Dim h = Hyouka()
-        Console.WriteLine(s & "H = " & h.ToString & ",D = " & currentEval.ToString)
+        If DEBUG Then
+            Dim H = Hyouka()
+            Dim D = currentEval / 200
+            Console.WriteLine(s & "H = " & H.ToString & ",D = " & D.ToString)
+        End If
     End Sub
     Private Sub UnmakeMove()
         Dim d As MoveData = modosi.Pop
@@ -2439,7 +2448,7 @@ LOG_WRITE:
             ReverseDrop(d.komaID, d.teban)
             'board(d.r2) = 0
             SetBoard(BLANK, d._to, d.komaID)
-            Exit Sub
+            GoTo CALC_UNDO_EVAL
         End If
         'board(d.r) = d.src
         ClassDown(d._to, d.from, d.komaID, d.src_kind)
@@ -2447,6 +2456,7 @@ LOG_WRITE:
             ReverseCapture(BLANK, d._to, d.capture, d.dst_kind, d.teban)
         End If
         DispSum("UnmakeMove")
+CALC_UNDO_EVAL:
         Dim undoInfo As UndoInfo = undoStack.Pop()
         UnmakeEval(undoInfo.deltaW, undoInfo.deltaB)
         DispEvalDifference("UnmakeMoveEval:")
