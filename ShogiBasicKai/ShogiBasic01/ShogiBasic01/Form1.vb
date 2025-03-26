@@ -731,7 +731,7 @@
     Private Function SetBoard(ByVal from As Integer, ByVal dist As Integer, ByVal id As Integer) As Integer
         Dim koma = BLANK
         If from = BLANK Then
-            Console.WriteLine("SetBoard: From Hand")
+            Console.WriteLine("SetBoard: From Hand" & ":from:" & from.ToString & ",dist:" & dist.ToString & ",id:" & id.ToString)
             koma = Piece(id).kind
         Else
             koma = board(from)
@@ -798,6 +798,9 @@
             bb_black.RemoveBoard(from)
         Else
             Console.WriteLine("SetBoard: from BLANK")
+            board(dist) = 0
+            bb_white.RemoveBoard(dist)
+            bb_black.RemoveBoard(dist)
         End If
         Return dst_id
     End Function
