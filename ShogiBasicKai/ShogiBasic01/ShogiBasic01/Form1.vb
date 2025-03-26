@@ -24,8 +24,8 @@
     Private CheckBit As Integer = 0
     Class MoveData
         Public komaID As Integer
-        Public org_pos As Integer
-        Public dst_pos As Integer
+        Public from As Integer
+        Public _to As Integer
         Public hand As Integer = BLANK
         Public classup As Boolean = True
         Public eval As Integer = 0
@@ -44,8 +44,8 @@
                 ByVal h As Integer,
                 ByVal t As Integer)
             komaID = id
-            org_pos = i
-            dst_pos = dist
+            from = i
+            _to = dist
             hand = h
             teban = t
             classup = True
@@ -53,14 +53,14 @@
 
         Sub New(ByVal i As Integer, ByVal j As Integer)
             hand = i
-            dst_pos = j
+            _to = j
         End Sub
 
         Public _RetString As String
         Function GetMoveDataString() As String
             _RetString = ""
-            _RetString += org_pos.ToString() + ","
-            _RetString += dst_pos.ToString() + ","
+            _RetString += from.ToString() + ","
+            _RetString += _to.ToString() + ","
             _RetString += hand.ToString() + ","
             _RetString += classup.ToString() + ","
             _RetString += eval.ToString() + ","
@@ -71,8 +71,8 @@
         Function SetMoveDataFromString(ByVal str As String) As String
             Dim a As Array = str.Split(",")
             If a.Length >= 7 Then
-                org_pos = a(0)
-                dst_pos = a(1)
+                from = a(0)
+                _to = a(1)
                 hand = a(2)
                 classup = a(3)
             Else
@@ -633,7 +633,7 @@
     Dim nirami_b As Integer
     Const KOMAKIKI_SUM As Integer = 11
     Const WH_OR_BL As Integer = 2 '空きマスを考慮する場合は"3"
-    Const KING_POS As Integer = 81
+    Const KING_POS_MAX As Integer = 81
     Const EFFECT_POS As Integer = 81
     Dim FINISH_SCORE = 15000
     Dim koma_position_score(KOMA_KIND, KOMA_POS) As Integer
@@ -642,7 +642,7 @@
     Dim our_effect_value(9) As Integer
     Dim their_effect_value(9) As Integer
     Dim blank_effect_value(9) As Integer
-    Dim score_table(KOMAKIKI_SUM, WH_OR_BL, KING_POS, EFFECT_POS) As Integer
+    Dim score_table(KOMAKIKI_SUM, WH_OR_BL, KING_POS_MAX, EFFECT_POS) As Integer
     Class EvalBuff
         Public komatoku As Integer = 0
         Public komakiki As Integer = 0
@@ -653,6 +653,97 @@
             komaichi = 0
         End Sub
     End Class
+    Private currentEval As Integer ' 現在の評価値
+    Private WBufGlobal As EvalBuff = New EvalBuff() ' 先手の評価（komatoku, komaichi, komakiki）
+    Private BBufGlobal As EvalBuff = New EvalBuff() ' 後手の評価
+    Sub InitializeEval()
+        currentEval = Hyouka()
+        WBufGlobal = WBuf
+        BBufGlobal = BBuf
+    End Sub
+    Public Structure Buffer
+        Public komatoku As Integer ' 駒の価値の合計
+        Public komaichi As Integer ' 駒の位置評価の合計
+        Public komakiki As Integer ' 駒の利きの評価の合計
+
+        ' 初期化メソッド
+        Public Sub Init()
+            komatoku = 0
+            komaichi = 0
+            komakiki = 0
+        End Sub
+    End Structure
+    Dim king_pos As Integer
+    Dim enem_pos As Integer
+
+    Private Sub UpdateEval(ByVal move As MoveData)
+        Dim deltaW As Buffer ' 先手の差分
+        Dim deltaB As Buffer ' 後手の差分
+        deltaW.Init()
+        deltaB.Init()
+
+        ' 移動元の評価を引く
+        If IsWB(WHITE, move.from) Then
+            deltaW.komatoku -= KomaScore(board(move.from))
+            deltaW.komaichi -= koma_position_score(board(move.from), move.from)
+            deltaW.komakiki -= score_table(komakiki_w(move.from), 1, king_pos, move.from)
+            deltaB.komakiki -= score_table(komakiki_b(move.from), 1, enem_pos, move.from)
+        ElseIf IsWB(BLACK, move.from) Then
+            deltaB.komatoku -= KomaScore(board(move.from))
+            deltaB.komaichi -= koma_position_score(board(move.from), move.from)
+            deltaW.komakiki -= score_table(komakiki_w(move.from), 1, king_pos, move.from)
+            deltaB.komakiki -= score_table(komakiki_b(move.from), 0, king_pos, move.from)
+        End If
+
+        ' 移動先の評価を足す
+        If IsWB(WHITE, move._to) Then
+            deltaW.komatoku += KomaScore(board(move._to))
+            deltaW.komaichi += koma_position_score(board(move._to), move._to)
+            deltaW.komakiki += score_table(komakiki_w(move._to), 1, king_pos, move._to)
+            deltaB.komakiki += score_table(komakiki_b(move._to), 1, enem_pos, move._to)
+        ElseIf IsWB(BLACK, move._to) Then
+            deltaB.komatoku += KomaScore(board(move._to))
+            deltaB.komaichi += koma_position_score(board(move._to), move._to)
+            deltaW.komakiki += score_table(komakiki_w(move._to), 1, king_pos, move._to)
+            deltaB.komakiki += score_table(komakiki_b(move._to), 0, king_pos, move._to)
+        End If
+
+        ' 捕獲があれば持ち駒として加算
+        If move.capture <> 0 Then
+            If IsWB(WHITE, move._to) Then
+                deltaW.komatoku += KomaScore(Piece(move.capture).omote) * 1.05
+            ElseIf IsWB(BLACK, move._to) Then
+                deltaB.komatoku += KomaScore(Piece(move.capture).omote) * 1.05
+            End If
+        End If
+
+        ' 全体の評価を更新
+        currentEval += (deltaW.komatoku + deltaW.komaichi + deltaW.komakiki)
+        currentEval -= (deltaB.komatoku + deltaB.komaichi + deltaB.komakiki)
+        currentEval = currentEval / 2
+
+        ' グローバルなバッファを更新
+        WBufGlobal.komatoku += deltaW.komatoku
+        WBufGlobal.komaichi += deltaW.komaichi
+        WBufGlobal.komakiki += deltaW.komakiki
+        BBufGlobal.komatoku += deltaB.komatoku
+        BBufGlobal.komaichi += deltaB.komaichi
+        BBufGlobal.komakiki += deltaB.komakiki
+    End Sub
+
+    Private Sub UnmakeEval(ByVal deltaW As Buffer, ByVal deltaB As Buffer)
+        currentEval -= (deltaW.komatoku + deltaW.komaichi + deltaW.komakiki)
+        currentEval += (deltaB.komatoku + deltaB.komaichi + deltaB.komakiki)
+        currentEval = currentEval / 2
+
+        WBufGlobal.komatoku -= deltaW.komatoku
+        WBufGlobal.komaichi -= deltaW.komaichi
+        WBufGlobal.komakiki -= deltaW.komakiki
+        BBufGlobal.komatoku -= deltaB.komatoku
+        BBufGlobal.komaichi -= deltaB.komaichi
+        BBufGlobal.komakiki -= deltaB.komakiki
+    End Sub
+
     Dim WBuf As EvalBuff = New EvalBuff() 'WhiteBuff
     Dim BBuf As EvalBuff = New EvalBuff() 'BlackBuff
     Dim WTop As EvalBuff = New EvalBuff()
@@ -1069,6 +1160,7 @@
             Next
         Next
         LoadJyoseki()
+        InitializeEval()
     End Sub
     Private Sub CalcHuRange(ByVal locate As Integer, ByVal wb As Integer)
         Dim x As Integer
@@ -1753,8 +1845,8 @@
         KomaDist = Math.Sqrt(x ^ 2 + y ^ 2) / 456
     End Function
     Private Function Hyouka() As Integer
-        Dim king_pos As Integer = -1
-        Dim enem_pos As Integer = -1
+        KING_POS = -1
+        enem_pos = -1
         Dim d As Integer = 0
         WBuf.Init()
         BBuf.Init()
@@ -1908,8 +2000,8 @@
             Exit Sub
         End If
         Dim c As Integer
-        Dim org_pos As Integer
-        Dim dst_pos As Integer
+        Dim from As Integer
+        Dim _to As Integer
         Dim nodemax As Integer
         Dim nodemin As Integer
         c = 0
@@ -1918,7 +2010,7 @@
         nodemin = -214748364
         SuspendLayout()
         Dim ret As Integer = 0
-        best.org_pos = BLANK
+        best.from = BLANK
         Dim s As String = _b.GetBoardString(board)
         If USE_JYOSEKI Then
             If _JyosekiDictionary.ContainsKey(s) Then
@@ -1940,16 +2032,16 @@
             ListBox1.Items.Add("▽投了")
             ListBox1.TopIndex = ListBox1.Items.Count - 1
         ElseIf best.hand = BLANK Then
-            org_pos = best.org_pos
-            dst_pos = best.dst_pos
-            GetButton(org_pos).PerformClick()
-            GetButton(dst_pos).PerformClick()
+            from = best.from
+            _to = best._to
+            GetButton(from).PerformClick()
+            GetButton(_to).PerformClick()
             robomode = False
         Else
-            org_pos = best.hand - 14
-            dst_pos = best.dst_pos
-            GetHandBlack(org_pos).PerformClick()
-            GetButton(dst_pos).PerformClick()
+            from = best.hand - 14
+            _to = best._to
+            GetHandBlack(from).PerformClick()
+            GetButton(_to).PerformClick()
             robomode = False
         End If
         If BestScore >= FINISH_SCORE Then
@@ -2001,8 +2093,8 @@
                 id = FromKind(board(undo), undo)
             End If
             d.komaID = id
-            d.org_pos = undo
-            d.dst_pos = locate
+            d.from = undo
+            d._to = locate
             d.teban = WHITE
             MakeMove(d, True)
             DispAll()
@@ -2023,8 +2115,8 @@
                 id = FromKind(board(undo), undo)
             End If
             d.komaID = id
-            d.org_pos = undo
-            d.dst_pos = locate
+            d.from = undo
+            d._to = locate
             d.teban = BLACK
             MakeMove(d, True)
             DispAll()
@@ -2035,8 +2127,8 @@
             'tegomaw(pop - 1) = tegomaw(pop - 1) - 1
             d.hand = pop
             d.komaID = GetTegomaIDFromKind(pop, WHITE)
-            d.org_pos = undo
-            d.dst_pos = locate
+            d.from = undo
+            d._to = locate
             d.teban = WHITE
             MakeMove(d, True)
             DispAll()
@@ -2053,8 +2145,8 @@
             'tegomab(pop - 15) = tegomab(pop - 15) - 1
             d.hand = pop
             d.komaID = GetTegomaIDFromKind(pop, BLACK)
-            d.org_pos = undo
-            d.dst_pos = locate
+            d.from = undo
+            d._to = locate
             d.teban = BLACK
             MakeMove(d, True)
             DispAll()
@@ -2297,27 +2389,27 @@
     Dim DummyIdx As Integer = 0
     Private Sub MakeMove(ByRef d As MoveData, ByVal mov As Boolean)
         DispSum("MakeMove: Start")
-        If BLANK <> d.org_pos Then
-            d.src_kind = board(d.org_pos)
+        If BLANK <> d.from Then
+            d.src_kind = board(d.from)
         End If
-        d.dst_kind = board(d.dst_pos)
+        d.dst_kind = board(d._to)
         If d.hand <> BLANK Then
             Dim id = GetTegomaIDFromKind(d.hand, d.teban)
-            DropHand(d.hand, d.dst_pos, id)
+            DropHand(d.hand, d._to, id)
             DispSum("MakeMove: AfterDrop")
             GoTo LOG_WRITE
         End If
-        'd.capture = KomaTori(d.dst_pos)
+        'd.capture = KomaTori(d._to)
         If mov Then
-            narimem = board(d.org_pos)
+            narimem = board(d.from)
         End If
         DispSum("MakeMove: BeforeMove")
-        d.capture = ClassUp(d.org_pos, d.dst_pos, d.komaID)
-        Dim s As String = "AfterClassUp:capture = " + d.capture.ToString + ",src:" + d.org_pos.ToString + ",dst:" + d.dst_pos.ToString + ",id:" + d.komaID.ToString + ",kind:" + d.src_kind.ToString
+        d.capture = ClassUp(d.from, d._to, d.komaID)
+        Dim s As String = "AfterClassUp:capture = " + d.capture.ToString + ",src:" + d.from.ToString + ",dst:" + d._to.ToString + ",id:" + d.komaID.ToString + ",kind:" + d.src_kind.ToString
         DispSum(s)
 LOG_WRITE:
         If DEBUG_LOG Then
-            AddYomi(d.dst_pos)
+            AddYomi(d._to)
         End If
         modosi.Push(d)
         DispSum("MakeMove: End")
@@ -2328,13 +2420,13 @@ LOG_WRITE:
         If d.hand <> BLANK Then
             ReverseDrop(d.komaID, d.teban)
             'board(d.r2) = 0
-            SetBoard(BLANK, d.dst_pos, d.komaID)
+            SetBoard(BLANK, d._to, d.komaID)
             Exit Sub
         End If
         'board(d.r) = d.src
-        ClassDown(d.dst_pos, d.org_pos, d.komaID, d.src_kind)
+        ClassDown(d._to, d.from, d.komaID, d.src_kind)
         If d.capture <> BLANK And d.capture <> DUMMY_ID Then
-            ReverseCapture(BLANK, d.dst_pos, d.capture, d.dst_kind, d.teban)
+            ReverseCapture(BLANK, d._to, d.capture, d.dst_kind, d.teban)
         End If
         DispSum("UnmakeMove")
     End Sub
