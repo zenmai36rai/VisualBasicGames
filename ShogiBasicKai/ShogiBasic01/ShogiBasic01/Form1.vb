@@ -1,6 +1,6 @@
 ﻿Public Class Form1
-    Const DEBUG As Boolean = True
-    Const ROBOT_MOVE As Boolean = False
+    Const DEBUG As Boolean = False
+    Const ROBOT_MOVE As Boolean = True
     Const WHITE As Integer = 1
     Const BLACK As Integer = -1
     Const USE_AB As Boolean = True
@@ -700,6 +700,9 @@
         Return current
     End Function
     Sub IdentifyMissingOrExtra()
+        If DEBUG = False Then
+            Exit Sub
+        End If
         Dim total = CalculateSum()
         If total <> 40 Then
             Dim currentPieces = GetCurrentPieces()
@@ -2513,6 +2516,9 @@ SET_BOARD:
         Return sum
     End Function
     Private Sub DispSum(ByVal s As String)
+        If DEBUG = False Then
+            Exit Sub
+        End If
         Dim n = 0
         For i = 0 To 80
             If board(i) <> 0 Then
@@ -2525,7 +2531,6 @@ SET_BOARD:
         If sum <> 40 Then
             Console.WriteLine(s & "sumError! sum:" & sum.ToString & ",n:" & n.ToString & ",w:" & w.ToString & ",b:" & b.ToString)
         End If
-
     End Sub
     Private Sub AddKihu(ByVal locate As Integer)
         Dim x As Integer
