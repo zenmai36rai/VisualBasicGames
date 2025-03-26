@@ -759,22 +759,12 @@
                 id = FromKind(take, dist)
             End If
         End If
-        If koma = 0 Then
-            Console.WriteLine("ZERO Move at SetBoard !")
-        ElseIf take = 0 Then
-            Console.WriteLine("ZERO Take at SetBoard !")
-        ElseIf 1 <= koma And koma <= 14 And 1 <= take And take <= 14 Then
-            Console.WriteLine("BOTH WHITE Move at SetBoard !")
-        ElseIf 15 <= koma And koma <= 28 And 15 <= take And take <= 28 Then
-            Console.WriteLine("BOTH BLACK Move at SetBoard !")
-        End If
         If 1 <= koma And koma <= 14 Then
             If take > 0 And dst_id <> DUMMY_ID Then
                 AddTegomaW(dst_id)
                 Piece(dst_id).place = BLANK
                 Piece(dst_id).captured = WHITE
             ElseIf take > 0 Then
-                Console.WriteLine("Failed Take at SetBoard !")
                 'AddTegomaW()
             End If
             board(dist) = koma
