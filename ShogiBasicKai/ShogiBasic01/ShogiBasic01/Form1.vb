@@ -635,7 +635,7 @@
     Const WH_OR_BL As Integer = 2 '空きマスを考慮する場合は"3"
     Const KING_POS_MAX As Integer = 81
     Const EFFECT_POS As Integer = 81
-    Dim FINISH_SCORE = 15000
+    Dim FINISH_SCORE = 9000
     Dim koma_position_score(KOMA_KIND, KOMA_POS) As Integer
     Const POSITION_BIAS As Integer = 150
     Const HIGH_POSITION_SCORE As Integer = 1
@@ -683,11 +683,33 @@
     Private Sub UpdateEval(ByVal move As MoveData, ByRef deltaW As Buffer, ByRef deltaB As Buffer)
         deltaW.Init()
         deltaB.Init()
+        If DEBUG Then
+            ' インデックスチェック
+            If move.from < 0 Or move.from > 80 Then
+                Throw New ArgumentException("move.fromが範囲外: " & move.from)
+            End If
+            If move._to < 0 Or move._to > 80 Then
+                Throw New ArgumentException("move.toが範囲外: " & move._to)
+            End If
+            If king_pos < 0 Or king_pos > 80 Then
+                Throw New ArgumentException("king_posが範囲外: " & king_pos)
+            End If
+            If enem_pos < 0 Or enem_pos > 80 Then
+                Throw New ArgumentException("enem_posが範囲外: " & enem_pos)
+            End If
+        End If
+        If king_pos < 0 Or king_pos > 80 Then
+            currentEval = -(FINISH_SCORE * 200)
+            Exit Sub
+        End If
+        If enem_pos < 0 Or enem_pos > 80 Then
+            currentEval = FINISH_SCORE * 200
+            Exit Sub
+        End If
 
         ' 移動する駒（移動先の駒は成り後の可能性あり）
         Dim originalPiece As Integer = move.src_kind ' MoveDataに移動前の駒を仮定
         Dim movingPiece As Integer = board(move._to)  ' 移動後の駒（成り済み）
-
 
         ' 移動元の評価を引く
         If IsWB(WHITE, move._to) Then
@@ -716,7 +738,7 @@
         End If
 
         ' 捕獲があれば持ち駒として加算
-        If move.capture <> DUMMY_ID Then
+        If move.capture <> DUMMY_ID And 0 < move.capture And move.capture <= Piece.Count Then
             If move.teban = WHITE Then
                 deltaW.komatoku += KomaScore(Piece(move.capture).omote) * 105
                 deltaB.komatoku -= KomaScore(Piece(move.capture).omote) * 105
@@ -1839,7 +1861,13 @@
         End If
     End Function
     Private Function KomaScore(ByVal koma) As Integer
-        Static score As Array = {0, 90, 315, 405, 495, 540, 990, 855, 30000, 540, 540, 540, 540, 1395, 945, 90, 315, 405, 495, 540, 990, 855, 30000, 540, 540, 540, 540, 1395, 945}
+        Static score As Array = {0, 90, 315, 405, 495, 540, 990, 855, 9999, 540, 540, 540, 540, 1395, 945, 90, 315, 405, 495, 540, 990, 855, 9999, 540, 540, 540, 540, 1395, 945}
+        If True Then
+            If koma < 0 Or score.Length <= koma Then
+                Console.WriteLine("KomaScore IndexOver !")
+                Return 0
+            End If
+        End If
         KomaScore = score(koma)
     End Function
     Private Function KomaDist(ByVal king_pos, ByVal koma) As Integer
