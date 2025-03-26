@@ -661,6 +661,10 @@
         WBufGlobal = WBuf
         BBufGlobal = BBuf
     End Sub
+    Sub UpdateKingPos(ByVal move As MoveData)
+        If board(move.from) = 8 Then king_pos = move._to
+        If board(move.from) = 22 Then enem_pos = move._to
+    End Sub
     Public Structure Buffer
         Public komatoku As Integer ' 駒の価値の合計
         Public komaichi As Integer ' 駒の位置評価の合計
@@ -676,9 +680,7 @@
     Dim king_pos As Integer
     Dim enem_pos As Integer
 
-    Private Sub UpdateEval(ByVal move As MoveData)
-        Dim deltaW As Buffer ' 先手の差分
-        Dim deltaB As Buffer ' 後手の差分
+    Private Sub UpdateEval(ByVal move As MoveData, ByRef deltaW As Buffer, ByRef deltaB As Buffer)
         deltaW.Init()
         deltaB.Init()
 
@@ -709,7 +711,7 @@
         End If
 
         ' 捕獲があれば持ち駒として加算
-        If move.capture <> 0 Then
+        If move.capture <> DUMMY_ID Then
             If IsWB(WHITE, move._to) Then
                 deltaW.komatoku += KomaScore(Piece(move.capture).omote) * 1.05
             ElseIf IsWB(BLACK, move._to) Then
@@ -2414,6 +2416,22 @@ LOG_WRITE:
         modosi.Push(d)
         DispSum("MakeMove: End")
         IdentifyMissingOrExtra()
+        '評価値更新
+        Dim deltaW As Buffer
+        Dim deltaB As Buffer
+        Dim undoInfo As New UndoInfo
+        UpdateKingPos(d)
+        UpdateEval(d, deltaW, deltaB)
+
+        ' スタックに差分を保存
+        undoInfo.deltaW = deltaW
+        undoInfo.deltaB = deltaB
+        undoStack.Push(undoInfo)
+        DispEvalDifference("MakeMoveEval:")
+    End Sub
+    Private Sub DispEvalDifference(ByVal s As String)
+        Dim h = Hyouka()
+        Console.WriteLine(s & "H = " & h.ToString & ",D = " & currentEval.ToString)
     End Sub
     Private Sub UnmakeMove()
         Dim d As MoveData = modosi.Pop
@@ -2429,7 +2447,18 @@ LOG_WRITE:
             ReverseCapture(BLANK, d._to, d.capture, d.dst_kind, d.teban)
         End If
         DispSum("UnmakeMove")
+        Dim undoInfo As UndoInfo = undoStack.Pop()
+        UnmakeEval(undoInfo.deltaW, undoInfo.deltaB)
+        DispEvalDifference("UnmakeMoveEval:")
     End Sub
+    Public Structure UndoInfo
+        Public from As Integer
+        Public _to As Integer
+        Public captured As Integer
+        Public deltaW As Buffer
+        Public deltaB As Buffer
+    End Structure
+    Dim undoStack As Stack(Of UndoInfo) = New Stack(Of UndoInfo)
     Private Function Question() As Boolean
         Question = True
         If My.Computer.Keyboard.ShiftKeyDown Then
