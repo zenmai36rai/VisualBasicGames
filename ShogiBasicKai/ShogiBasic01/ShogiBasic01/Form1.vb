@@ -3661,36 +3661,19 @@ SET_BOARD:
 
             ' 起動直後に終了するか、エラー出力を確認
             ' スレッドを待機状態に（プロセスを維持）
-            While Not engineProcess.HasExited
-                Threading.Thread.Sleep(100) ' 無限ループでCPU負荷を抑える
-                engineProcess.StandardInput.WriteLine("usi")
-                engineProcess.StandardInput.Flush()
-                UpdateTextBox("usi送信")
-                ' 非同期で読み取り開始
-                Dim reader As IO.StreamReader = engineProcess.StandardOutput
-                reader.BaseStream.BeginRead(New Byte() {0}, 0, 1, AddressOf ReadCallback, reader)
+            Threading.Thread.Sleep(100) ' 無限ループでCPU負荷を抑える
+            engineProcess.StandardInput.WriteLine("usi")
+            engineProcess.StandardInput.Flush()
+            UpdateTextBox("usi送信")
 
-                If engineProcess IsNot Nothing AndAlso Not engineProcess.HasExited Then
-                    UpdateTextBox("プロセスが終了してます")
+            ' 複数行読み取り
+            Dim response As String
+            Do
+                response = engineProcess.StandardOutput.ReadLine()
+                If response IsNot Nothing Then
+                    UpdateTextBox("出力: " & response)
                 End If
-                ' 応答を読み取る
-                Dim output As String = engineProcess.StandardOutput.ReadLine()
-                Dim _error As String = engineProcess.StandardError.ReadLine()
-
-                UpdateTextBox("UIスレッドに結果を反映")
-                UpdateTextBox("出力:" & output & vbCrLf & "エラー: " & _error)
-                ' UIスレッドに結果を反映
-                If RichTextBox1.InvokeRequired Then
-                    UpdateTextBox("UIスレッドに結果を反映")
-                    RichTextBox1.Invoke(Sub() RichTextBox1.Text = "出力: " & output & vbCrLf & "エラー: " & _error)
-                Else
-                    RichTextBox1.Text = "出力: " & output & vbCrLf & "エラー: " & _error
-                End If
-                ' プロセスが終了したか確認
-                If engineProcess.HasExited Then
-                    RichTextBox1.Invoke(Sub() RichTextBox1.Text &= vbCrLf & "プロセス終了 (コード: " & engineProcess.ExitCode & ")")
-                End If
-            End While
+            Loop Until response Is Nothing OrElse response = "usiok" OrElse engineProcess.HasExited
         ElseIf engineState = START_ENGINE Then
             If engineProcess.HasExited Then
                 Dim _error As String = engineProcess.StandardError.ReadToEnd()
