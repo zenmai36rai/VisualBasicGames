@@ -3632,5 +3632,22 @@ SET_BOARD:
         DispSum(s)
     End Sub
 
+    Private Sub ConsoleMode()
+        Dim engineProcess As New Process()
+        engineProcess.StartInfo.FileName = "エンジンのパス\engine.exe" ' 使用する将棋エンジンのパス
+        engineProcess.StartInfo.RedirectStandardInput = True
+        engineProcess.StartInfo.RedirectStandardOutput = True
+        engineProcess.StartInfo.UseShellExecute = False
+        engineProcess.StartInfo.CreateNoWindow = True ' コンソールウィンドウを表示しない
+        engineProcess.Start()
+
+        ' USIコマンド送信
+        engineProcess.StandardInput.WriteLine("usi")
+        engineProcess.StandardInput.Flush()
+
+        ' エンジンからの応答を読み取る
+        Dim response As String = engineProcess.StandardOutput.ReadLine()
+        TextBox1.Text = response ' フォーム上のテキストボックスに表示するなど
+    End Sub
 End Class
 ' 2015 - 2025 Written By Kyosuke Miyazawa ShogiBasic
