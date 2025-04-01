@@ -3641,17 +3641,35 @@ SET_BOARD:
         engineProcess.StartInfo.FileName = filePath
         engineProcess.StartInfo.RedirectStandardInput = True
         engineProcess.StartInfo.RedirectStandardOutput = True
+        engineProcess.StartInfo.RedirectStandardError = True ' これを追加
         engineProcess.StartInfo.UseShellExecute = False
-        engineProcess.StartInfo.CreateNoWindow = False ' コンソールウィンドウを表示しない
+        engineProcess.StartInfo.CreateNoWindow = True ' コンソールウィンドウを表示しない
         engineProcess.Start()
 
-        ' USIコマンド送信
+        ' USIコマンド送信0
         engineProcess.StandardInput.WriteLine("usi")
         engineProcess.StandardInput.Flush()
 
         ' エンジンからの応答を読み取る
         Dim response As String = engineProcess.StandardOutput.ReadLine()
         RichTextBox1.Text = response ' フォーム上のテキストボックスに表示するなど
+        ' 応答を少し待つ
+        Dim startTime As DateTime = DateTime.Now
+        Do While DateTime.Now.Subtract(startTime).TotalSeconds < 5 ' 5秒待機
+            If Not engineProcess.HasExited Then
+                If engineProcess.StandardOutput.Peek() >= 0 Then
+                    response = engineProcess.StandardOutput.ReadLine()
+                    TextBox1.Text = response
+                    Exit Do
+                End If
+            Else
+                TextBox1.Text = "プロセスが終了しました"
+                Exit Do
+            End If
+            System.Threading.Thread.Sleep(100) ' 少し待機
+        Loop
+        Dim _error As String = engineProcess.StandardError.ReadLine()
+        TextBox1.Text = "出力: " & response & vbCrLf & "エラー: " & _error
     End Sub
 End Class
 ' 2015 - 2025 Written By Kyosuke Miyazawa ShogiBasic
