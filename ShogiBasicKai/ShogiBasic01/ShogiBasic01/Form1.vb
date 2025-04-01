@@ -3675,23 +3675,19 @@ SET_BOARD:
                 End If
             Loop Until response Is Nothing OrElse response = "usiok" OrElse engineProcess.HasExited
         ElseIf engineState = START_ENGINE Then
-            If engineProcess.HasExited Then
-                Dim _error As String = engineProcess.StandardError.ReadToEnd()
-                Dim output As String = engineProcess.StandardOutput.ReadToEnd() ' 念のため標準出力も
-                UpdateTextBox("即終了 (コード: " & engineProcess.ExitCode & ")")
-                UpdateTextBox("出力: " & output)
-                UpdateTextBox("エラー: " & _error)
-                Exit Sub
-            End If
-            If engineProcess IsNot Nothing AndAlso Not engineProcess.HasExited Then
-                UpdateTextBox("プロセスが終了してます")
-            End If
-            ' USIコマンド送信
-            engineProcess.StandardInput.WriteLine("usi")
+            Threading.Thread.Sleep(100) ' 無限ループでCPU負荷を抑える
+            engineProcess.StandardInput.WriteLine("isready")
             engineProcess.StandardInput.Flush()
-            ' デバッグ用ログ
-            UpdateTextBox("usi送信")
-            engineState = SEND_USI
+            UpdateTextBox("isready送信")
+
+            ' 複数行読み取り
+            Dim response As String
+            Do
+                response = engineProcess.StandardOutput.ReadLine()
+                If response IsNot Nothing Then
+                    UpdateTextBox("出力: " & response)
+                End If
+            Loop Until response Is Nothing OrElse response = "usiok" OrElse engineProcess.HasExited
         Else
             UpdateTextBox("応答を読み取る")
 
