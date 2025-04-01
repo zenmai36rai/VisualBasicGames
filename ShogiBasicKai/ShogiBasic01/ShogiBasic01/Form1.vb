@@ -3604,7 +3604,9 @@ SET_BOARD:
         RichTextBox1.Text = s
     End Sub
     Private Sub Button87_Click(sender As Object, e As EventArgs) Handles Button87.Click
-        ConsoleMode()
+        Dim thread As New Threading.Thread(AddressOf CommunicateWithEngine)
+        thread.IsBackground = True ' フォーム終了時にスレッドも終了するよう設定
+        thread.Start()
     End Sub
     Private Sub AddTegomaW(ByVal id)
         If tegomaw.Find(Function(n) n = id) Then
@@ -3636,40 +3638,97 @@ SET_BOARD:
     End Sub
 
     Dim filePath As String = "..\..\Engine\ShogiBasicEngine.exe"
-    Dim engineProcess As New Process()
-    Private Sub ConsoleMode()
-        engineProcess.StartInfo.FileName = filePath
-        engineProcess.StartInfo.RedirectStandardInput = True
-        engineProcess.StartInfo.RedirectStandardOutput = True
-        engineProcess.StartInfo.RedirectStandardError = True ' これを追加
-        engineProcess.StartInfo.UseShellExecute = False
-        engineProcess.StartInfo.CreateNoWindow = True ' コンソールウィンドウを表示しない
-        engineProcess.Start()
+    Dim engineProcess As Process = Nothing
+    Dim engineState As Integer = INIT_ENGINE
+    Const INIT_ENGINE = 0
+    Const START_ENGINE = 1
+    Const SEND_USI = 2
+    Const WAIT_MESSAGE = 3
+    Private Sub CommunicateWithEngine()
+        If engineState = INIT_ENGINE Then
+            engineProcess = New Process()
+            engineProcess.StartInfo.FileName = filePath
+            engineProcess.StartInfo.RedirectStandardInput = True
+            engineProcess.StartInfo.RedirectStandardOutput = True
+            engineProcess.StartInfo.RedirectStandardError = True
+            engineProcess.StartInfo.UseShellExecute = False
+            engineProcess.StartInfo.CreateNoWindow = False ' デバッグ用に黒窓表示
+            engineProcess.Start()
+            engineState = START_ENGINE
+            ' デバッグ用ログ
+            UpdateTextBox("プロセス起動")
 
-        ' USIコマンド送信0
-        engineProcess.StandardInput.WriteLine("usi")
-        engineProcess.StandardInput.Flush()
+            ' 起動直後に終了するか、エラー出力を確認
+            ' スレッドを待機状態に（プロセスを維持）
+            While Not engineProcess.HasExited
+                Threading.Thread.Sleep(100) ' 無限ループでCPU負荷を抑える
+                engineProcess.StandardInput.WriteLine("usi")
+                engineProcess.StandardInput.Flush()
+                UpdateTextBox("usi送信")
+                UpdateTextBox("応答を読み取る")
 
-        ' エンジンからの応答を読み取る
-        Dim response As String = engineProcess.StandardOutput.ReadLine()
-        RichTextBox1.Text = response ' フォーム上のテキストボックスに表示するなど
-        ' 応答を少し待つ
-        Dim startTime As DateTime = DateTime.Now
-        Do While DateTime.Now.Subtract(startTime).TotalSeconds < 5 ' 5秒待機
-            If Not engineProcess.HasExited Then
-                If engineProcess.StandardOutput.Peek() >= 0 Then
-                    response = engineProcess.StandardOutput.ReadLine()
-                    TextBox1.Text = response
-                    Exit Do
+                If engineProcess IsNot Nothing AndAlso Not engineProcess.HasExited Then
+                    UpdateTextBox("プロセスが終了してます")
                 End If
-            Else
-                TextBox1.Text = "プロセスが終了しました"
-                Exit Do
+                ' 応答を読み取る
+                Dim output As String = engineProcess.StandardOutput.ReadLine()
+                Dim _error As String = engineProcess.StandardError.ReadLine()
+
+                UpdateTextBox("UIスレッドに結果を反映")
+                UpdateTextBox("出力:" & output & vbCrLf & "エラー: " & _error)
+                ' UIスレッドに結果を反映
+                If RichTextBox1.InvokeRequired Then
+                    UpdateTextBox("UIスレッドに結果を反映")
+                    RichTextBox1.Invoke(Sub() RichTextBox1.Text = "出力: " & output & vbCrLf & "エラー: " & _error)
+                Else
+                    RichTextBox1.Text = "出力: " & output & vbCrLf & "エラー: " & _error
+                End If
+                ' プロセスが終了したか確認
+                If engineProcess.HasExited Then
+                    RichTextBox1.Invoke(Sub() RichTextBox1.Text &= vbCrLf & "プロセス終了 (コード: " & engineProcess.ExitCode & ")")
+                End If
+            End While
+        ElseIf engineState = START_ENGINE Then
+            If engineProcess IsNot Nothing AndAlso Not engineProcess.HasExited Then
+                UpdateTextBox("プロセスが終了してます")
             End If
-            System.Threading.Thread.Sleep(100) ' 少し待機
-        Loop
-        Dim _error As String = engineProcess.StandardError.ReadLine()
-        TextBox1.Text = "出力: " & response & vbCrLf & "エラー: " & _error
+            ' USIコマンド送信
+            engineProcess.StandardInput.WriteLine("usi")
+            engineProcess.StandardInput.Flush()
+            ' デバッグ用ログ
+            UpdateTextBox("usi送信")
+            engineState = SEND_USI
+        Else
+            UpdateTextBox("応答を読み取る")
+
+            If engineProcess IsNot Nothing AndAlso Not engineProcess.HasExited Then
+                UpdateTextBox("プロセスが終了してます")
+            End If
+            ' 応答を読み取る
+            Dim output As String = engineProcess.StandardOutput.ReadLine()
+                Dim _error As String = engineProcess.StandardError.ReadLine()
+
+                UpdateTextBox("UIスレッドに結果を反映")
+                UpdateTextBox("出力:" & output & vbCrLf & "エラー: " & _error)
+                ' UIスレッドに結果を反映
+                If RichTextBox1.InvokeRequired Then
+                    UpdateTextBox("UIスレッドに結果を反映")
+                    RichTextBox1.Invoke(Sub() RichTextBox1.Text = "出力: " & output & vbCrLf & "エラー: " & _error)
+                Else
+                    RichTextBox1.Text = "出力: " & output & vbCrLf & "エラー: " & _error
+                End If
+                ' プロセスが終了したか確認
+                If engineProcess.HasExited Then
+                    RichTextBox1.Invoke(Sub() RichTextBox1.Text &= vbCrLf & "プロセス終了 (コード: " & engineProcess.ExitCode & ")")
+                End If
+            End If
+    End Sub
+    Private Sub UpdateTextBox(message As String)
+        If RichTextBox1.InvokeRequired Then
+            RichTextBox1.Invoke(Sub() RichTextBox1.Text &= message & vbCrLf)
+        Else
+            RichTextBox1.Text &= message & vbCrLf
+        End If
     End Sub
 End Class
 ' 2015 - 2025 Written By Kyosuke Miyazawa ShogiBasic
