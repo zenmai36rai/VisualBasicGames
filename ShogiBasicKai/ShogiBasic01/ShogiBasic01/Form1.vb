@@ -3584,7 +3584,7 @@ SET_BOARD:
 
     End Sub
 
-    Private Sub Button87_Click(sender As Object, e As EventArgs) Handles Button87.Click
+    Private Sub DispPieceID()
         Dim s As String
         For i = 0 To 80
             Dim flag = False
@@ -3602,6 +3602,9 @@ SET_BOARD:
             End If
         Next
         RichTextBox1.Text = s
+    End Sub
+    Private Sub Button87_Click(sender As Object, e As EventArgs) Handles Button87.Click
+        ConsoleMode()
     End Sub
     Private Sub AddTegomaW(ByVal id)
         If tegomaw.Find(Function(n) n = id) Then
@@ -3632,13 +3635,14 @@ SET_BOARD:
         DispSum(s)
     End Sub
 
+    Dim filePath As String = "..\..\Engine\ShogiBasicEngine.exe"
+    Dim engineProcess As New Process()
     Private Sub ConsoleMode()
-        Dim engineProcess As New Process()
-        engineProcess.StartInfo.FileName = "エンジンのパス\engine.exe" ' 使用する将棋エンジンのパス
+        engineProcess.StartInfo.FileName = filePath
         engineProcess.StartInfo.RedirectStandardInput = True
         engineProcess.StartInfo.RedirectStandardOutput = True
         engineProcess.StartInfo.UseShellExecute = False
-        engineProcess.StartInfo.CreateNoWindow = True ' コンソールウィンドウを表示しない
+        engineProcess.StartInfo.CreateNoWindow = False ' コンソールウィンドウを表示しない
         engineProcess.Start()
 
         ' USIコマンド送信
@@ -3647,7 +3651,7 @@ SET_BOARD:
 
         ' エンジンからの応答を読み取る
         Dim response As String = engineProcess.StandardOutput.ReadLine()
-        TextBox1.Text = response ' フォーム上のテキストボックスに表示するなど
+        RichTextBox1.Text = response ' フォーム上のテキストボックスに表示するなど
     End Sub
 End Class
 ' 2015 - 2025 Written By Kyosuke Miyazawa ShogiBasic

@@ -182,6 +182,8 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Engine\ShogiBasicEngine.dll" />
+    <Content Include="Engine\ShogiBasicEngine.exe" />
     <Content Include="JD\book.txt" />
     <Content Include="Resources\ロボット帽.jpg" />
     <Content Include="robot.ico" />
