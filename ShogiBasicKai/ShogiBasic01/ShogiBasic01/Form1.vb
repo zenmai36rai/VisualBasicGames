@@ -3658,6 +3658,7 @@ SET_BOARD:
             ' デバッグ用ログ
             UpdateTextBox("プロセス起動")
 
+
             ' 起動直後に終了するか、エラー出力を確認
             ' スレッドを待機状態に（プロセスを維持）
             While Not engineProcess.HasExited
@@ -3666,6 +3667,9 @@ SET_BOARD:
                 engineProcess.StandardInput.Flush()
                 UpdateTextBox("usi送信")
                 UpdateTextBox("応答を読み取る")
+                engineProcess.StandardInput.WriteLine("isready") ' 追加
+                engineProcess.StandardInput.Flush()
+                UpdateTextBox("isready送信")
 
                 If engineProcess IsNot Nothing AndAlso Not engineProcess.HasExited Then
                     UpdateTextBox("プロセスが終了してます")
@@ -3689,6 +3693,14 @@ SET_BOARD:
                 End If
             End While
         ElseIf engineState = START_ENGINE Then
+            If engineProcess.HasExited Then
+                Dim _error As String = engineProcess.StandardError.ReadToEnd()
+                Dim output As String = engineProcess.StandardOutput.ReadToEnd() ' 念のため標準出力も
+                UpdateTextBox("即終了 (コード: " & engineProcess.ExitCode & ")")
+                UpdateTextBox("出力: " & output)
+                UpdateTextBox("エラー: " & _error)
+                Exit Sub
+            End If
             If engineProcess IsNot Nothing AndAlso Not engineProcess.HasExited Then
                 UpdateTextBox("プロセスが終了してます")
             End If
