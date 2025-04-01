@@ -50,7 +50,7 @@
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>NFVYu7+Y8nhp8C+D0oZKbqpT23w=</dsig:DigestValue>
+        <dsig:DigestValue>vzj8lA5qXCwtzOnywJm2tY/WbQk=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -60,7 +60,7 @@
         <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
       </dsig:Transforms>
       <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-      <dsig:DigestValue>XZzjCe5GOY9sMwLYVf5uZyk29cw=</dsig:DigestValue>
+      <dsig:DigestValue>2k38jj48W6elMZNOvQ6qKNzG+Y4=</dsig:DigestValue>
     </hash>
   </file>
   <file name="Engine\ShogiBasicEngine.exe" size="174592">
