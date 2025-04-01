@@ -3652,7 +3652,7 @@ SET_BOARD:
             engineProcess.StartInfo.RedirectStandardOutput = True
             engineProcess.StartInfo.RedirectStandardError = True
             engineProcess.StartInfo.UseShellExecute = False
-            engineProcess.StartInfo.CreateNoWindow = False ' デバッグ用に黒窓表示
+            engineProcess.StartInfo.CreateNoWindow = True ' デバッグ用に黒窓表示
             engineProcess.Start()
             engineState = START_ENGINE
             ' デバッグ用ログ
@@ -3666,10 +3666,9 @@ SET_BOARD:
                 engineProcess.StandardInput.WriteLine("usi")
                 engineProcess.StandardInput.Flush()
                 UpdateTextBox("usi送信")
-                UpdateTextBox("応答を読み取る")
-                engineProcess.StandardInput.WriteLine("isready") ' 追加
-                engineProcess.StandardInput.Flush()
-                UpdateTextBox("isready送信")
+                ' 非同期で読み取り開始
+                Dim reader As IO.StreamReader = engineProcess.StandardOutput
+                reader.BaseStream.BeginRead(New Byte() {0}, 0, 1, AddressOf ReadCallback, reader)
 
                 If engineProcess IsNot Nothing AndAlso Not engineProcess.HasExited Then
                     UpdateTextBox("プロセスが終了してます")
@@ -3740,6 +3739,13 @@ SET_BOARD:
             RichTextBox1.Invoke(Sub() RichTextBox1.Text &= message & vbCrLf)
         Else
             RichTextBox1.Text &= message & vbCrLf
+        End If
+    End Sub
+    Private Sub ReadCallback(ar As IAsyncResult)
+        Dim reader As IO.StreamReader = DirectCast(ar.AsyncState, IO.StreamReader)
+        Dim line As String = reader.ReadLine()
+        If line IsNot Nothing Then
+            UpdateTextBox("出力: " & line)
         End If
     End Sub
 End Class
