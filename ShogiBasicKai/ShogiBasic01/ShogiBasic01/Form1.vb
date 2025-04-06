@@ -1,4 +1,5 @@
-﻿Public Class Form1
+﻿Imports System.Drawing.Drawing2D
+Public Class Form1
     Const DEBUG As Boolean = False
     Const ROBOT_MOVE As Boolean = True
     Const WHITE As Integer = 1
@@ -1880,7 +1881,7 @@
         KomaDist = Math.Sqrt(x ^ 2 + y ^ 2) / 456
     End Function
     Private Function Hyouka() As Integer
-        KING_POS = -1
+        king_pos = -1
         enem_pos = -1
         Dim d As Integer = 0
         WBuf.Init()
@@ -2224,6 +2225,30 @@
         TextBox4.Text = -Hyouka().ToString
         SetReverseImage()
     End Sub
+    Private Sub Panel1_Paint(sender As Object, e As PaintEventArgs) Handles Panel1.Paint
+        Dim g As Graphics = e.Graphics
+        g.SmoothingMode = SmoothingMode.AntiAlias
+
+        ' パネルの幅と高さに基づいてマス目を計算
+        Dim cellWidth As Single = Panel1.Width / 9  ' 横9マス
+        Dim cellHeight As Single = Panel1.Height / 9 ' 縦9マス
+
+        ' グリッド線を描画
+        Using pen As New Pen(Color.Black, 1)
+            ' 縦線
+            For i As Integer = 0 To 9
+                Dim x As Single = i * cellWidth
+                g.DrawLine(pen, x, 0, x, Panel1.Height)
+            Next
+
+            ' 横線
+            For i As Integer = 0 To 9
+                Dim y As Single = i * cellHeight
+                g.DrawLine(pen, 0, y, Panel1.Width, y)
+            Next
+        End Using
+    End Sub
+
     Private Function HandRange(ByVal wb As Integer, ByVal idx As Integer) As List(Of Integer)
         'Dim koma = KomaIdx(idx, wb)
         Dim koma = ClassDown(GetTegoma(idx, wb))
@@ -3760,7 +3785,6 @@ SET_BOARD:
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         DispAll()
     End Sub
-
     Private Sub SetButtonImage(btn As Button)
         Dim text As String = btn.Text
         Dim isBlack As Boolean = False
@@ -3779,6 +3803,35 @@ SET_BOARD:
                 g.TranslateTransform(-btn.Width, -btn.Height)
             End If
             g.DrawString(text, font, New SolidBrush(btn.ForeColor), x, y)
+            ' 五角形の頂点を計算（ボタンのサイズに基づく）
+            Dim points(5) As Point
+            Dim centerX As Integer = btn.Width / 2 + 10
+            Dim centerY As Integer = btn.Height / 2 + 10
+            Dim radius As Integer = Math.Min(btn.Width, btn.Height) \ 2 ' 少し内側に
+
+            If isBlack Then
+                points(0) = New Point(1, 1)
+                points(1) = New Point(btn.Width, 0)
+                points(2) = New Point(btn.Width - 4, btn.Height - 7)
+                points(3) = New Point(btn.Width / 2, btn.Height - 2)
+                points(4) = New Point(3, btn.Height - 7)
+                'points(5) = New Point(centerX, btn.Height)
+            Else
+                points(0) = New Point(centerX, 1)
+                points(1) = New Point(3, 5)
+                points(2) = New Point(0, btn.Height - 1)
+                points(3) = New Point(btn.Width - 1, btn.Height - 1)
+                points(4) = New Point(btn.Width - 3, 5)
+                'points(5) = New Point(centerX, 0)
+            End If
+
+            ' GraphicsPathで五角形を作成
+            Dim path As New GraphicsPath()
+            path.AddPolygon(points)
+
+            ' ボタンの形状を五角形に設定
+            btn.Region = New Region(path)
+            btn.FlatAppearance.BorderSize = 0 ' 枠線の太さを0に設定して消す
         End Using
         btn.Text = ""
         btn.Image = bmp
