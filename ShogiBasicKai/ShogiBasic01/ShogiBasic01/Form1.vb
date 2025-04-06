@@ -2438,19 +2438,31 @@ Public Class Form1
         Next
 
         For i = 1 To tw.Length Step 1
-            GetHandWhite(i).Text = GetKomaName(i) + Str(tw(i - 1))
+            Dim btn As Button = GetHandWhite(i)
+            Dim num As Integer = tw(i - 1)
+            btn.Text = GetKomaName(i)
+            If num >= 2 Then
+                btn.Text += (vbCrLf + Str(tw(i - 1)))
+            End If
             If tw(i - 1) > 0 Then
-                GetHandWhite(i).Visible = True
+                btn.Visible = True
+                SetButtonImage(btn)
             Else
-                GetHandWhite(i).Visible = False
+                btn.Visible = False
             End If
         Next
         For i = 1 To tb.Length Step 1
-            GetHandBlack(i).Text = GetKomaName(i) + Str(tb(i - 1))
+            Dim num As Integer = tb(i - 1)
+            Dim btn As Button = GetHandBlack(i)
+            btn.Text = GetKomaName(i)
+            If num >= 2 Then
+                btn.Text += (vbCrLf + Str(tb(i - 1)))
+            End If
             If tb(i - 1) > 0 Then
-                GetHandBlack(i).Visible = True
+                btn.Visible = True
+                SetButtonImage(btn)
             Else
-                GetHandBlack(i).Visible = False
+                btn.Visible = False
             End If
         Next
     End Sub
@@ -3810,6 +3822,7 @@ SET_BOARD:
     End Sub
     Private Sub SetButtonImage(btn As Button)
         Dim text As String = btn.Text
+        Dim isHand As Boolean = False
         Dim isBlack As Boolean = False
         If btn.BackColor = Color.Cornsilk Then
             isBlack = True
@@ -3818,10 +3831,16 @@ SET_BOARD:
         ElseIf btn.BackColor = Color.DarkOrange And text = "" Then
             isBlack = True
         End If
+        If text.Length >= 2 Then
+            isHand = True
+        End If
         Dim bmp As New Bitmap(btn.Width, btn.Height)
         Using g As Graphics = Graphics.FromImage(bmp)
             g.Clear(btn.BackColor)
             Dim font As New Font("MS Gothic", 14)
+            If isHand Then
+                font = New Font("MS Gothic", 10)
+            End If
             Dim textSize As SizeF = g.MeasureString(text, font)
             Dim x As Single = (btn.Width - textSize.Width) / 2
             Dim y As Single = (btn.Height - textSize.Height) / 2
