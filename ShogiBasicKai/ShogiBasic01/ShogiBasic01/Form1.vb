@@ -3812,6 +3812,8 @@ SET_BOARD:
             isBlack = True
         ElseIf btn.BackColor = Color.SandyBrown And text <> "" Then
             isBlack = True
+        ElseIf btn.BackColor = Color.DarkOrange And text = "" Then
+            isBlack = True
         End If
         Dim bmp As New Bitmap(btn.Width, btn.Height)
         Using g As Graphics = Graphics.FromImage(bmp)
