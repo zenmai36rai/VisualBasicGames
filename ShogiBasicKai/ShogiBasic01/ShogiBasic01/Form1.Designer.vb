@@ -151,10 +151,10 @@ Partial Class Form1
         '
         'Button9
         '
-        Me.Button9.BackColor = System.Drawing.Color.DimGray
+        Me.Button9.BackColor = System.Drawing.Color.Cornsilk
         Me.Button9.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.Button9.Font = New System.Drawing.Font("MS UI Gothic", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(128, Byte))
-        Me.Button9.ForeColor = System.Drawing.Color.White
+        Me.Button9.ForeColor = System.Drawing.Color.Black
         Me.Button9.Location = New System.Drawing.Point(9, 4)
         Me.Button9.Name = "Button9"
         Me.Button9.Size = New System.Drawing.Size(35, 38)
@@ -164,10 +164,10 @@ Partial Class Form1
         '
         'Button8
         '
-        Me.Button8.BackColor = System.Drawing.Color.DimGray
+        Me.Button8.BackColor = System.Drawing.Color.Cornsilk
         Me.Button8.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.Button8.Font = New System.Drawing.Font("MS UI Gothic", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(128, Byte))
-        Me.Button8.ForeColor = System.Drawing.Color.White
+        Me.Button8.ForeColor = System.Drawing.Color.Black
         Me.Button8.Location = New System.Drawing.Point(50, 4)
         Me.Button8.Name = "Button8"
         Me.Button8.Size = New System.Drawing.Size(35, 38)
@@ -177,10 +177,10 @@ Partial Class Form1
         '
         'Button7
         '
-        Me.Button7.BackColor = System.Drawing.Color.DimGray
+        Me.Button7.BackColor = System.Drawing.Color.Cornsilk
         Me.Button7.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.Button7.Font = New System.Drawing.Font("MS UI Gothic", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(128, Byte))
-        Me.Button7.ForeColor = System.Drawing.Color.White
+        Me.Button7.ForeColor = System.Drawing.Color.Black
         Me.Button7.Location = New System.Drawing.Point(92, 4)
         Me.Button7.Name = "Button7"
         Me.Button7.Size = New System.Drawing.Size(35, 38)
@@ -190,10 +190,10 @@ Partial Class Form1
         '
         'Button6
         '
-        Me.Button6.BackColor = System.Drawing.Color.DimGray
+        Me.Button6.BackColor = System.Drawing.Color.Cornsilk
         Me.Button6.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.Button6.Font = New System.Drawing.Font("MS UI Gothic", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(128, Byte))
-        Me.Button6.ForeColor = System.Drawing.Color.White
+        Me.Button6.ForeColor = System.Drawing.Color.Black
         Me.Button6.Location = New System.Drawing.Point(133, 4)
         Me.Button6.Name = "Button6"
         Me.Button6.Size = New System.Drawing.Size(35, 38)
@@ -203,10 +203,10 @@ Partial Class Form1
         '
         'Button5
         '
-        Me.Button5.BackColor = System.Drawing.Color.DimGray
+        Me.Button5.BackColor = System.Drawing.Color.Cornsilk
         Me.Button5.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.Button5.Font = New System.Drawing.Font("MS UI Gothic", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(128, Byte))
-        Me.Button5.ForeColor = System.Drawing.Color.White
+        Me.Button5.ForeColor = System.Drawing.Color.Black
         Me.Button5.Location = New System.Drawing.Point(175, 4)
         Me.Button5.Name = "Button5"
         Me.Button5.Size = New System.Drawing.Size(35, 38)
@@ -216,10 +216,10 @@ Partial Class Form1
         '
         'Button4
         '
-        Me.Button4.BackColor = System.Drawing.Color.DimGray
+        Me.Button4.BackColor = System.Drawing.Color.Cornsilk
         Me.Button4.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.Button4.Font = New System.Drawing.Font("MS UI Gothic", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(128, Byte))
-        Me.Button4.ForeColor = System.Drawing.Color.White
+        Me.Button4.ForeColor = System.Drawing.Color.Black
         Me.Button4.Location = New System.Drawing.Point(219, 4)
         Me.Button4.Name = "Button4"
         Me.Button4.Size = New System.Drawing.Size(35, 38)
@@ -229,10 +229,10 @@ Partial Class Form1
         '
         'Button3
         '
-        Me.Button3.BackColor = System.Drawing.Color.DimGray
+        Me.Button3.BackColor = System.Drawing.Color.Cornsilk
         Me.Button3.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.Button3.Font = New System.Drawing.Font("MS UI Gothic", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(128, Byte))
-        Me.Button3.ForeColor = System.Drawing.Color.White
+        Me.Button3.ForeColor = System.Drawing.Color.Black
         Me.Button3.Location = New System.Drawing.Point(260, 4)
         Me.Button3.Name = "Button3"
         Me.Button3.Size = New System.Drawing.Size(35, 38)
@@ -242,10 +242,10 @@ Partial Class Form1
         '
         'Button2
         '
-        Me.Button2.BackColor = System.Drawing.Color.DimGray
+        Me.Button2.BackColor = System.Drawing.Color.Cornsilk
         Me.Button2.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.Button2.Font = New System.Drawing.Font("MS UI Gothic", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(128, Byte))
-        Me.Button2.ForeColor = System.Drawing.Color.White
+        Me.Button2.ForeColor = System.Drawing.Color.Black
         Me.Button2.Location = New System.Drawing.Point(303, 4)
         Me.Button2.Name = "Button2"
         Me.Button2.Size = New System.Drawing.Size(35, 38)
@@ -255,10 +255,10 @@ Partial Class Form1
         '
         'Button1
         '
-        Me.Button1.BackColor = System.Drawing.Color.DimGray
+        Me.Button1.BackColor = System.Drawing.Color.Cornsilk
         Me.Button1.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.Button1.Font = New System.Drawing.Font("MS UI Gothic", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(128, Byte))
-        Me.Button1.ForeColor = System.Drawing.Color.White
+        Me.Button1.ForeColor = System.Drawing.Color.Black
         Me.Button1.Location = New System.Drawing.Point(344, 4)
         Me.Button1.Name = "Button1"
         Me.Button1.Size = New System.Drawing.Size(35, 38)
@@ -279,10 +279,10 @@ Partial Class Form1
         '
         'Button17
         '
-        Me.Button17.BackColor = System.Drawing.Color.DimGray
+        Me.Button17.BackColor = System.Drawing.Color.Cornsilk
         Me.Button17.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.Button17.Font = New System.Drawing.Font("MS UI Gothic", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(128, Byte))
-        Me.Button17.ForeColor = System.Drawing.Color.White
+        Me.Button17.ForeColor = System.Drawing.Color.Black
         Me.Button17.Location = New System.Drawing.Point(50, 48)
         Me.Button17.Name = "Button17"
         Me.Button17.Size = New System.Drawing.Size(35, 38)
@@ -347,10 +347,10 @@ Partial Class Form1
         '
         'Button11
         '
-        Me.Button11.BackColor = System.Drawing.Color.DimGray
+        Me.Button11.BackColor = System.Drawing.Color.Cornsilk
         Me.Button11.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.Button11.Font = New System.Drawing.Font("MS UI Gothic", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(128, Byte))
-        Me.Button11.ForeColor = System.Drawing.Color.White
+        Me.Button11.ForeColor = System.Drawing.Color.Black
         Me.Button11.Location = New System.Drawing.Point(303, 48)
         Me.Button11.Name = "Button11"
         Me.Button11.Size = New System.Drawing.Size(35, 38)
@@ -371,10 +371,10 @@ Partial Class Form1
         '
         'Button27
         '
-        Me.Button27.BackColor = System.Drawing.Color.DimGray
+        Me.Button27.BackColor = System.Drawing.Color.Cornsilk
         Me.Button27.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.Button27.Font = New System.Drawing.Font("MS UI Gothic", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(128, Byte))
-        Me.Button27.ForeColor = System.Drawing.Color.White
+        Me.Button27.ForeColor = System.Drawing.Color.Black
         Me.Button27.Location = New System.Drawing.Point(9, 92)
         Me.Button27.Name = "Button27"
         Me.Button27.Size = New System.Drawing.Size(35, 38)
@@ -384,10 +384,10 @@ Partial Class Form1
         '
         'Button26
         '
-        Me.Button26.BackColor = System.Drawing.Color.DimGray
+        Me.Button26.BackColor = System.Drawing.Color.Cornsilk
         Me.Button26.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.Button26.Font = New System.Drawing.Font("MS UI Gothic", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(128, Byte))
-        Me.Button26.ForeColor = System.Drawing.Color.White
+        Me.Button26.ForeColor = System.Drawing.Color.Black
         Me.Button26.Location = New System.Drawing.Point(50, 92)
         Me.Button26.Name = "Button26"
         Me.Button26.Size = New System.Drawing.Size(35, 38)
@@ -397,10 +397,10 @@ Partial Class Form1
         '
         'Button25
         '
-        Me.Button25.BackColor = System.Drawing.Color.DimGray
+        Me.Button25.BackColor = System.Drawing.Color.Cornsilk
         Me.Button25.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.Button25.Font = New System.Drawing.Font("MS UI Gothic", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(128, Byte))
-        Me.Button25.ForeColor = System.Drawing.Color.White
+        Me.Button25.ForeColor = System.Drawing.Color.Black
         Me.Button25.Location = New System.Drawing.Point(92, 92)
         Me.Button25.Name = "Button25"
         Me.Button25.Size = New System.Drawing.Size(35, 38)
@@ -410,10 +410,10 @@ Partial Class Form1
         '
         'Button24
         '
-        Me.Button24.BackColor = System.Drawing.Color.DimGray
+        Me.Button24.BackColor = System.Drawing.Color.Cornsilk
         Me.Button24.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.Button24.Font = New System.Drawing.Font("MS UI Gothic", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(128, Byte))
-        Me.Button24.ForeColor = System.Drawing.Color.White
+        Me.Button24.ForeColor = System.Drawing.Color.Black
         Me.Button24.Location = New System.Drawing.Point(133, 92)
         Me.Button24.Name = "Button24"
         Me.Button24.Size = New System.Drawing.Size(35, 38)
@@ -423,10 +423,10 @@ Partial Class Form1
         '
         'Button23
         '
-        Me.Button23.BackColor = System.Drawing.Color.DimGray
+        Me.Button23.BackColor = System.Drawing.Color.Cornsilk
         Me.Button23.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.Button23.Font = New System.Drawing.Font("MS UI Gothic", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(128, Byte))
-        Me.Button23.ForeColor = System.Drawing.Color.White
+        Me.Button23.ForeColor = System.Drawing.Color.Black
         Me.Button23.Location = New System.Drawing.Point(175, 92)
         Me.Button23.Name = "Button23"
         Me.Button23.Size = New System.Drawing.Size(35, 38)
@@ -436,10 +436,10 @@ Partial Class Form1
         '
         'Button22
         '
-        Me.Button22.BackColor = System.Drawing.Color.DimGray
+        Me.Button22.BackColor = System.Drawing.Color.Cornsilk
         Me.Button22.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.Button22.Font = New System.Drawing.Font("MS UI Gothic", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(128, Byte))
-        Me.Button22.ForeColor = System.Drawing.Color.White
+        Me.Button22.ForeColor = System.Drawing.Color.Black
         Me.Button22.Location = New System.Drawing.Point(219, 92)
         Me.Button22.Name = "Button22"
         Me.Button22.Size = New System.Drawing.Size(35, 38)
@@ -449,10 +449,10 @@ Partial Class Form1
         '
         'Button21
         '
-        Me.Button21.BackColor = System.Drawing.Color.DimGray
+        Me.Button21.BackColor = System.Drawing.Color.Cornsilk
         Me.Button21.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.Button21.Font = New System.Drawing.Font("MS UI Gothic", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(128, Byte))
-        Me.Button21.ForeColor = System.Drawing.Color.White
+        Me.Button21.ForeColor = System.Drawing.Color.Black
         Me.Button21.Location = New System.Drawing.Point(260, 92)
         Me.Button21.Name = "Button21"
         Me.Button21.Size = New System.Drawing.Size(35, 38)
@@ -462,10 +462,10 @@ Partial Class Form1
         '
         'Button20
         '
-        Me.Button20.BackColor = System.Drawing.Color.DimGray
+        Me.Button20.BackColor = System.Drawing.Color.Cornsilk
         Me.Button20.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.Button20.Font = New System.Drawing.Font("MS UI Gothic", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(128, Byte))
-        Me.Button20.ForeColor = System.Drawing.Color.White
+        Me.Button20.ForeColor = System.Drawing.Color.Black
         Me.Button20.Location = New System.Drawing.Point(303, 92)
         Me.Button20.Name = "Button20"
         Me.Button20.Size = New System.Drawing.Size(35, 38)
@@ -475,10 +475,10 @@ Partial Class Form1
         '
         'Button19
         '
-        Me.Button19.BackColor = System.Drawing.Color.DimGray
+        Me.Button19.BackColor = System.Drawing.Color.Cornsilk
         Me.Button19.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.Button19.Font = New System.Drawing.Font("MS UI Gothic", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(128, Byte))
-        Me.Button19.ForeColor = System.Drawing.Color.White
+        Me.Button19.ForeColor = System.Drawing.Color.Black
         Me.Button19.Location = New System.Drawing.Point(344, 92)
         Me.Button19.Name = "Button19"
         Me.Button19.Size = New System.Drawing.Size(35, 38)
@@ -785,7 +785,7 @@ Partial Class Form1
         '
         'Button63
         '
-        Me.Button63.BackColor = System.Drawing.Color.White
+        Me.Button63.BackColor = System.Drawing.Color.LemonChiffon
         Me.Button63.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.Button63.Font = New System.Drawing.Font("MS UI Gothic", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(128, Byte))
         Me.Button63.Location = New System.Drawing.Point(9, 268)
@@ -797,7 +797,7 @@ Partial Class Form1
         '
         'Button62
         '
-        Me.Button62.BackColor = System.Drawing.Color.White
+        Me.Button62.BackColor = System.Drawing.Color.LemonChiffon
         Me.Button62.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.Button62.Font = New System.Drawing.Font("MS UI Gothic", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(128, Byte))
         Me.Button62.Location = New System.Drawing.Point(50, 268)
@@ -809,7 +809,7 @@ Partial Class Form1
         '
         'Button61
         '
-        Me.Button61.BackColor = System.Drawing.Color.White
+        Me.Button61.BackColor = System.Drawing.Color.LemonChiffon
         Me.Button61.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.Button61.Font = New System.Drawing.Font("MS UI Gothic", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(128, Byte))
         Me.Button61.Location = New System.Drawing.Point(92, 268)
@@ -821,7 +821,7 @@ Partial Class Form1
         '
         'Button60
         '
-        Me.Button60.BackColor = System.Drawing.Color.White
+        Me.Button60.BackColor = System.Drawing.Color.LemonChiffon
         Me.Button60.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.Button60.Font = New System.Drawing.Font("MS UI Gothic", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(128, Byte))
         Me.Button60.Location = New System.Drawing.Point(133, 268)
@@ -833,7 +833,7 @@ Partial Class Form1
         '
         'Button59
         '
-        Me.Button59.BackColor = System.Drawing.Color.White
+        Me.Button59.BackColor = System.Drawing.Color.LemonChiffon
         Me.Button59.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.Button59.Font = New System.Drawing.Font("MS UI Gothic", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(128, Byte))
         Me.Button59.Location = New System.Drawing.Point(175, 268)
@@ -845,7 +845,7 @@ Partial Class Form1
         '
         'Button58
         '
-        Me.Button58.BackColor = System.Drawing.Color.White
+        Me.Button58.BackColor = System.Drawing.Color.LemonChiffon
         Me.Button58.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.Button58.Font = New System.Drawing.Font("MS UI Gothic", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(128, Byte))
         Me.Button58.Location = New System.Drawing.Point(219, 268)
@@ -857,7 +857,7 @@ Partial Class Form1
         '
         'Button57
         '
-        Me.Button57.BackColor = System.Drawing.Color.White
+        Me.Button57.BackColor = System.Drawing.Color.LemonChiffon
         Me.Button57.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.Button57.Font = New System.Drawing.Font("MS UI Gothic", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(128, Byte))
         Me.Button57.Location = New System.Drawing.Point(260, 268)
@@ -869,7 +869,7 @@ Partial Class Form1
         '
         'Button56
         '
-        Me.Button56.BackColor = System.Drawing.Color.White
+        Me.Button56.BackColor = System.Drawing.Color.LemonChiffon
         Me.Button56.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.Button56.Font = New System.Drawing.Font("MS UI Gothic", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(128, Byte))
         Me.Button56.Location = New System.Drawing.Point(303, 268)
@@ -881,7 +881,7 @@ Partial Class Form1
         '
         'Button55
         '
-        Me.Button55.BackColor = System.Drawing.Color.White
+        Me.Button55.BackColor = System.Drawing.Color.LemonChiffon
         Me.Button55.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.Button55.Font = New System.Drawing.Font("MS UI Gothic", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(128, Byte))
         Me.Button55.Location = New System.Drawing.Point(344, 268)
@@ -904,7 +904,7 @@ Partial Class Form1
         '
         'Button71
         '
-        Me.Button71.BackColor = System.Drawing.Color.White
+        Me.Button71.BackColor = System.Drawing.Color.LemonChiffon
         Me.Button71.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.Button71.Font = New System.Drawing.Font("MS UI Gothic", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(128, Byte))
         Me.Button71.Location = New System.Drawing.Point(50, 312)
@@ -971,7 +971,7 @@ Partial Class Form1
         '
         'Button65
         '
-        Me.Button65.BackColor = System.Drawing.Color.White
+        Me.Button65.BackColor = System.Drawing.Color.LemonChiffon
         Me.Button65.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.Button65.Font = New System.Drawing.Font("MS UI Gothic", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(128, Byte))
         Me.Button65.Location = New System.Drawing.Point(303, 312)
@@ -994,7 +994,7 @@ Partial Class Form1
         '
         'Button81
         '
-        Me.Button81.BackColor = System.Drawing.Color.White
+        Me.Button81.BackColor = System.Drawing.Color.LemonChiffon
         Me.Button81.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.Button81.Font = New System.Drawing.Font("MS UI Gothic", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(128, Byte))
         Me.Button81.Location = New System.Drawing.Point(9, 356)
@@ -1006,7 +1006,7 @@ Partial Class Form1
         '
         'Button80
         '
-        Me.Button80.BackColor = System.Drawing.Color.White
+        Me.Button80.BackColor = System.Drawing.Color.LemonChiffon
         Me.Button80.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.Button80.Font = New System.Drawing.Font("MS UI Gothic", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(128, Byte))
         Me.Button80.Location = New System.Drawing.Point(50, 356)
@@ -1018,7 +1018,7 @@ Partial Class Form1
         '
         'Button79
         '
-        Me.Button79.BackColor = System.Drawing.Color.White
+        Me.Button79.BackColor = System.Drawing.Color.LemonChiffon
         Me.Button79.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.Button79.Font = New System.Drawing.Font("MS UI Gothic", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(128, Byte))
         Me.Button79.Location = New System.Drawing.Point(92, 356)
@@ -1030,7 +1030,7 @@ Partial Class Form1
         '
         'Button78
         '
-        Me.Button78.BackColor = System.Drawing.Color.White
+        Me.Button78.BackColor = System.Drawing.Color.LemonChiffon
         Me.Button78.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.Button78.Font = New System.Drawing.Font("MS UI Gothic", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(128, Byte))
         Me.Button78.Location = New System.Drawing.Point(133, 356)
@@ -1042,7 +1042,7 @@ Partial Class Form1
         '
         'Button77
         '
-        Me.Button77.BackColor = System.Drawing.Color.White
+        Me.Button77.BackColor = System.Drawing.Color.LemonChiffon
         Me.Button77.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.Button77.Font = New System.Drawing.Font("MS UI Gothic", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(128, Byte))
         Me.Button77.Location = New System.Drawing.Point(175, 356)
@@ -1054,7 +1054,7 @@ Partial Class Form1
         '
         'Button76
         '
-        Me.Button76.BackColor = System.Drawing.Color.White
+        Me.Button76.BackColor = System.Drawing.Color.LemonChiffon
         Me.Button76.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.Button76.Font = New System.Drawing.Font("MS UI Gothic", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(128, Byte))
         Me.Button76.Location = New System.Drawing.Point(219, 356)
@@ -1066,7 +1066,7 @@ Partial Class Form1
         '
         'Button75
         '
-        Me.Button75.BackColor = System.Drawing.Color.White
+        Me.Button75.BackColor = System.Drawing.Color.LemonChiffon
         Me.Button75.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.Button75.Font = New System.Drawing.Font("MS UI Gothic", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(128, Byte))
         Me.Button75.Location = New System.Drawing.Point(260, 356)
@@ -1078,7 +1078,7 @@ Partial Class Form1
         '
         'Button74
         '
-        Me.Button74.BackColor = System.Drawing.Color.White
+        Me.Button74.BackColor = System.Drawing.Color.LemonChiffon
         Me.Button74.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.Button74.Font = New System.Drawing.Font("MS UI Gothic", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(128, Byte))
         Me.Button74.Location = New System.Drawing.Point(303, 356)
@@ -1090,7 +1090,7 @@ Partial Class Form1
         '
         'Button73
         '
-        Me.Button73.BackColor = System.Drawing.Color.White
+        Me.Button73.BackColor = System.Drawing.Color.LemonChiffon
         Me.Button73.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.Button73.Font = New System.Drawing.Font("MS UI Gothic", 11.25!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(128, Byte))
         Me.Button73.Location = New System.Drawing.Point(344, 356)
@@ -1207,10 +1207,10 @@ Partial Class Form1
         '
         'ButtonB1
         '
-        Me.ButtonB1.BackColor = System.Drawing.Color.DimGray
+        Me.ButtonB1.BackColor = System.Drawing.Color.Cornsilk
         Me.ButtonB1.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.ButtonB1.Font = New System.Drawing.Font("MS UI Gothic", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(128, Byte))
-        Me.ButtonB1.ForeColor = System.Drawing.Color.White
+        Me.ButtonB1.ForeColor = System.Drawing.Color.Black
         Me.ButtonB1.Location = New System.Drawing.Point(49, 136)
         Me.ButtonB1.Name = "ButtonB1"
         Me.ButtonB1.Size = New System.Drawing.Size(35, 38)
@@ -1220,10 +1220,10 @@ Partial Class Form1
         '
         'ButtonB8
         '
-        Me.ButtonB8.BackColor = System.Drawing.Color.DimGray
+        Me.ButtonB8.BackColor = System.Drawing.Color.Cornsilk
         Me.ButtonB8.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.ButtonB8.Font = New System.Drawing.Font("MS UI Gothic", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(128, Byte))
-        Me.ButtonB8.ForeColor = System.Drawing.Color.White
+        Me.ButtonB8.ForeColor = System.Drawing.Color.Black
         Me.ButtonB8.Location = New System.Drawing.Point(8, 4)
         Me.ButtonB8.Name = "ButtonB8"
         Me.ButtonB8.Size = New System.Drawing.Size(35, 38)
@@ -1233,10 +1233,10 @@ Partial Class Form1
         '
         'ButtonB7
         '
-        Me.ButtonB7.BackColor = System.Drawing.Color.DimGray
+        Me.ButtonB7.BackColor = System.Drawing.Color.Cornsilk
         Me.ButtonB7.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.ButtonB7.Font = New System.Drawing.Font("MS UI Gothic", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(128, Byte))
-        Me.ButtonB7.ForeColor = System.Drawing.Color.White
+        Me.ButtonB7.ForeColor = System.Drawing.Color.Black
         Me.ButtonB7.Location = New System.Drawing.Point(49, 4)
         Me.ButtonB7.Name = "ButtonB7"
         Me.ButtonB7.Size = New System.Drawing.Size(35, 38)
@@ -1246,10 +1246,10 @@ Partial Class Form1
         '
         'ButtonB5
         '
-        Me.ButtonB5.BackColor = System.Drawing.Color.DimGray
+        Me.ButtonB5.BackColor = System.Drawing.Color.Cornsilk
         Me.ButtonB5.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.ButtonB5.Font = New System.Drawing.Font("MS UI Gothic", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(128, Byte))
-        Me.ButtonB5.ForeColor = System.Drawing.Color.White
+        Me.ButtonB5.ForeColor = System.Drawing.Color.Black
         Me.ButtonB5.Location = New System.Drawing.Point(49, 48)
         Me.ButtonB5.Name = "ButtonB5"
         Me.ButtonB5.Size = New System.Drawing.Size(35, 38)
@@ -1259,10 +1259,10 @@ Partial Class Form1
         '
         'ButtonB2
         '
-        Me.ButtonB2.BackColor = System.Drawing.Color.DimGray
+        Me.ButtonB2.BackColor = System.Drawing.Color.Cornsilk
         Me.ButtonB2.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.ButtonB2.Font = New System.Drawing.Font("MS UI Gothic", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(128, Byte))
-        Me.ButtonB2.ForeColor = System.Drawing.Color.White
+        Me.ButtonB2.ForeColor = System.Drawing.Color.Black
         Me.ButtonB2.Location = New System.Drawing.Point(8, 136)
         Me.ButtonB2.Name = "ButtonB2"
         Me.ButtonB2.Size = New System.Drawing.Size(35, 38)
@@ -1272,10 +1272,10 @@ Partial Class Form1
         '
         'ButtonB4
         '
-        Me.ButtonB4.BackColor = System.Drawing.Color.DimGray
+        Me.ButtonB4.BackColor = System.Drawing.Color.Cornsilk
         Me.ButtonB4.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.ButtonB4.Font = New System.Drawing.Font("MS UI Gothic", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(128, Byte))
-        Me.ButtonB4.ForeColor = System.Drawing.Color.White
+        Me.ButtonB4.ForeColor = System.Drawing.Color.Black
         Me.ButtonB4.Location = New System.Drawing.Point(8, 92)
         Me.ButtonB4.Name = "ButtonB4"
         Me.ButtonB4.Size = New System.Drawing.Size(35, 38)
@@ -1285,10 +1285,10 @@ Partial Class Form1
         '
         'ButtonB6
         '
-        Me.ButtonB6.BackColor = System.Drawing.Color.DimGray
+        Me.ButtonB6.BackColor = System.Drawing.Color.Cornsilk
         Me.ButtonB6.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.ButtonB6.Font = New System.Drawing.Font("MS UI Gothic", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(128, Byte))
-        Me.ButtonB6.ForeColor = System.Drawing.Color.White
+        Me.ButtonB6.ForeColor = System.Drawing.Color.Black
         Me.ButtonB6.Location = New System.Drawing.Point(8, 48)
         Me.ButtonB6.Name = "ButtonB6"
         Me.ButtonB6.Size = New System.Drawing.Size(35, 38)
@@ -1298,10 +1298,10 @@ Partial Class Form1
         '
         'ButtonB3
         '
-        Me.ButtonB3.BackColor = System.Drawing.Color.DimGray
+        Me.ButtonB3.BackColor = System.Drawing.Color.Cornsilk
         Me.ButtonB3.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.ButtonB3.Font = New System.Drawing.Font("MS UI Gothic", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(128, Byte))
-        Me.ButtonB3.ForeColor = System.Drawing.Color.White
+        Me.ButtonB3.ForeColor = System.Drawing.Color.Black
         Me.ButtonB3.Location = New System.Drawing.Point(49, 92)
         Me.ButtonB3.Name = "ButtonB3"
         Me.ButtonB3.Size = New System.Drawing.Size(35, 38)
@@ -1327,7 +1327,7 @@ Partial Class Form1
         '
         'ButtonA8
         '
-        Me.ButtonA8.BackColor = System.Drawing.Color.White
+        Me.ButtonA8.BackColor = System.Drawing.Color.LemonChiffon
         Me.ButtonA8.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.ButtonA8.Font = New System.Drawing.Font("MS UI Gothic", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(128, Byte))
         Me.ButtonA8.Location = New System.Drawing.Point(49, 136)
@@ -1339,7 +1339,7 @@ Partial Class Form1
         '
         'ButtonA1
         '
-        Me.ButtonA1.BackColor = System.Drawing.Color.White
+        Me.ButtonA1.BackColor = System.Drawing.Color.LemonChiffon
         Me.ButtonA1.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.ButtonA1.Font = New System.Drawing.Font("MS UI Gothic", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(128, Byte))
         Me.ButtonA1.Location = New System.Drawing.Point(8, 4)
@@ -1351,7 +1351,7 @@ Partial Class Form1
         '
         'ButtonA2
         '
-        Me.ButtonA2.BackColor = System.Drawing.Color.White
+        Me.ButtonA2.BackColor = System.Drawing.Color.LemonChiffon
         Me.ButtonA2.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.ButtonA2.Font = New System.Drawing.Font("MS UI Gothic", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(128, Byte))
         Me.ButtonA2.Location = New System.Drawing.Point(49, 4)
@@ -1363,7 +1363,7 @@ Partial Class Form1
         '
         'ButtonA4
         '
-        Me.ButtonA4.BackColor = System.Drawing.Color.White
+        Me.ButtonA4.BackColor = System.Drawing.Color.LemonChiffon
         Me.ButtonA4.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.ButtonA4.Font = New System.Drawing.Font("MS UI Gothic", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(128, Byte))
         Me.ButtonA4.Location = New System.Drawing.Point(49, 48)
@@ -1375,7 +1375,7 @@ Partial Class Form1
         '
         'ButtonA7
         '
-        Me.ButtonA7.BackColor = System.Drawing.Color.White
+        Me.ButtonA7.BackColor = System.Drawing.Color.LemonChiffon
         Me.ButtonA7.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.ButtonA7.Font = New System.Drawing.Font("MS UI Gothic", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(128, Byte))
         Me.ButtonA7.Location = New System.Drawing.Point(8, 136)
@@ -1387,7 +1387,7 @@ Partial Class Form1
         '
         'ButtonA5
         '
-        Me.ButtonA5.BackColor = System.Drawing.Color.White
+        Me.ButtonA5.BackColor = System.Drawing.Color.LemonChiffon
         Me.ButtonA5.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.ButtonA5.Font = New System.Drawing.Font("MS UI Gothic", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(128, Byte))
         Me.ButtonA5.Location = New System.Drawing.Point(8, 92)
@@ -1399,7 +1399,7 @@ Partial Class Form1
         '
         'ButtonA3
         '
-        Me.ButtonA3.BackColor = System.Drawing.Color.White
+        Me.ButtonA3.BackColor = System.Drawing.Color.LemonChiffon
         Me.ButtonA3.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.ButtonA3.Font = New System.Drawing.Font("MS UI Gothic", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(128, Byte))
         Me.ButtonA3.Location = New System.Drawing.Point(8, 48)
@@ -1411,7 +1411,7 @@ Partial Class Form1
         '
         'ButtonA6
         '
-        Me.ButtonA6.BackColor = System.Drawing.Color.White
+        Me.ButtonA6.BackColor = System.Drawing.Color.LemonChiffon
         Me.ButtonA6.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.ButtonA6.Font = New System.Drawing.Font("MS UI Gothic", 9.75!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(128, Byte))
         Me.ButtonA6.Location = New System.Drawing.Point(49, 92)

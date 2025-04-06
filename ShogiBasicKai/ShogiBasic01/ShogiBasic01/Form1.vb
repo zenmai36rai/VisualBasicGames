@@ -1327,12 +1327,12 @@
             b.BackColor = Color.BurlyWood
         ElseIf 1 <= c And c <= 14 Then
             b.Text = komaname(c)
-            b.BackColor = Color.WhiteSmoke
+            b.BackColor = Color.LemonChiffon
             b.ForeColor = Color.Black
         Else
             b.Text = komaname(c - 14)
-            b.BackColor = Color.DimGray
-            b.ForeColor = Color.White
+            b.BackColor = Color.Cornsilk
+            b.ForeColor = Color.Black
         End If
     End Sub
     Dim InitGenerate As Boolean = True
@@ -2114,9 +2114,9 @@
             For c = 0 To range.Length - 1 Step 1
                 b = GetButton(range(c))
                 If IsWhite(locate) = True Then
-                    b.BackColor = Color.RoyalBlue
+                    b.BackColor = Color.SandyBrown
                 ElseIf IsBlack(locate) = True Then
-                    b.BackColor = Color.OrangeRed
+                    b.BackColor = Color.SandyBrown
                 Else
                     b.BackColor = Color.YellowGreen
                 End If
@@ -2362,7 +2362,7 @@
             state = ST_WHITE_MOVE
             For c = 0 To range.Length - 1 Step 1
                 b = GetButton(range(c))
-                b.BackColor = Color.RoyalBlue
+                b.BackColor = Color.SandyBrown
                 If REVERSE_BUTTON Then
                     SetButtonImage(b)
                 End If
@@ -2372,7 +2372,7 @@
             state = ST_BLACK_MOVE
             For c = 0 To range.Length - 1 Step 1
                 b = GetButton(range(c))
-                b.BackColor = Color.OrangeRed
+                b.BackColor = Color.SandyBrown
                 If REVERSE_BUTTON Then
                     SetButtonImage(b)
                 End If
@@ -3764,7 +3764,7 @@ SET_BOARD:
     Private Sub SetButtonImage(btn As Button)
         Dim text As String = btn.Text
         Dim isBlack As Boolean = False
-        If btn.ForeColor = Color.White Then
+        If btn.BackColor = Color.Cornsilk Then
             isBlack = True
         End If
         Dim bmp As New Bitmap(btn.Width, btn.Height)
