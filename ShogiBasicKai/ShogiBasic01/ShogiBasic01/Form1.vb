@@ -2121,6 +2121,14 @@
                     b.BackColor = Color.YellowGreen
                 End If
                 If REVERSE_BUTTON Then
+                    Dim n = board(range(c))
+                    If n = 0 Then
+                        b.Text = ""
+                    ElseIf 1 <= n And n <= 14 Then
+                        b.Text = komaname(n)
+                    Else
+                        b.Text = komaname(n - 14)
+                    End If
                     SetButtonImage(b)
                 End If
             Next
@@ -2196,7 +2204,7 @@
         End If
     End Sub
 
-    Const REVERSE_BUTTON = False
+    Const REVERSE_BUTTON = True
     Private Sub SetReverseImage()
         If REVERSE_BUTTON Then
             For i As Integer = 0 To 80
@@ -3744,6 +3752,7 @@ SET_BOARD:
         End If
     End Sub
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        DispAll()
     End Sub
 
     Private Sub SetButtonImage(btn As Button)
