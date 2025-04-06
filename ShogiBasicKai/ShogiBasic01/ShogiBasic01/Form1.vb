@@ -2117,7 +2117,7 @@ Public Class Form1
                 If IsWhite(locate) = True Then
                     b.BackColor = Color.SandyBrown
                 ElseIf IsBlack(locate) = True Then
-                    b.BackColor = Color.SandyBrown
+                    b.BackColor = Color.DarkOrange
                 Else
                     b.BackColor = Color.YellowGreen
                 End If
@@ -2416,7 +2416,7 @@ Public Class Form1
             state = ST_BLACK_MOVE
             For c = 0 To range.Length - 1 Step 1
                 b = GetButton(range(c))
-                b.BackColor = Color.SandyBrown
+                b.BackColor = Color.DarkOrange
                 If REVERSE_BUTTON Then
                     SetButtonImage(b)
                 End If
@@ -3809,6 +3809,8 @@ SET_BOARD:
         Dim text As String = btn.Text
         Dim isBlack As Boolean = False
         If btn.BackColor = Color.Cornsilk Then
+            isBlack = True
+        ElseIf btn.BackColor = Color.SandyBrown And text <> "" Then
             isBlack = True
         End If
         Dim bmp As New Bitmap(btn.Width, btn.Height)
