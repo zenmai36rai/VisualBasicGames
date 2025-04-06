@@ -1324,7 +1324,7 @@
         c = board(locale)
         If c = 0 Then
             b.Text = ""
-            b.BackColor = Color.LightGray
+            b.BackColor = Color.Peru
         ElseIf 1 <= c And c <= 14 Then
             b.Text = komaname(c)
             b.BackColor = Color.WhiteSmoke
@@ -2363,6 +2363,9 @@
             For c = 0 To range.Length - 1 Step 1
                 b = GetButton(range(c))
                 b.BackColor = Color.RoyalBlue
+                If REVERSE_BUTTON Then
+                    SetButtonImage(b)
+                End If
             Next
         End If
         If 15 <= koma Then
@@ -2370,6 +2373,9 @@
             For c = 0 To range.Length - 1 Step 1
                 b = GetButton(range(c))
                 b.BackColor = Color.OrangeRed
+                If REVERSE_BUTTON Then
+                    SetButtonImage(b)
+                End If
             Next
         End If
         TakeHand = range.Clone
