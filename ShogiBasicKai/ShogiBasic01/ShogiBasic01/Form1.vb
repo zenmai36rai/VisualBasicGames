@@ -1324,7 +1324,7 @@
         c = board(locale)
         If c = 0 Then
             b.Text = ""
-            b.BackColor = Color.Peru
+            b.BackColor = Color.BurlyWood
         ElseIf 1 <= c And c <= 14 Then
             b.Text = komaname(c)
             b.BackColor = Color.WhiteSmoke
@@ -3770,7 +3770,7 @@ SET_BOARD:
         Dim bmp As New Bitmap(btn.Width, btn.Height)
         Using g As Graphics = Graphics.FromImage(bmp)
             g.Clear(btn.BackColor)
-            Dim font As New Font("MS Gothic", 11.25)
+            Dim font As New Font("MS Gothic", 14)
             Dim textSize As SizeF = g.MeasureString(text, font)
             Dim x As Single = (btn.Width - textSize.Width) / 2
             Dim y As Single = (btn.Height - textSize.Height) / 2

@@ -1102,7 +1102,7 @@ Partial Class Form1
         '
         'Panel1
         '
-        Me.Panel1.BackColor = System.Drawing.Color.Peru
+        Me.Panel1.BackColor = System.Drawing.Color.BurlyWood
         Me.Panel1.Controls.Add(Me.Button73)
         Me.Panel1.Controls.Add(Me.Button74)
         Me.Panel1.Controls.Add(Me.Button75)
@@ -1191,7 +1191,7 @@ Partial Class Form1
         '
         'Panel3
         '
-        Me.Panel3.BackColor = System.Drawing.Color.Peru
+        Me.Panel3.BackColor = System.Drawing.Color.BurlyWood
         Me.Panel3.Controls.Add(Me.ButtonB1)
         Me.Panel3.Controls.Add(Me.ButtonB8)
         Me.Panel3.Controls.Add(Me.ButtonB7)
@@ -1311,7 +1311,7 @@ Partial Class Form1
         '
         'Panel2
         '
-        Me.Panel2.BackColor = System.Drawing.Color.Peru
+        Me.Panel2.BackColor = System.Drawing.Color.BurlyWood
         Me.Panel2.Controls.Add(Me.ButtonA8)
         Me.Panel2.Controls.Add(Me.ButtonA1)
         Me.Panel2.Controls.Add(Me.ButtonA2)
@@ -1595,7 +1595,7 @@ Partial Class Form1
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 12.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.BackColor = System.Drawing.Color.SaddleBrown
+        Me.BackColor = System.Drawing.Color.DarkGreen
         Me.ClientSize = New System.Drawing.Size(917, 416)
         Me.Controls.Add(Me.Button87)
         Me.Controls.Add(Me.Button86)
