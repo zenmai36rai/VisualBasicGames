@@ -1576,6 +1576,7 @@ Partial Class Form1
         Me.Button85.TabIndex = 110
         Me.Button85.Text = "save"
         Me.Button85.UseVisualStyleBackColor = True
+        Me.Button85.Visible = False
         '
         'Button86
         '
@@ -1585,6 +1586,7 @@ Partial Class Form1
         Me.Button86.TabIndex = 111
         Me.Button86.Text = "load"
         Me.Button86.UseVisualStyleBackColor = True
+        Me.Button86.Visible = False
         '
         'Button87
         '

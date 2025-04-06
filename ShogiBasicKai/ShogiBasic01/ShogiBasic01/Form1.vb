@@ -3620,6 +3620,9 @@ SET_BOARD:
         End Using
     End Sub
     Private Sub LoadJyoseki()
+        If USE_JYOSEKI <> True Then
+            Exit Sub
+        End If
         Dim encoding = System.Text.Encoding.UTF8
         Dim filePath As String = "..\..\JD\book.txt"
         Dim line As String = String.Empty
