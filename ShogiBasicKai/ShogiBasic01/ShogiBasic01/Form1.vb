@@ -2234,7 +2234,7 @@ Public Class Form1
         Dim cellHeight As Single = Panel1.Height / 9 ' 縦9マス
 
         ' グリッド線を描画
-        Using pen As New Pen(Color.Black, 1)
+        Using pen As New Pen(Color.Black, 2)
             ' 縦線
             For i As Integer = 0 To 9
                 Dim x As Single = i * cellWidth
