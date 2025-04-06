@@ -2236,16 +2236,32 @@ Public Class Form1
         ' グリッド線を描画
         Using pen As New Pen(Color.Black, 2)
             ' 縦線
-            For i As Integer = 0 To 9
+            For i As Integer = 0 To 8
                 Dim x As Single = i * cellWidth
                 g.DrawLine(pen, x, 0, x, Panel1.Height)
+                For j = 0 To 8
+                    Dim pos = (8 - i) + j * 9
+                    Dim btn As Button = GetButton(pos)
+                    btn.Left = x + 3
+                Next
             Next
 
+
             ' 横線
-            For i As Integer = 0 To 9
+            For i As Integer = 0 To 8
                 Dim y As Single = i * cellHeight
                 g.DrawLine(pen, 0, y, Panel1.Width, y)
             Next
+
+            For i As Integer = 3 To 8 Step 3
+                For j As Integer = 3 To 8 Step 3
+                    Dim x As Single = i * cellWidth - 3
+                    Dim y As Single = j * cellHeight - 3
+                    Dim r As Rectangle = New Rectangle(x, y, 6, 6)
+                    g.DrawEllipse(Pens.Black, r)
+                Next
+            Next
+
         End Using
     End Sub
 
