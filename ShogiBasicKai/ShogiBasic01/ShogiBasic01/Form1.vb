@@ -3804,8 +3804,8 @@ SET_BOARD:
             End If
             g.DrawString(text, font, New SolidBrush(btn.ForeColor), x, y)
             ' 五角形の頂点を計算（ボタンのサイズに基づく）
-            Dim points(5) As Point
-            Dim centerX As Integer = btn.Width / 2 + 10
+            Dim points(6) As Point
+            Dim centerX As Integer = btn.Width / 2
             Dim centerY As Integer = btn.Height / 2 + 10
             Dim radius As Integer = Math.Min(btn.Width, btn.Height) \ 2 ' 少し内側に
 
@@ -3815,14 +3815,14 @@ SET_BOARD:
                 points(2) = New Point(btn.Width - 4, btn.Height - 7)
                 points(3) = New Point(btn.Width / 2, btn.Height - 2)
                 points(4) = New Point(3, btn.Height - 7)
-                'points(5) = New Point(centerX, btn.Height)
+                points(5) = New Point(1, 1)
             Else
                 points(0) = New Point(centerX, 1)
-                points(1) = New Point(3, 5)
-                points(2) = New Point(0, btn.Height - 1)
-                points(3) = New Point(btn.Width - 1, btn.Height - 1)
-                points(4) = New Point(btn.Width - 3, 5)
-                'points(5) = New Point(centerX, 0)
+                points(1) = New Point(btn.Width - 3, 5)
+                points(2) = New Point(btn.Width - 1, btn.Height - 1)
+                points(3) = New Point(0, btn.Height - 1)
+                points(4) = New Point(3, 5)
+                points(5) = New Point(centerX, 1)
             End If
 
             ' GraphicsPathで五角形を作成
