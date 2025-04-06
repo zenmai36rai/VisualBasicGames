@@ -2225,34 +2225,35 @@ Public Class Form1
         TextBox4.Text = -Hyouka().ToString
         SetReverseImage()
     End Sub
-    Private Sub Panel1_Paint(sender As Object, e As PaintEventArgs) Handles Panel1.Paint
-        Dim g As Graphics = e.Graphics
-        g.SmoothingMode = SmoothingMode.AntiAlias
+    Private Sub DrawShogiBoard(ByVal panel As Panel)
+        Dim bmp As New Bitmap(panel.Width, panel.Height)
+        Using g As Graphics = Graphics.FromImage(bmp)
+            g.Clear(panel.BackColor) ' 背景をクリア
+            g.SmoothingMode = SmoothingMode.AntiAlias
 
-        ' パネルの幅と高さに基づいてマス目を計算
-        Dim cellWidth As Single = Panel1.Width / 9  ' 横9マス
-        Dim cellHeight As Single = Panel1.Height / 9 ' 縦9マス
+            ' マス目を計算
+            Dim cellWidth As Single = panel.Width / 9
+            Dim cellHeight As Single = panel.Height / 9
 
-        ' グリッド線を描画
-        Using pen As New Pen(Color.Black, 2)
-            ' 縦線
-            For i As Integer = 0 To 8
-                Dim x As Single = i * cellWidth
-                g.DrawLine(pen, x, 0, x, Panel1.Height)
-                For j = 0 To 8
-                    Dim pos = (8 - i) + j * 9
-                    Dim btn As Button = GetButton(pos)
-                    btn.Left = x + 3
+            ' グリッド線を描画
+            Using pen As New Pen(Color.Black, 1)
+                ' 縦線
+                For i As Integer = 0 To 8
+                    Dim x As Single = i * cellWidth
+                    g.DrawLine(pen, x, 0, x, panel.Height)
+                    For j = 0 To 8
+                        Dim pos = (8 - i) + j * 9
+                        Dim btn As Button = GetButton(pos)
+                        btn.Left = x + 3
+                    Next
+
                 Next
-            Next
-
-
-            ' 横線
-            For i As Integer = 0 To 8
-                Dim y As Single = i * cellHeight
-                g.DrawLine(pen, 0, y, Panel1.Width, y)
-            Next
-
+                ' 横線
+                For i As Integer = 0 To 8
+                    Dim y As Single = i * cellHeight
+                    g.DrawLine(pen, 0, y, panel.Width, y)
+                Next
+            End Using
             For i As Integer = 3 To 8 Step 3
                 For j As Integer = 3 To 8 Step 3
                     Dim x As Single = i * cellWidth - 3
@@ -2261,8 +2262,10 @@ Public Class Form1
                     g.DrawEllipse(Pens.Black, r)
                 Next
             Next
-
         End Using
+        panel.BackgroundImage = bmp
+
+
     End Sub
 
     Private Function HandRange(ByVal wb As Integer, ByVal idx As Integer) As List(Of Integer)
@@ -3800,6 +3803,7 @@ SET_BOARD:
     End Sub
     Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         DispAll()
+        DrawShogiBoard(Panel1)
     End Sub
     Private Sub SetButtonImage(btn As Button)
         Dim text As String = btn.Text
