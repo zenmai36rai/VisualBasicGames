@@ -2120,6 +2120,9 @@
                 Else
                     b.BackColor = Color.YellowGreen
                 End If
+                If REVERSE_BUTTON Then
+                    SetButtonImage(b)
+                End If
             Next
         ElseIf state = ST_WHITE_CHOOSE And RangeCheck(range, locate) Then
             'MoveChara(locate)
@@ -2193,8 +2196,9 @@
         End If
     End Sub
 
+    Const REVERSE_BUTTON = False
     Private Sub SetReverseImage()
-        If False Then
+        If REVERSE_BUTTON Then
             For i As Integer = 0 To 80
                 Dim btn As Button = GetButton(i)
                 If btn IsNot Nothing Then
