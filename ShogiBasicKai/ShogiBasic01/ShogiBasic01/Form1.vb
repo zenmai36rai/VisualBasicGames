@@ -2192,6 +2192,17 @@
             state = ST_FREE
         End If
     End Sub
+
+    Private Sub SetReverseImage()
+        If False Then
+            For i As Integer = 0 To 80
+                Dim btn As Button = GetButton(i)
+                If btn IsNot Nothing Then
+                    SetButtonImage(btn)
+                End If
+            Next
+        End If
+    End Sub
     Private Sub DispAll()
         For p = 0 To 80 Step 1
             UnitSet(p)
@@ -2199,6 +2210,7 @@
         DispHand()
         TextBox3.Text = Hyouka().ToString
         TextBox4.Text = -Hyouka().ToString
+        SetReverseImage()
     End Sub
     Private Function HandRange(ByVal wb As Integer, ByVal idx As Integer) As List(Of Integer)
         'Dim koma = KomaIdx(idx, wb)
@@ -3696,22 +3708,22 @@ SET_BOARD:
             End If
             ' 応答を読み取る
             Dim output As String = engineProcess.StandardOutput.ReadLine()
-                Dim _error As String = engineProcess.StandardError.ReadLine()
+            Dim _error As String = engineProcess.StandardError.ReadLine()
 
+            UpdateTextBox("UIスレッドに結果を反映")
+            UpdateTextBox("出力:" & output & vbCrLf & "エラー: " & _error)
+            ' UIスレッドに結果を反映
+            If RichTextBox1.InvokeRequired Then
                 UpdateTextBox("UIスレッドに結果を反映")
-                UpdateTextBox("出力:" & output & vbCrLf & "エラー: " & _error)
-                ' UIスレッドに結果を反映
-                If RichTextBox1.InvokeRequired Then
-                    UpdateTextBox("UIスレッドに結果を反映")
-                    RichTextBox1.Invoke(Sub() RichTextBox1.Text = "出力: " & output & vbCrLf & "エラー: " & _error)
-                Else
-                    RichTextBox1.Text = "出力: " & output & vbCrLf & "エラー: " & _error
-                End If
-                ' プロセスが終了したか確認
-                If engineProcess.HasExited Then
-                    RichTextBox1.Invoke(Sub() RichTextBox1.Text &= vbCrLf & "プロセス終了 (コード: " & engineProcess.ExitCode & ")")
-                End If
+                RichTextBox1.Invoke(Sub() RichTextBox1.Text = "出力: " & output & vbCrLf & "エラー: " & _error)
+            Else
+                RichTextBox1.Text = "出力: " & output & vbCrLf & "エラー: " & _error
             End If
+            ' プロセスが終了したか確認
+            If engineProcess.HasExited Then
+                RichTextBox1.Invoke(Sub() RichTextBox1.Text &= vbCrLf & "プロセス終了 (コード: " & engineProcess.ExitCode & ")")
+            End If
+        End If
     End Sub
     Private Sub UpdateTextBox(message As String)
         If RichTextBox1.InvokeRequired Then
@@ -3726,6 +3738,31 @@ SET_BOARD:
         If line IsNot Nothing Then
             UpdateTextBox("出力: " & line)
         End If
+    End Sub
+    Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+    End Sub
+
+    Private Sub SetButtonImage(btn As Button)
+        Dim text As String = btn.Text
+        Dim isBlack As Boolean = False
+        If btn.ForeColor = Color.White Then
+            isBlack = True
+        End If
+        Dim bmp As New Bitmap(btn.Width, btn.Height)
+        Using g As Graphics = Graphics.FromImage(bmp)
+            g.Clear(btn.BackColor)
+            Dim font As New Font("MS Gothic", 11.25)
+            Dim textSize As SizeF = g.MeasureString(text, font)
+            Dim x As Single = (btn.Width - textSize.Width) / 2
+            Dim y As Single = (btn.Height - textSize.Height) / 2
+            If isBlack Then
+                g.RotateTransform(180)
+                g.TranslateTransform(-btn.Width, -btn.Height)
+            End If
+            g.DrawString(text, font, New SolidBrush(btn.ForeColor), x, y)
+        End Using
+        btn.Text = ""
+        btn.Image = bmp
     End Sub
 End Class
 ' 2015 - 2025 Written By Kyosuke Miyazawa ShogiBasic
