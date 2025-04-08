@@ -2217,6 +2217,7 @@ Public Class Form1
         End If
     End Sub
     Private Sub DispAll()
+        Me.SuspendLayout()
         For p = 0 To 80 Step 1
             UnitSet(p)
         Next
@@ -2224,6 +2225,7 @@ Public Class Form1
         TextBox3.Text = Hyouka().ToString
         TextBox4.Text = -Hyouka().ToString
         SetReverseImage()
+        Me.ResumeLayout()
     End Sub
     Private Sub DrawShogiBoard(ByVal panel As Panel)
         Dim bmp As New Bitmap(panel.Width, panel.Height)
