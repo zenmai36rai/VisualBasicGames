@@ -1430,10 +1430,10 @@ Public Class Form1
         Dim Move As MoveData
         For Each Move In moves
             ' ハッシュムーブ
-            If ttMove IsNot Nothing AndAlso Move.from = ttMove.from AndAlso Move._to = ttMove._to Then
+            If False And ttMove IsNot Nothing AndAlso Move.from = ttMove.from AndAlso Move._to = ttMove._to Then
                 Move.score = Integer.MaxValue
                 ' キャプチャムーブ（MVV/LVA）
-            ElseIf Move.Capture <> BLANK Then
+            ElseIf Move.capture <> BLANK Then
                 Dim victimValue As Integer = GetPieceValue(Move.capture) ' 例：飛車=500, 歩=100
                 Dim attackerValue As Integer = GetPieceValue(Move.from) ' 攻撃駒の価値
                 Move.score = 10000 + victimValue - attackerValue
@@ -1458,7 +1458,7 @@ Public Class Form1
 
     Private Function IsKillerMove(move As MoveData) As Boolean
         ' キラームーブテーブルをチェック
-        Return False ' 仮実装
+        Return (move.capture <> BLANK)
     End Function
 
     Private Function GetHistoryScore(fromSquare As Integer, toSquare As Integer) As Integer
@@ -2251,10 +2251,8 @@ Public Class Form1
             End If
         End If
         Dim last As Integer = GenerateMoves(first, wb, depth)
-        If USE_HASH Then
-            ' 指し手オーダリング
-            OrderMoves(Node.GetRange(first, last - first), ttMove)
-        End If
+        ' 指し手オーダリング
+        OrderMoves(Node.GetRange(first, last - first), ttMove)
         For i = first To last - 1 Step 1
             MakeMove(Node(i), False)
             Dim a = -alphabeta(position, last, -wb, depth - 1, -beta, -alpha, tt)
