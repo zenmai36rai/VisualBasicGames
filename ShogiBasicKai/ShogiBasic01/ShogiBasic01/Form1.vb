@@ -1,6 +1,7 @@
 ﻿Imports System.Drawing.Drawing2D
 Public Class Form1
     Const DEBUG As Boolean = False
+    Const KILLER_SORT = False
     Const ROBOT_MOVE As Boolean = True
     Const WHITE As Integer = 1
     Const BLACK As Integer = -1
@@ -36,6 +37,8 @@ Public Class Form1
         Public dst_kind As Integer = 0
         Public teban As Integer = 0
         Public capture As Integer = BLANK
+        Public _check As Integer = 0
+        Public score As Integer = 0
         Sub New()
 
         End Sub
@@ -1395,6 +1398,18 @@ Public Class Form1
                 UnitRange = KakuRange(id, locate, -1, True)
         End Select
         If 0 <= id And id < 40 Then
+            If KILLER_SORT Then
+                Dim last = KomaIDNode(id).Count - 1
+                For i = 0 To last
+                    Dim m As MoveData = KomaIDNode(id).ElementAt(i)
+                    If m.capture <> BLANK Then
+                        Node.Add(m)
+                        KomaIDNode(id).RemoveAt(i)
+                        i = i - 1
+                        last = KomaIDNode(id).Count - 1
+                    End If
+                Next
+            End If
             Node.InsertRange(NodeIdx, KomaIDNode(id))
             NodeIdx += KomaIDNode(id).Count
         End If
@@ -1409,6 +1424,78 @@ Public Class Form1
             End While
         End If
     End Function
+
+    Public Sub OrderMoves(moves As List(Of MoveData), ttMove As MoveData)
+        Dim Move As MoveData
+        For Each Move In moves
+            ' ハッシュムーブ
+            If ttMove IsNot Nothing AndAlso Move.from = ttMove.from AndAlso Move._to = ttMove._to Then
+                Move.score = Integer.MaxValue
+                ' キャプチャムーブ（MVV/LVA）
+            ElseIf Move.Capture <> BLANK Then
+                Dim victimValue As Integer = GetPieceValue(Move.capture) ' 例：飛車=500, 歩=100
+                Dim attackerValue As Integer = GetPieceValue(Move.from) ' 攻撃駒の価値
+                Move.score = 10000 + victimValue - attackerValue
+                ' キラームーブ
+            ElseIf IsKillerMove(Move) Then
+                Move.score = 9000
+                ' プロモーション
+            ElseIf Move.classup Then
+                Move.score = 8000
+                ' ヒストリー
+            Else
+                Move.score = GetHistoryScore(Move.from, Move._to)
+            End If
+        Next
+        ' スコアで降順ソート
+        moves.Sort(Function(a, b) b.score.CompareTo(a.score))
+    End Sub
+
+    Private Function GetPieceValue(piece As Integer) As Integer
+        Return KomaScore(piece)
+    End Function
+
+    Private Function IsKillerMove(move As MoveData) As Boolean
+        ' キラームーブテーブルをチェック
+        Return False ' 仮実装
+    End Function
+
+    Private Function GetHistoryScore(fromSquare As Integer, toSquare As Integer) As Integer
+        ' ヒストリーテーブルをチェック
+        Return 0 ' 仮実装
+    End Function
+    Public Class TranspositionTableEntry
+        Public Hash As ULong ' 局面のZobristハッシュ
+        Public Depth As Integer = YOMI_DEPTH ' 探索深さ
+        Public Score As Integer ' 評価値
+        Public BestMove As MoveData ' 最善の指し手（ttMove）
+        Public NodeType As Integer ' ノード種別（0=Exact, 1=Upper, 2=Lower）
+    End Class
+
+    Public Class TranspositionTable
+        Private Table As Dictionary(Of ULong, TranspositionTableEntry)
+        Public Sub New()
+            Table = New Dictionary(Of ULong, TranspositionTableEntry)()
+        End Sub
+
+        Public Sub Store(hash As ULong, depth As Integer, score As Integer, bestMove As MoveData, nodeType As Integer)
+            Dim entry As New TranspositionTableEntry With {
+            .Hash = hash,
+            .Depth = depth,
+            .Score = score,
+            .BestMove = bestMove,
+            .NodeType = nodeType
+        }
+            Table(hash) = entry ' 簡略化：実際は衝突処理や上書きルールが必要
+        End Sub
+
+        Public Function Lookup(hash As ULong) As TranspositionTableEntry
+            If Table.ContainsKey(hash) Then
+                Return Table(hash)
+            End If
+            Return Nothing
+        End Function
+    End Class
     Private Function RangeCheck(ByRef r As Array, ByVal locate As Integer) As Boolean
         Dim i As Integer
         For i = 0 To r.Length - 1 Step 1
@@ -1945,8 +2032,172 @@ Public Class Form1
     Private Function IsKillerMove(ByVal wb As Integer, ByVal dst As Integer) As Boolean
         Return IsWB(-wb, dst)
     End Function
-    Private Function alphabeta(ByVal first As Integer, ByVal wb As Integer, ByVal depth As Integer,
-                                ByVal alpha As Integer, ByVal beta As Integer) As Integer
+    Public Class Zobrist
+        ' Zobristテーブル
+        Public Table As ULong(,,) ' [マス][駒種][プレイヤー]
+        Public Turn As ULong() ' [プレイヤー]
+        Public Hand As ULong(,,) ' [駒種][プレイヤー][枚数]
+
+        ' 初期化
+        Public Sub Initialize()
+            Dim rand As New Random(42) ' 再現性のためシード固定
+            Table = New ULong(80, 14, 1) {} ' 81マス、15駒種（0=空）、2プレイヤー（先手=0, 後手=1）
+            Turn = New ULong(1) {} ' 先手=0, 後手=1
+            Hand = New ULong(6, 1, 18) {} ' 7駒種（歩,桂,香,銀,金,角,飛）、2プレイヤー、最大18枚
+
+            ' 盤面のZobrist値
+            For square As Integer = 0 To 80
+                For piece As Integer = 0 To 14 ' 0=空, 1=歩, ..., 14=龍
+                    For player As Integer = 0 To 1
+                        Table(square, piece, player) = GenerateRandomULong(rand)
+                    Next
+                Next
+            Next
+
+            ' 手番
+            For player As Integer = 0 To 1
+                Turn(player) = GenerateRandomULong(rand)
+            Next
+
+            ' 持ち駒
+            For piece As Integer = 0 To 6 ' 歩,桂,香,銀,金,角,飛
+                For player As Integer = 0 To 1
+                    For count As Integer = 0 To 18
+                        Hand(piece, player, count) = GenerateRandomULong(rand)
+                    Next
+                Next
+            Next
+        End Sub
+
+        Private Function GenerateRandomULong(rand As Random) As ULong
+            Dim bytes(7) As Byte
+            rand.NextBytes(bytes)
+            Return BitConverter.ToUInt64(bytes, 0)
+        End Function
+    End Class
+
+    Public Class Position
+        Private Board As Integer() ' 盤面：マスごとの駒（例：1=先手歩, -1=後手歩, 0=空）
+        Private TurnPlayer As Integer ' 0=先手, 1=後手
+        Private Hand As Integer(,) ' 持ち駒：[駒種][プレイヤー]
+        Private CurrentHash As ULong ' 現在のZobristハッシュ
+        Public _Zobrist As Zobrist
+
+        Public Sub New()
+            Board = New Integer(80) {} ' 81マス
+            TurnPlayer = 0
+            Hand = New Integer(6, 1) {} ' 7駒種×2プレイヤー
+            CurrentHash = 0
+            _Zobrist = New Zobrist
+            _Zobrist.Initialize() ' Zobristテーブル初期化
+            UpdateHash() ' 初期局面のハッシュを計算
+        End Sub
+
+        ' Zobristハッシュを計算（初回または再計算用）
+        Private Sub UpdateHash()
+            CurrentHash = 0
+            ' 盤面
+            For square As Integer = 0 To 80
+                Dim piece As Integer = Board(square)
+                If piece <> 0 Then
+                    Dim pieceType As Integer = Math.Abs(piece) ' 駒種（1=歩, ..., 14=龍）
+                    Dim player As Integer = If(piece > 0, 0, 1) ' 先手=0, 後手=1
+                    CurrentHash = CurrentHash Xor _Zobrist.Table(square, pieceType, player)
+                End If
+            Next
+            ' 手番
+            CurrentHash = CurrentHash Xor _Zobrist.Turn(TurnPlayer)
+            ' 持ち駒
+            For piece As Integer = 0 To 6
+                For player As Integer = 0 To 1
+                    Dim count As Integer = Hand(piece, player)
+                    If count > 0 Then
+                        CurrentHash = CurrentHash Xor _Zobrist.Hand(piece, player, count)
+                    End If
+                Next
+            Next
+        End Sub
+
+        ' Zobristハッシュを取得
+        Public Function GetZobristHash() As ULong
+            Return CurrentHash
+        End Function
+
+        ' 指し手を適用（ハッシュを増分更新）
+        Public Sub MakeMove(move As MoveData)
+            Dim fromSquare As Integer = move.from
+            Dim toSquare As Integer = move._to
+            Dim piece As Integer = Board(fromSquare)
+            Dim captured As Integer = Board(toSquare)
+            Dim pieceType As Integer = Math.Abs(piece)
+            Dim player As Integer = If(piece > 0, 0, 1)
+
+            ' 1. 移動元を空に
+            CurrentHash = CurrentHash Xor _Zobrist.Table(fromSquare, pieceType, player)
+            ' 2. 移動先に駒を配置（成り考慮）
+            Dim newPieceType As Integer = If(move.classup, pieceType + 7, pieceType) ' 例：歩(1)→と金(8)
+            CurrentHash = CurrentHash Xor _Zobrist.Table(toSquare, newPieceType, player)
+            ' 3. 駒を取った場合
+            If captured <> 0 Then
+                Dim capturedType As Integer = Math.Abs(captured)
+                Dim capturedPlayer As Integer = If(captured <> BLANK, 0, 1)
+                CurrentHash = CurrentHash Xor _Zobrist.Table(toSquare, capturedType, capturedPlayer)
+                ' 持ち駒に追加
+                Dim handPiece As Integer = If(capturedType > 7, capturedType - 7, capturedType) ' 例：と金(8)→歩(1)
+                Dim oldCount As Integer = Hand(handPiece, player)
+                CurrentHash = CurrentHash Xor _Zobrist.Hand(handPiece, player, oldCount)
+                Hand(handPiece, player) += 1
+                CurrentHash = CurrentHash Xor _Zobrist.Hand(handPiece, player, oldCount + 1)
+            End If
+            ' 4. 手番を変更
+            CurrentHash = CurrentHash Xor _Zobrist.Turn(TurnPlayer)
+            TurnPlayer = 1 - TurnPlayer
+            CurrentHash = CurrentHash Xor _Zobrist.Turn(TurnPlayer)
+
+            ' 盤面更新
+            Board(toSquare) = If(move.classup, pieceType + 7, piece)
+            Board(fromSquare) = 0
+        End Sub
+
+        ' 指し手を戻す（ハッシュも復元）
+        Public Sub UnmakeMove(move As MoveData)
+            Dim fromSquare As Integer = move.from
+            Dim toSquare As Integer = move._to
+            Dim piece As Integer = Board(toSquare)
+            Dim captured As Integer = move.capture
+            Dim pieceType As Integer = Math.Abs(piece)
+            Dim player As Integer = If(piece > 0, 0, 1)
+
+            ' 1. 手番を戻す
+            CurrentHash = CurrentHash Xor _Zobrist.Turn(TurnPlayer)
+            TurnPlayer = 1 - TurnPlayer
+            CurrentHash = CurrentHash Xor _Zobrist.Turn(TurnPlayer)
+            ' 2. 移動先を元に戻す（駒取り考慮）
+            If captured <> 0 Then
+                Dim capturedType As Integer = Math.Abs(captured)
+                Dim capturedPlayer As Integer = If(captured > 0, 0, 1)
+                CurrentHash = CurrentHash Xor _Zobrist.Table(toSquare, pieceType, player)
+                CurrentHash = CurrentHash Xor _Zobrist.Table(toSquare, capturedType, capturedPlayer)
+                ' 持ち駒を減らす
+                Dim handPiece As Integer = If(capturedType > 7, capturedType - 7, capturedType)
+                Dim oldCount As Integer = Hand(handPiece, player)
+                CurrentHash = CurrentHash Xor _Zobrist.Hand(handPiece, player, oldCount)
+                Hand(handPiece, player) -= 1
+                CurrentHash = CurrentHash Xor _Zobrist.Hand(handPiece, player, oldCount - 1)
+            Else
+                CurrentHash = CurrentHash Xor _Zobrist.Table(toSquare, pieceType, player)
+            End If
+            ' 3. 移動元に駒を戻す
+            Dim origPieceType As Integer = If(move.classup, pieceType - 7, pieceType)
+            CurrentHash = CurrentHash Xor _Zobrist.Table(fromSquare, origPieceType, player)
+
+            ' 盤面復元
+            Board(fromSquare) = If(piece > 0, origPieceType, -origPieceType)
+            Board(toSquare) = captured
+        End Sub
+    End Class
+    Private Function alphabeta(ByVal position As Position, ByVal first As Integer, ByVal wb As Integer, ByVal depth As Integer,
+                                ByVal alpha As Integer, ByVal beta As Integer, tt As TranspositionTable) As Integer
         'Dim h As Integer = Hyouka() * wb
         Dim h As Integer = (currentEval / 200) * wb
         If depth = 0 Then
@@ -1955,10 +2206,31 @@ Public Class Form1
         If Math.Abs(h) >= FINISH_SCORE Then
             Return h
         End If
+        ' 置換表を参照
+        Dim hash As ULong = position.GetZobristHash()
+        Dim ttEntry As TranspositionTableEntry = tt.Lookup(hash)
+        Dim ttMove As MoveData = Nothing
+        If False Then
+            If ttEntry IsNot Nothing AndAlso ttEntry.Depth >= depth Then
+                ttMove = ttEntry.BestMove
+                ' 評価値が使える場合、探索をスキップ
+                If ttEntry.NodeType = 0 Then ' Exact
+                    Return ttEntry.Score
+                ElseIf ttEntry.NodeType = 1 AndAlso ttEntry.Score <= alpha Then ' Upper
+                    Return alpha
+                ElseIf ttEntry.NodeType = 2 AndAlso ttEntry.Score >= beta Then ' Lower
+                    Return beta
+                End If
+            End If
+        End If
         Dim last As Integer = GenerateMoves(first, wb, depth)
+        If False Then
+            ' 指し手オーダリング
+            OrderMoves(Node.GetRange(first, last - first), ttMove)
+        End If
         For i = first To last - 1 Step 1
             MakeMove(Node(i), False)
-            Dim a = -alphabeta(last, -wb, depth - 1, -beta, -alpha)
+            Dim a = -alphabeta(position, last, -wb, depth - 1, -beta, -alpha, tt)
             UnmakeMove()
             If (a > alpha) Then
                 alpha = a
@@ -1973,9 +2245,14 @@ Public Class Form1
                 End If
             End If
             If alpha >= beta Then
-                Return alpha
+                Exit For
             End If
         Next
+        If False Then
+            ' 置換表に保存
+            Dim nodeType As Integer = If(BestScore <= alpha, 1, If(BestScore >= beta, 2, 0))
+            tt.Store(hash, depth, BestScore, best, nodeType)
+        End If
         Return alpha
     End Function
     Private Function GenerateMoves(ByVal first As Integer, ByVal wb As Integer,
@@ -2048,13 +2325,15 @@ Public Class Form1
         SuspendLayout()
         Dim ret As Integer = 0
         best.from = BLANK
+        Dim position As New Position()
+        Dim tt As New TranspositionTable()
         Dim s As String = _b.GetBoardString(board)
         If USE_JYOSEKI Then
             If _JyosekiDictionary.ContainsKey(s) Then
                 best.SetMoveDataFromString(_JyosekiDictionary(s))
             End If
         Else
-            ret = alphabeta(0, wb, YOMI_DEPTH, nodemin, nodemax)
+            ret = alphabeta(position, 0, wb, YOMI_DEPTH, nodemin, nodemax, tt)
             Dim s2 As String = best.GetMoveDataString()
             If False Then
                 _JyosekiDictionary.Add(s, s2)
