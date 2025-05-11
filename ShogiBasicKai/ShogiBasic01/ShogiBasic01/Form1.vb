@@ -1,7 +1,8 @@
 ﻿Imports System.Drawing.Drawing2D
 Public Class Form1
     Const DEBUG As Boolean = False
-    Const KILLER_SORT = False
+    Const USE_HASH As Boolean = False
+    Const KILLER_SORT As Boolean = False
     Const ROBOT_MOVE As Boolean = True
     Const WHITE As Integer = 1
     Const BLACK As Integer = -1
@@ -2122,6 +2123,34 @@ Public Class Form1
         Public Function GetZobristHash() As ULong
             Return CurrentHash
         End Function
+        Private Function ClassUp(ByVal unit As Integer) As Integer
+            Dim unit_up = unit
+            Select Case unit
+                Case 1, 2, 3, 4
+                    unit_up = unit + 8
+                Case 6, 7
+                    unit_up = unit + 7
+                Case 15, 16, 17, 18
+                    unit_up = unit + 8
+                Case 20, 21
+                    unit_up = unit + 7
+            End Select
+            Return unit_up
+        End Function
+        Private Function ClassDown(ByVal kind As Integer) As Integer
+            Dim unit As Integer = kind
+            Select Case unit
+                Case 9, 10, 11, 12
+                    unit = unit - 8
+                Case 13, 14
+                    unit = unit - 7
+                Case 23, 24, 25, 26
+                    unit = unit - 8
+                Case 27, 28
+                    unit = unit - 7
+            End Select
+            Return unit
+        End Function
 
         ' 指し手を適用（ハッシュを増分更新）
         Public Sub MakeMove(move As MoveData)
@@ -2135,7 +2164,7 @@ Public Class Form1
             ' 1. 移動元を空に
             CurrentHash = CurrentHash Xor _Zobrist.Table(fromSquare, pieceType, player)
             ' 2. 移動先に駒を配置（成り考慮）
-            Dim newPieceType As Integer = If(move.classup, pieceType + 7, pieceType) ' 例：歩(1)→と金(8)
+            Dim newPieceType As Integer = If(move.classup, ClassUp(pieceType), pieceType) ' 例：歩(1)→と金(8)
             CurrentHash = CurrentHash Xor _Zobrist.Table(toSquare, newPieceType, player)
             ' 3. 駒を取った場合
             If captured <> 0 Then
@@ -2143,7 +2172,7 @@ Public Class Form1
                 Dim capturedPlayer As Integer = If(captured <> BLANK, 0, 1)
                 CurrentHash = CurrentHash Xor _Zobrist.Table(toSquare, capturedType, capturedPlayer)
                 ' 持ち駒に追加
-                Dim handPiece As Integer = If(capturedType > 7, capturedType - 7, capturedType) ' 例：と金(8)→歩(1)
+                Dim handPiece As Integer = If(capturedType > 7, ClassDown(capturedType), capturedType) ' 例：と金(8)→歩(1)
                 Dim oldCount As Integer = Hand(handPiece, player)
                 CurrentHash = CurrentHash Xor _Zobrist.Hand(handPiece, player, oldCount)
                 Hand(handPiece, player) += 1
@@ -2155,7 +2184,7 @@ Public Class Form1
             CurrentHash = CurrentHash Xor _Zobrist.Turn(TurnPlayer)
 
             ' 盤面更新
-            Board(toSquare) = If(move.classup, pieceType + 7, piece)
+            Board(toSquare) = If(move.classup, ClassUp(pieceType), piece)
             Board(fromSquare) = 0
         End Sub
 
@@ -2179,7 +2208,7 @@ Public Class Form1
                 CurrentHash = CurrentHash Xor _Zobrist.Table(toSquare, pieceType, player)
                 CurrentHash = CurrentHash Xor _Zobrist.Table(toSquare, capturedType, capturedPlayer)
                 ' 持ち駒を減らす
-                Dim handPiece As Integer = If(capturedType > 7, capturedType - 7, capturedType)
+                Dim handPiece As Integer = If(capturedType > 7, ClassDown(capturedType), capturedType)
                 Dim oldCount As Integer = Hand(handPiece, player)
                 CurrentHash = CurrentHash Xor _Zobrist.Hand(handPiece, player, oldCount)
                 Hand(handPiece, player) -= 1
@@ -2188,7 +2217,7 @@ Public Class Form1
                 CurrentHash = CurrentHash Xor _Zobrist.Table(toSquare, pieceType, player)
             End If
             ' 3. 移動元に駒を戻す
-            Dim origPieceType As Integer = If(move.classup, pieceType - 7, pieceType)
+            Dim origPieceType As Integer = If(move.classup, ClassDown(pieceType), pieceType)
             CurrentHash = CurrentHash Xor _Zobrist.Table(fromSquare, origPieceType, player)
 
             ' 盤面復元
@@ -2210,21 +2239,19 @@ Public Class Form1
         Dim hash As ULong = position.GetZobristHash()
         Dim ttEntry As TranspositionTableEntry = tt.Lookup(hash)
         Dim ttMove As MoveData = Nothing
-        If False Then
-            If ttEntry IsNot Nothing AndAlso ttEntry.Depth >= depth Then
-                ttMove = ttEntry.BestMove
-                ' 評価値が使える場合、探索をスキップ
-                If ttEntry.NodeType = 0 Then ' Exact
-                    Return ttEntry.Score
-                ElseIf ttEntry.NodeType = 1 AndAlso ttEntry.Score <= alpha Then ' Upper
-                    Return alpha
-                ElseIf ttEntry.NodeType = 2 AndAlso ttEntry.Score >= beta Then ' Lower
-                    Return beta
-                End If
+        If USE_HASH And ttEntry IsNot Nothing AndAlso ttEntry.Depth >= depth Then
+            ttMove = ttEntry.BestMove
+            ' 評価値が使える場合、探索をスキップ
+            If ttEntry.NodeType = 0 Then ' Exact
+                Return ttEntry.Score
+            ElseIf ttEntry.NodeType = 1 AndAlso ttEntry.Score <= alpha Then ' Upper
+                Return alpha
+            ElseIf ttEntry.NodeType = 2 AndAlso ttEntry.Score >= beta Then ' Lower
+                Return beta
             End If
         End If
         Dim last As Integer = GenerateMoves(first, wb, depth)
-        If False Then
+        If USE_HASH Then
             ' 指し手オーダリング
             OrderMoves(Node.GetRange(first, last - first), ttMove)
         End If
@@ -2248,7 +2275,7 @@ Public Class Form1
                 Exit For
             End If
         Next
-        If False Then
+        If USE_HASH Then
             ' 置換表に保存
             Dim nodeType As Integer = If(BestScore <= alpha, 1, If(BestScore >= beta, 2, 0))
             tt.Store(hash, depth, BestScore, best, nodeType)
@@ -2917,6 +2944,7 @@ SET_BOARD:
         DispSum("ClassDown:SetBoard:Before")
         Return SetBoard(from, dst, id)
     End Function
+
 
     Private Function ClassDown(ByVal kind As Integer) As Integer
         Dim unit As Integer = kind
