@@ -17,7 +17,7 @@ Public Class Form1
     Const DEBUG_LOG As Boolean = False
     Const RETURN_LOG As Boolean = False
     Const DEBUG_TIME As Boolean = False
-    Const ROBO_TEBAN As Integer = BLACK
+    Const ROBO_TEBAN As Integer = WHITE
     Const BLANK As Integer = 255
     Const DUMMY_ID As Integer = 128
     Const BRANCH_WIDTH As Integer = 600
@@ -3820,7 +3820,7 @@ SET_BOARD:
         TakeHand(22)
     End Sub
     Private Sub ButtonRobo_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles ButtonRobo.Click
-        RobotMove(-1)
+        RobotMove(ROBO_TEBAN)
     End Sub
 
     Private Sub Button82_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button82.Click

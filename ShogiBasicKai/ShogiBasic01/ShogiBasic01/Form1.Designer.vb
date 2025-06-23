@@ -1504,7 +1504,6 @@ Partial Class Form1
         Me.ButtonRobo.TabIndex = 103
         Me.ButtonRobo.Text = "Robo"
         Me.ButtonRobo.UseVisualStyleBackColor = False
-        Me.ButtonRobo.Visible = False
         '
         'TextBox3
         '
