@@ -1032,9 +1032,9 @@ Public Class Form1
         Public Function GetBoardString(ByVal bd As Array) As String
             _old_board = bd
             _retstring = ""
-            'For i = 0 To 80
-            '_retstring += _board(i).ToString() + ","
-            'Next
+            For i = 0 To 80
+                _retstring += bd(i).ToString() + ","
+            Next
             'For i = 0 To 7
             '_retstring += _tegomaw(i).ToString() + ","
             'Next
@@ -2334,10 +2334,15 @@ Public Class Form1
         End If
         Return idx
     End Function
+    Private HashCount As Dictionary(Of String, Integer)
     Private Sub RobotMove(ByVal wb As Integer)
         If ROBOT_MOVE = False Then
             Exit Sub
         End If
+        If modosi.Count = 0 Then
+            HashCount = New Dictionary(Of String, Integer)
+        End If
+        Dim hash As String
         Dim c As Integer
         Dim from As Integer
         Dim _to As Integer
@@ -2360,8 +2365,15 @@ Public Class Form1
         Else
             ret = alphabeta(position, 0, wb, YOMI_DEPTH, nodemin, nodemax, tt)
             Dim s2 As String = best.GetMoveDataString()
-            If False Then
-                _JyosekiDictionary.Add(s, s2)
+            If True Then
+                If Not _JyosekiDictionary.ContainsKey(s) Then
+                    _JyosekiDictionary.Add(s, s2)
+                End If
+                For Each key In _JyosekiDictionary.Keys
+                    If key = s Then
+                        hash = key.GetHashCode()
+                    End If
+                Next
             End If
         End If
         If RETURN_LOG Then
@@ -2369,9 +2381,27 @@ Public Class Form1
         End If
         robomode = True
         ResumeLayout()
+        Dim s4 As String = best.GetMoveDataString()
+        Dim s3 As String = s
+        Dim BoardLoop As Boolean = False
+        If HashCount.ContainsKey(s3) Then
+            Dim count = HashCount(s3)
+            HashCount(s3) += 1
+            If HashCount(s3) >= 4 Then
+                BoardLoop = True
+            End If
+        Else
+            HashCount.Add(s3, 0)
+        End If
+        If BoardLoop Then
+            ListBox1.Items.Add("▽千日手")
+            ListBox1.TopIndex = ListBox1.Items.Count - 1
+            robomode = False
+        End If
         If BestScore <= -FINISH_SCORE Then
             ListBox1.Items.Add("▽投了")
             ListBox1.TopIndex = ListBox1.Items.Count - 1
+            robomode = False
         ElseIf best.hand = BLANK Then
             from = best.from
             _to = best._to
@@ -2388,6 +2418,7 @@ Public Class Form1
         If BestScore >= FINISH_SCORE Then
             ListBox1.Items.Add("▲詰み")
             ListBox1.TopIndex = ListBox1.Items.Count - 1
+            robomode = False
         End If
     End Sub
     Private Sub UnitClick(ByVal locate As Integer)
