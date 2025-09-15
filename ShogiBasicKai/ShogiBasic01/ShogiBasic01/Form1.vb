@@ -1047,6 +1047,7 @@ Public Class Form1
     Public _b As ShogiBoard = New ShogiBoard()
     Public _JyosekiDictionary As Dictionary(Of String, String) = New Dictionary(Of String, String)
     Private Sub Init() Handles Me.HandleCreated
+        HashCount = New Dictionary(Of String, Integer)
         Piece = New List(Of PieceID)
         Node = New List(Of MoveData)
         For n = 0 To (BRANCH_WIDTH * (YOMI_DEPTH + 1)) Step 1
@@ -1426,7 +1427,7 @@ Public Class Form1
         End If
     End Function
 
-    Public Sub OrderMoves(moves As List(Of MoveData), ttMove As MoveData)
+    Public Function OrderMoves(ByRef moves As List(Of MoveData), ttMove As MoveData) As List(Of MoveData)
         Dim Move As MoveData
         For Each Move In moves
             ' ハッシュムーブ
@@ -1450,7 +1451,8 @@ Public Class Form1
         Next
         ' スコアで降順ソート
         moves.Sort(Function(a, b) b.score.CompareTo(a.score))
-    End Sub
+        Return moves
+    End Function
 
     Private Function GetPieceValue(piece As Integer) As Integer
         Return KomaScore(piece)
@@ -2252,7 +2254,9 @@ Public Class Form1
         End If
         Dim last As Integer = GenerateMoves(first, wb, depth)
         ' 指し手オーダリング
-        OrderMoves(Node.GetRange(first, last - first), ttMove)
+        Dim SortedNode As List(Of MoveData) = OrderMoves(Node.GetRange(first, last - first), ttMove)
+        Node.RemoveRange(first, last - first)
+        Node.InsertRange(first, SortedNode)
         For i = first To last - 1 Step 1
             MakeMove(Node(i), False)
             Dim a = -alphabeta(position, last, -wb, depth - 1, -beta, -alpha, tt)
@@ -2338,9 +2342,6 @@ Public Class Form1
     Private Sub RobotMove(ByVal wb As Integer)
         If ROBOT_MOVE = False Then
             Exit Sub
-        End If
-        If modosi.Count = 0 Then
-            HashCount = New Dictionary(Of String, Integer)
         End If
         Dim hash As String
         Dim c As Integer
