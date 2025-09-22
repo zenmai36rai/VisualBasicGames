@@ -1544,7 +1544,6 @@ Partial Class Form1
         Me.RichTextBox1.Size = New System.Drawing.Size(266, 349)
         Me.RichTextBox1.TabIndex = 107
         Me.RichTextBox1.Text = ""
-        Me.RichTextBox1.Visible = False
         Me.RichTextBox1.WordWrap = False
         '
         'Button83
@@ -1555,7 +1554,6 @@ Partial Class Form1
         Me.Button83.TabIndex = 108
         Me.Button83.Text = "Button83"
         Me.Button83.UseVisualStyleBackColor = True
-        Me.Button83.Visible = False
         '
         'Button84
         '
@@ -1565,7 +1563,6 @@ Partial Class Form1
         Me.Button84.TabIndex = 109
         Me.Button84.Text = "Button84"
         Me.Button84.UseVisualStyleBackColor = True
-        Me.Button84.Visible = False
         '
         'Button85
         '
@@ -1595,14 +1592,13 @@ Partial Class Form1
         Me.Button87.TabIndex = 112
         Me.Button87.Text = "Button87"
         Me.Button87.UseVisualStyleBackColor = True
-        Me.Button87.Visible = False
         '
         'Form1
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 12.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.BackColor = System.Drawing.Color.DarkGreen
-        Me.ClientSize = New System.Drawing.Size(624, 416)
+        Me.ClientSize = New System.Drawing.Size(908, 412)
         Me.Controls.Add(Me.Button87)
         Me.Controls.Add(Me.Button86)
         Me.Controls.Add(Me.Button85)

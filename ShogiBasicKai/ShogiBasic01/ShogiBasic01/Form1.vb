@@ -16,6 +16,7 @@ Public Class Form1
     Const NIRAMI_READ As Boolean = True
     Const DEBUG_LOG As Boolean = False
     Const RETURN_LOG As Boolean = False
+    Const BOARD_LOG As Boolean = False
     Const DEBUG_TIME As Boolean = False
     Const ROBO_TEBAN As Integer = WHITE
     Const BLANK As Integer = 255
@@ -2232,6 +2233,9 @@ Public Class Form1
         'Dim h As Integer = Hyouka() * wb
         Dim h As Integer = (currentEval / 200) * wb
         If depth = 0 Then
+            If BOARD_LOG Then
+                UpdateTextBox(_b.GetBoardString(board))
+            End If
             Return h
         End If
         If Math.Abs(h) >= FINISH_SCORE Then
